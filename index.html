@@ -3,140 +3,394 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f5c4a">
-<title>Leitor de Cupom Fiscal - PR</title>
+<meta name="theme-color" content="#0f766e">
+<title>Leitor de Cupom Fiscal</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-:root{--bg:#f0f4f3;--card:#fff;--text:#1a2a26;--green:#0f5c4a;--border:#e2e8e6;--red:#b42318}
-*{box-sizing:border-box;font-family:system-ui,sans-serif}body{margin:0;background:var(--bg);color:var(--text)}
-header{background:var(--green);color:#fff;padding:20px 16px;text-align:center}
-.wrap{max-width:720px;margin:0 auto;padding:14px}
-.card{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 4px 16px rgba(0,0,0,.06);border:1px solid var(--border)}
-.btn{width:100%;background:var(--green);color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;cursor:pointer}
-.btn-sec{background:#fff;color:var(--green);border:2px solid var(--green)}
-#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:12px}
-input{width:100%;padding:12px;border:1px solid #d0d8d5;border-radius:10px;margin-top:8px}
-.prod{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--border)}
-.total{display:flex;justify-content:space-between;font-weight:800;font-size:18px;padding-top:12px;margin-top:8px;border-top:2px solid var(--text)}
-.err{color:var(--red);background:#fef0ef;padding:12px;border-radius:10px;font-size:13px;line-height:1.5;word-break:break-word}
+  :root {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #0f766e;
+    --primary-dark: #115e59;
+    --border: #e5e7eb;
+    --danger: #b91c1c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111827;
+      --card: #1f2937;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #374151;
+      --danger: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.4;
+  }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+    text-align: center;
+  }
+  header h1 { margin: 0; font-size: 1.25rem; }
+  header p { margin: 4px 0 0; font-size: .85rem; opacity: .85; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  #reader { width: 100%; border-radius: 8px; overflow: hidden; }
+  #reader video { border-radius: 8px; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  button {
+    flex: 1 1 140px;
+    min-height: 48px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+  }
+  button:active { background: var(--primary-dark); }
+  button.secondary { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+  button:disabled { opacity: .5; cursor: default; }
+  details summary { cursor: pointer; color: var(--muted); font-size: .9rem; margin-top: 12px; }
+  .manual { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .manual input {
+    flex: 1 1 200px;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--text);
+  }
+  #status { font-size: .9rem; color: var(--muted); margin: 0 0 12px; word-break: break-all; }
+  #status.error { color: var(--danger); }
+  .spinner {
+    display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px;
+    border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .nota-head { text-align: center; margin-bottom: 12px; }
+  .store { font-weight: 700; color: var(--primary); font-size: 1.05rem; margin: 0 0 4px; text-transform: uppercase; }
+  .store-info { font-size: .8rem; margin: 0; }
+  .filter {
+    width: 100%; min-height: 40px; padding: 8px 10px 8px 34px; margin-bottom: 10px;
+    border: 1px solid var(--border); border-radius: 6px; font-size: .95rem;
+    background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E") no-repeat 10px center;
+    color: var(--text);
+  }
+  ul.items { list-style: none; margin: 0 -16px; padding: 0; }
+  ul.items li { padding: 10px 16px; border-top: 1px solid var(--border); }
+  ul.items li:nth-child(odd) { background: rgba(127, 127, 127, .08); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .row + .row { margin-top: 8px; }
+  .item-name { color: var(--primary); font-size: 1.05rem; text-transform: uppercase; word-break: break-word; }
+  .item-code { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+  .label-total { color: var(--primary); white-space: nowrap; }
+  .item-meta { font-size: .85rem; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .item-meta b { font-weight: 700; }
+  .item-total { color: var(--primary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .empty { text-align: center; color: var(--muted); padding: 16px 0; }
+  .summary {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 2px solid var(--text); margin-top: 8px; padding-top: 12px;
+    font-size: 1.15rem; font-weight: 700;
+  }
+  .summary small { font-weight: 400; color: var(--muted); font-size: .85rem; display: block; }
+  a { color: var(--primary); }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
-<header><h1>Leitor de Cupom Fiscal</h1><p style="margin:6px 0 0;opacity:.9;font-size:14px">Escaneie o QR Code da NFC-e</p></header>
-<div class="wrap">
-<div class="card">
-<button class="btn" id="btnScan">📷 Escanear QR Code</button>
-<div id="reader" style="display:none"></div>
-<details style="margin-top:12px"><summary style="cursor:pointer;color:#0f5c4a;font-weight:700">▶ Colar URL manualmente</summary>
-<input id="urlInput" placeholder="https://www.fazenda.pr.gov.br/nfce/qrcode...">
-<button class="btn btn-sec" style="margin-top:8px" id="btnManual">Buscar nota</button>
-</details>
-</div>
-<div class="card" id="result" style="display:none"></div>
-</div>
+<header>
+  <h1>Leitor de Cupom Fiscal</h1>
+  <p>Escaneie o QR Code da NFC-e para ver os produtos</p>
+</header>
+
+<main>
+  <section class="card" id="scanCard">
+    <div id="reader"></div>
+    <div class="btns">
+      <button id="btnStart">📷 Escanear QR Code</button>
+      <button id="btnStop" class="secondary hidden">Parar câmera</button>
+    </div>
+    <details>
+      <summary>Colar URL manualmente</summary>
+      <div class="manual">
+        <input id="manualUrl" type="url" placeholder="https://...sefaz...">
+        <button id="btnManual" class="secondary">Buscar</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="card hidden" id="resultCard">
+    <p id="status"></p>
+    <div id="result"></div>
+  </section>
+</main>
+
 <script>
-const $=s=>document.querySelector(s);
-const resultEl=$('#result');
-function show(html){resultEl.style.display='block';resultEl.innerHTML=html; window.scrollTo({top:resultEl.offsetTop-20,behavior:'smooth'});}
-let lastUrl='';
-async function fetchViaProxy(target){
-  const proxies=[
-    url=>`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    url=>`https://corsproxy.io/?${encodeURIComponent(url)}`,
-    url=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-    url=>`https://thingproxy.freeboard.io/fetch/${url}`,
-    url=>`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+  // Proxies CORS tentados em ordem; se um falhar, passa para o próximo
+  const PROXIES = [
+    { name: 'allorigins', build: (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
+    { name: 'allorigins (json)', build: (u) => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true },
+    { name: 'codetabs', build: (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
+    { name: 'corsproxy.io', build: (u) => 'https://corsproxy.io/?url=' + encodeURIComponent(u) }
   ];
-  let erros=[];
-  for(let i=0;i<proxies.length;i++){
-    const pUrl=proxies[i](target);
-    try{
-      show(`<div>🔍 Buscando na SEFAZ... tentativa ${i+1}/${proxies.length}<br><small>${target}</small></div>`);
-      const ctrl=new AbortController();
-      const to=setTimeout(()=>ctrl.abort(),12000);
-      const res=await fetch(pUrl,{signal:ctrl.signal});
-      clearTimeout(to);
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      let txt='';
-      if(pUrl.includes('/get?')){
-        const j=await res.json();
-        txt=j.contents||'';
-      }else txt=await res.text();
-      if(!txt || txt.length<300) throw new Error('resposta vazia');
-      return txt;
-    }catch(e){erros.push(`proxy${i}: ${e.message}`);}
+  const TIMEOUT_MS = 15000;
+
+  const $ = (id) => document.getElementById(id);
+  const btnStart = $('btnStart');
+  const btnStop = $('btnStop');
+  const resultCard = $('resultCard');
+  const statusEl = $('status');
+  const resultEl = $('result');
+
+  let scanner = null;
+  let busy = false;
+
+  // ---------- Helpers ----------
+  const brl = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  function toNumber(str) {
+    if (!str) return NaN;
+    const m = String(str).replace(/\s/g, '').match(/-?[\d.]*,?\d+/);
+    if (!m) return NaN;
+    return parseFloat(m[0].replace(/\./g, '').replace(',', '.'));
   }
-  throw new Error(erros.join(' | '));
-}
-function parseNota(htmlText){
-  const doc=new DOMParser().parseFromString(htmlText,'text/html');
-  const getText=s=>{ const el=doc.querySelector(s); return el?el.innerText.trim():''; };
-  let produtos=[];
-  doc.querySelectorAll('#tabResult tr').forEach(tr=>{
-    const nomeSpan=tr.querySelector('.txtTit');
-    if(!nomeSpan) return;
-    const nome=nomeSpan.innerText.trim();
-    if(!nome || nome.toLowerCase().includes('descri')) return;
-    const qtd=tr.querySelector('.Rqtd')?.innerText|| tr.querySelectorAll('td')[1]?.innerText||'1';
-    const un=tr.querySelector('.RUN')?.innerText?.replace(/UN:?/i,'').trim()||'';
-    const vlTotal=tr.querySelector('.valor')?.innerText||'';
-    produtos.push({nome,qtd,un,valor:vlTotal});
-  });
-  if(produtos.length===0){
-    doc.querySelectorAll('tr').forEach(tr=>{
-      const tds=tr.querySelectorAll('td');
-      if(tds.length>=4){
-        const nome=tds[0]?.innerText?.trim();
-        if(!nome||nome.length<3||nome.length>120) return;
-        if(nome.toLowerCase().includes('descri')) return;
-        produtos.push({nome,qtd:tds[1].innerText.trim(),un:tds[2].innerText.trim(),valor:tds[3].innerText.trim()});
+
+  function clean(str) {
+    return (str || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function setStatus(msg, { loading = false, error = false } = {}) {
+    resultCard.classList.remove('hidden');
+    statusEl.className = error ? 'error' : '';
+    statusEl.innerHTML = (loading ? '<span class="spinner"></span>' : '') + msg;
+  }
+
+  // ---------- Câmera ----------
+  async function startScanner() {
+    if (!scanner) scanner = new Html5Qrcode('reader');
+    btnStart.disabled = true;
+    try {
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.75); return { width: s, height: s }; } },
+        onScanSuccess,
+        () => {}
+      );
+      btnStart.classList.add('hidden');
+      btnStop.classList.remove('hidden');
+    } catch (err) {
+      setStatus('Não foi possível abrir a câmera: ' + escapeHtml(err?.message || err) +
+        '<br>Obs.: a câmera só funciona em HTTPS ou localhost.', { error: true });
+    } finally {
+      btnStart.disabled = false;
+    }
+  }
+
+  async function stopScanner() {
+    if (scanner && scanner.isScanning) {
+      try { await scanner.stop(); } catch (_) {}
+    }
+    btnStop.classList.add('hidden');
+    btnStart.classList.remove('hidden');
+  }
+
+  async function onScanSuccess(text) {
+    if (busy) return;
+    busy = true;
+    if (navigator.vibrate) navigator.vibrate(100);
+    await stopScanner();
+    await processUrl(text.trim());
+    busy = false;
+  }
+
+  // ---------- Busca + parse ----------
+  async function fetchWithTimeout(url) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    try {
+      return await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function fetchViaProxies(url) {
+    const errors = [];
+    for (let i = 0; i < PROXIES.length; i++) {
+      const p = PROXIES[i];
+      setStatus('Buscando nota na SEFAZ... (' + (i + 1) + '/' + PROXIES.length + ': ' + p.name + ')', { loading: true });
+      try {
+        const res = await fetchWithTimeout(p.build(url));
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const html = p.json ? (await res.json()).contents : await res.text();
+        if (!html || html.length < 200) throw new Error('resposta vazia');
+        return html;
+      } catch (err) {
+        errors.push(p.name + ': ' + (err.name === 'AbortError' ? 'tempo esgotado' : err.message));
       }
-    });
+    }
+    throw new Error('Nenhum proxy respondeu.<br><small>' + errors.map(escapeHtml).join('<br>') + '</small>');
   }
-  let total='';
-  const totalEl=doc.querySelector('#totalNota .totalNumb.txtMax')||doc.querySelector('#linhaTotal .totalNumb');
-  if(totalEl) total=totalEl.innerText.trim();
-  else{
-    const m=(doc.body.innerText||'').match(/Valor a pagar[^\d]*R\$\s*([\d.,]+)/i);
-    if(m) total=m[1];
-  }
-  const loja=getText('#u20')||getText('.txtTopo')||'';
-  return {produtos,total,loja};
-}
-async function buscarNota(url){
-  lastUrl=url;
-  show(`<div>🔍 Buscando nota na SEFAZ PR...<br><small style="color:#666">${url}</small></div>`);
-  try{
-    const html=await fetchViaProxy(url);
-    const dados=parseNota(html);
-    if(dados.produtos.length===0){
-      show(`<div class=err>Consegui acessar mas nao achei produtos.<br><br><a href="${url}" target=_blank>Abrir nota original</a><br><br><button class="btn btn-sec" onclick="buscarNota(lastUrl)">Tentar novamente</button></div>`);
+
+  async function processUrl(url) {
+    resultEl.innerHTML = '';
+    if (!/^https?:\/\//i.test(url)) {
+      setStatus('O QR Code lido não contém uma URL válida:<br><code>' + escapeHtml(url) + '</code>', { error: true });
       return;
     }
-    let h='';
-    if(dados.loja) h+=`<div style="font-weight:800;margin-bottom:12px">${dados.loja}</div>`;
-    dados.produtos.forEach(p=>{
-      h+=`<div class=prod><div style="flex:1;padding-right:10px"><b>${p.nome}</b><br><small>${p.qtd} ${p.un}</small></div><div><b>${p.valor?('R$ '+p.valor):''}</b></div></div>`;
-    });
-    if(dados.total) h+=`<div class=total><span>Total</span><span>R$ ${dados.total}</span></div>`;
-    h+=`<div style="margin-top:16px"><a href="${url}" target=_blank style="color:#0f5c4a;font-weight:700">Abrir nota original</a></div>`;
-    show(h);
-  }catch(e){
-    show(`<div class=err><b>Erro ao buscar a nota:</b><br>${e.message}<br><br>Clique em Tentar novamente, na 2a vez geralmente vai.<br><br><button class="btn btn-sec" onclick="buscarNota(lastUrl)">Tentar novamente</button><br><br><a href="${url}" target=_blank style="color:#0f5c4a;font-weight:700">Abrir nota original</a></div>`);
+    try {
+      const html = await fetchViaProxies(url);
+      const data = parseNota(html);
+
+      if (!data.items.length) {
+        setStatus('Não encontrei produtos na resposta da SEFAZ. O layout desse estado pode ser diferente ou a consulta pode exigir captcha. ' +
+          '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Abrir nota original</a>', { error: true });
+        return;
+      }
+      setStatus('<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Ver nota original na SEFAZ</a>');
+      renderNota(data);
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      setStatus('Erro ao buscar a nota: ' + err.message +
+        '<br><button class="secondary" id="btnRetry" style="margin:8px 0">Tentar novamente</button><br>' +
+        '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Abrir nota original</a>', { error: true });
+      $('btnRetry').addEventListener('click', () => processUrl(url));
+    }
   }
-}
-$('#btnManual').onclick=()=>{const u=$('#urlInput').value.trim(); if(!u){alert('Cole a URL');return;} buscarNota(u);};
-let qr=null;
-$('#btnScan').onclick=async()=>{
-  const rEl=$('#reader'); rEl.style.display='block';
-  if(qr){try{await qr.stop();}catch{}}
-  qr=new Html5Qrcode("reader");
-  try{
-    await qr.start({facingMode:"environment"},{fps:10,qrbox:250},(decoded)=>{qr.stop(); rEl.style.display='none'; $('#urlInput').value=decoded; buscarNota(decoded);},()=>{});
-    $('#btnScan').textContent='Parar camera';
-  }catch(err){alert('Erro na camera: '+err.message);}
-};
-window.buscarNota=buscarNota;
+
+  function parseNota(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const text = (sel, root = doc) => clean(root.querySelector(sel)?.textContent);
+
+    const data = {
+      store: text('#u20') || text('.txtTopo'),
+      storeInfo: Array.from(doc.querySelectorAll('.txtCenter .text')).map(e => clean(e.textContent)).filter(Boolean),
+      items: [],
+      total: NaN
+    };
+
+    // Layout padrão nacional da NFC-e (SP, BA, PR, RS, GO, etc.)
+    let rows = doc.querySelectorAll('#tabResult tr');
+    if (!rows.length) rows = Array.from(doc.querySelectorAll('tr')).filter(tr => tr.querySelector('.txtTit'));
+
+    rows.forEach(tr => {
+      const name = text('.txtTit', tr) || text('.txtTit2', tr);
+      if (!name) return;
+      const code = (text('.RCod', tr).match(/\d+/) || [''])[0];
+      const qtd = toNumber(text('.Rqtd', tr).replace(/qtde\.?:?/i, ''));
+      const un = clean(text('.RUN', tr).replace(/un:?/i, ''));
+      const unit = toNumber(text('.RvlUnit', tr).replace(/vl\.?\s*unit\.?:?/i, ''));
+      let total = toNumber(text('.valor', tr));
+      if (isNaN(total) && !isNaN(qtd) && !isNaN(unit)) total = qtd * unit;
+      data.items.push({ name, code, qtd, un, unit, total });
+    });
+
+    // Fallback genérico: tabelas com colunas descrição/qtd/valor
+    if (!data.items.length) {
+      doc.querySelectorAll('table tr').forEach(tr => {
+        const cells = Array.from(tr.querySelectorAll('td')).map(td => clean(td.textContent));
+        if (cells.length < 3) return;
+        const nums = cells.map(toNumber);
+        const name = cells.find((c, i) => isNaN(nums[i]) && c.length > 2);
+        const numeric = nums.filter(n => !isNaN(n));
+        if (!name || numeric.length < 2) return;
+        data.items.push({ name, code: '', qtd: numeric[0], un: '', unit: NaN, total: numeric[numeric.length - 1] });
+      });
+    }
+
+    // Total da nota
+    const totalEl = Array.from(doc.querySelectorAll('#totalNota #linhaTotal')).find(l => /valor a pagar/i.test(l.textContent))
+      || doc.querySelector('#totalNota .totalNumb.txtMax');
+    data.total = toNumber(totalEl ? (totalEl.querySelector('.totalNumb')?.textContent || totalEl.textContent) : '');
+    if (isNaN(data.total)) data.total = data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+
+    return data;
+  }
+
+  function renderNota(data) {
+    const fmtQtd = (q) => isNaN(q) ? '' : q.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
+    const sumItems = data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+
+    const fmtNum = (n) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    let html = '<div class="nota-head">';
+    if (data.store) html += '<p class="store">' + escapeHtml(data.store) + '</p>';
+    data.storeInfo.forEach(line => { html += '<p class="store-info">' + escapeHtml(line) + '</p>'; });
+    html += '</div>';
+
+    html += '<input type="search" class="filter" id="filterItems" placeholder="Filtrar itens...">';
+    html += '<ul class="items" id="itemList">';
+    data.items.forEach(i => {
+      const meta = [];
+      if (!isNaN(i.qtd)) meta.push('<span><b>Qtde.:</b> ' + fmtQtd(i.qtd) + '</span>');
+      if (i.un) meta.push('<span><b>UN:</b> ' + escapeHtml(i.un) + '</span>');
+      if (!isNaN(i.unit)) meta.push('<span><b>Unidade Vl.:</b> ' + fmtNum(i.unit) + '</span>');
+      const search = (i.name + ' ' + i.code).toLowerCase();
+      html += '<li data-search="' + escapeHtml(search) + '">' +
+        '<div class="row"><div><span class="item-name">' + escapeHtml(i.name) + '</span>' +
+        (i.code ? ' <span class="item-code">(Código: ' + escapeHtml(i.code) + ')</span>' : '') + '</div>' +
+        '<span class="label-total">Total Vl.</span></div>' +
+        '<div class="row"><div class="item-meta">' + meta.join('') + '</div>' +
+        '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div></li>';
+    });
+    html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
+
+    html += '<div class="summary"><div>Total<small>' + data.items.length + ' ' +
+      (data.items.length === 1 ? 'item' : 'itens') +
+      (Math.abs(sumItems - data.total) > 0.009 ? ' · soma dos itens ' + brl(sumItems) : '') +
+      '</small></div><div>' + brl(data.total) + '</div></div>';
+
+    resultEl.innerHTML = html;
+
+    $('filterItems').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      let visible = 0;
+      $('itemList').querySelectorAll('li').forEach(li => {
+        const show = !q || li.dataset.search.includes(q);
+        li.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      $('noItems').classList.toggle('hidden', visible > 0);
+    });
+  }
+
+  // ---------- Eventos ----------
+  btnStart.addEventListener('click', startScanner);
+  btnStop.addEventListener('click', stopScanner);
+  $('btnManual').addEventListener('click', () => {
+    const url = $('manualUrl').value.trim();
+    if (url) processUrl(url);
+  });
+  $('manualUrl').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('btnManual').click();
+  });
 </script>
 </body>
 </html>
