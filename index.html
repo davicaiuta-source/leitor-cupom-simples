@@ -323,8 +323,12 @@
 </div>
 
 <script>
+  // URL do seu proxy no Cloudflare Workers (ver worker.js). Ex.: 'https://nota-proxy.seunome.workers.dev'
+  const WORKER_URL = 'https://dry-base-52b4.davi-caiuta.workers.dev';
+
   // Proxies CORS tentados em ordem; se um falhar, passa para o próximo
   const PROXIES = [
+    ...(WORKER_URL ? [{ name: 'proxy próprio', build: (u) => WORKER_URL.replace(/\/$/, '') + '/?url=' + encodeURIComponent(u) }] : []),
     { name: 'allorigins', build: (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
     { name: 'allorigins (json)', build: (u) => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true },
     { name: 'codetabs', build: (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) }
@@ -499,6 +503,13 @@
     }
   }
 
+  // Algumas SEFAZ respondem em ISO-8859-1; res.text() sempre decodifica como UTF-8
+  async function decodeBody(res) {
+    const buf = await res.arrayBuffer();
+    const charset = ((res.headers.get('Content-Type') || '').match(/charset=([\w-]+)/i) || [])[1];
+    try { return new TextDecoder(charset || 'utf-8').decode(buf); } catch (_) { return new TextDecoder().decode(buf); }
+  }
+
   async function fetchViaProxies(url) {
     const errors = [];
     for (let i = 0; i < PROXIES.length; i++) {
@@ -507,7 +518,7 @@
       try {
         const res = await fetchWithTimeout(p.build(url));
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        const html = p.json ? (await res.json()).contents : await res.text();
+        const html = p.json ? (await res.json()).contents : await decodeBody(res);
         if (!html || html.length < 200) throw new Error('resposta vazia');
         return html;
       } catch (err) {
@@ -602,11 +613,14 @@
       const qtdM = seg.match(/Qtde?\.?\s*:?\s*([\d.,]+)/i);
       const unM = seg.match(/(?:ONU|UN)\s*:\s*([A-Za-zÀ-ú]+?)(?=\s|Vl|Unid|\d|$)/i);
       const unitPos = seg.search(/Unit|Unidade/i);
-      const nums = (unitPos >= 0 ? seg.slice(unitPos) : seg).match(MONEY) || [];
+      const afterUnit = unitPos >= 0 ? seg.slice(unitPos) : seg;
+      // valor unitário pode vir sem 2 casas ("79", "29,9"); o total vem logo depois com 2 casas
+      const unitM = afterUnit.match(/:\s*(\d[\d.]*(?:,\d+)?)/);
+      const rest = unitM ? afterUnit.slice(unitM.index + unitM[0].length) : afterUnit;
 
       const qtd = qtdM ? toNumber(qtdM[1]) : NaN;
-      const unit = toNumber(nums[0]);
-      let total = toNumber(nums[1]);
+      const unit = unitM ? toNumber(unitM[1]) : NaN;
+      let total = toNumber((rest.match(MONEY) || [])[0]);
       if (isNaN(total) && !isNaN(qtd) && !isNaN(unit)) total = qtd * unit;
       data.items.push({ name, code: m[1], qtd, un: unM ? unM[1] : '', unit, total });
     });
