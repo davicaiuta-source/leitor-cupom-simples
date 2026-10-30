@@ -328,7 +328,8 @@
 
   // Proxies CORS tentados em ordem; se um falhar, passa para o próximo
   const PROXIES = [
-    ...(WORKER_URL ? [{ name: 'proxy próprio', build: (u) => WORKER_URL.replace(/\/$/, '') + '/?url=' + encodeURIComponent(u) }] : []),
+    // formato de caminho: WORKER_URL/https://sefaz... (sem codificar a URL)
+    ...(WORKER_URL ? [{ name: 'proxy próprio', build: (u) => WORKER_URL.replace(/\/$/, '') + '/' + u }] : []),
     { name: 'allorigins', build: (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
     { name: 'allorigins (json)', build: (u) => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true },
     { name: 'codetabs', build: (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) }
