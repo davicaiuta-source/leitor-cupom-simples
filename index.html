@@ -77,8 +77,20 @@
   .scan-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
   .scan-card p.lead { margin: 0 0 8px; color: var(--muted); font-size: .9rem; }
   .illustration { display: block; width: 100%; max-width: 260px; margin: 4px auto 12px; }
-  #reader { width: 100%; border-radius: 12px; overflow: hidden; margin: 12px 0; }
-  #reader video { border-radius: 12px; }
+  .reader-wrap { position: relative; margin: 12px 0; }
+  #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 200px; }
+  #reader video { border-radius: 12px; display: block; }
+  .torch {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(0, 0, 0, .55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .torch.on { background: #facc15; color: #1a1f1c; }
+  .torch svg { width: 22px; height: 22px; stroke: currentColor; }
+  .reader-hint { margin: 8px 0 0; text-align: center; font-size: .82rem; color: var(--muted); }
+  .reader-hint.warn { color: var(--orange); font-weight: 600; }
+  .photo-btn { margin-top: 10px; }
 
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -280,12 +292,22 @@
               fill="#fff" stroke="#1a1f1c" stroke-width="3"/>
       </svg>
 
-      <div id="reader" class="hidden"></div>
+      <div class="reader-wrap hidden" id="readerWrap">
+        <div id="reader"></div>
+        <button class="torch hidden" id="btnTorch" aria-label="Lanterna">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+        </button>
+        <p class="reader-hint" id="readerHint">Centralize o QR Code no quadro e aproxime até ficar nítido.</p>
+      </div>
 
       <button class="btn" id="btnScan">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
         <span>Escanear QR Code</span>
       </button>
+      <label class="btn small ghost photo-btn">
+        <input type="file" accept="image/*" id="photoInput" hidden>
+        Ler de uma foto
+      </label>
 
       <button class="link-btn" id="btnToggleManual">
         Inserir URL manualmente
@@ -448,49 +470,143 @@
   }
 
   // ---------- Câmera ----------
+  // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
+  const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
+  let torchOn = false;
+  let hintTimer = null;
+
+  function getScanner() {
+    if (!scanner) {
+      scanner = new Html5Qrcode('reader', {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], // só QR: não perde tempo com outros formatos
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        verbose: false
+      });
+    }
+    return scanner;
+  }
+
   function setScanButton(scanning) {
     btnScan.classList.toggle('stop', scanning);
     btnScan.querySelector('span').textContent = scanning ? 'Parar câmera' : 'Escanear QR Code';
     $('illustration').classList.toggle('hidden', scanning);
-    $('reader').classList.toggle('hidden', !scanning);
+    $('readerWrap').classList.toggle('hidden', !scanning);
+  }
+
+  function setHint(msg, warn = false) {
+    const el = $('readerHint');
+    el.textContent = msg;
+    el.classList.toggle('warn', warn);
+  }
+
+  function cameraErrorMessage(err) {
+    const name = err?.name || String(err);
+    if (/NotAllowed|Permission/i.test(name)) return 'Permissão da câmera negada. Libere o acesso à câmera nas configurações do navegador e tente de novo.';
+    if (/NotFound|Overconstrained/i.test(name)) return 'Nenhuma câmera encontrada neste aparelho.';
+    if (/NotReadable|TrackStart/i.test(name)) return 'A câmera está sendo usada por outro app. Feche-o e tente de novo.';
+    if (!window.isSecureContext) return 'A câmera só funciona em HTTPS ou localhost.';
+    return 'Não foi possível abrir a câmera: ' + (err?.message || err);
   }
 
   async function startScanner() {
-    if (!scanner) scanner = new Html5Qrcode('reader');
+    const sc = getScanner();
     setScanButton(true);
+    setHint('Centralize o QR Code no quadro e aproxime até ficar nítido.');
     btnScan.disabled = true;
+
+    // Resolução alta ajuda a ler o QR pequeno do cupom; foco contínuo onde o aparelho suportar
+    const res = HAS_NATIVE_DETECTOR ? { width: { ideal: 1920 }, height: { ideal: 1080 } } : { width: { ideal: 1280 }, height: { ideal: 720 } };
+    const config = {
+      fps: HAS_NATIVE_DETECTOR ? 20 : 12,
+      qrbox: (w, h) => { const s = Math.max(180, Math.floor(Math.min(w, h) * 0.8)); return { width: s, height: s }; },
+      disableFlip: true,
+      videoConstraints: { facingMode: 'environment', ...res, advanced: [{ focusMode: 'continuous' }] }
+    };
+
     try {
-      await scanner.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.75); return { width: s, height: s }; } },
-        onScanSuccess,
-        () => {}
-      );
+      try {
+        await sc.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
+      } catch (err) {
+        // alguns aparelhos recusam as restrições avançadas: tenta de novo no modo básico
+        if (/NotAllowed|Permission/i.test(err?.name || String(err))) throw err;
+        delete config.videoConstraints;
+        await sc.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
+      }
+      setupTorch();
+      // se demorar, dá uma dica
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => {
+        if (sc.isScanning) setHint('Difícil de ler? Afaste um pouco o celular, evite reflexo, use a lanterna ou "Ler de uma foto".', true);
+      }, 8000);
     } catch (err) {
       setScanButton(false);
       resultEl.innerHTML = '';
-      setStatus('Não foi possível abrir a câmera: ' + escapeHtml(err?.message || err) +
-        '<br>Obs.: a câmera só funciona em HTTPS ou localhost.', { error: true });
+      setStatus(escapeHtml(cameraErrorMessage(err)), { error: true });
       openResultCard();
     } finally {
       btnScan.disabled = false;
     }
   }
 
+  function setupTorch() {
+    const btn = $('btnTorch');
+    torchOn = false;
+    btn.classList.remove('on');
+    let supported = false;
+    try { supported = !!scanner.getRunningTrackCapabilities().torch; } catch (_) {}
+    btn.classList.toggle('hidden', !supported);
+  }
+
+  async function toggleTorch() {
+    if (!scanner || !scanner.isScanning) return;
+    torchOn = !torchOn;
+    try {
+      await scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+    } catch (_) {
+      torchOn = !torchOn;
+    }
+    $('btnTorch').classList.toggle('on', torchOn);
+  }
+
   async function stopScanner() {
+    clearTimeout(hintTimer);
     if (scanner && scanner.isScanning) {
       try { await scanner.stop(); } catch (_) {}
     }
+    torchOn = false;
     setScanButton(false);
   }
 
   async function onScanSuccess(text) {
     if (busy) return;
+    text = (text || '').trim();
+    // QR que não é de nota fiscal: avisa e continua escaneando
+    if (!/^https?:\/\//i.test(text)) {
+      setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR da NFC-e.', true);
+      return;
+    }
     busy = true;
     if (navigator.vibrate) navigator.vibrate(100);
     await stopScanner();
-    await processUrl(text.trim());
+    await processUrl(text);
     busy = false;
+  }
+
+  // Lê o QR a partir de uma foto (câmera nativa foca melhor em cupons amassados/pequenos)
+  async function scanFromPhoto(file) {
+    if (!file) return;
+    await stopScanner();
+    resultEl.innerHTML = '';
+    setStatus('Lendo QR Code da foto...', { loading: true });
+    openResultCard();
+    try {
+      const text = (await getScanner().scanFile(file, false)).trim();
+      if (!/^https?:\/\//i.test(text)) throw new Error('não é de cupom fiscal');
+      if (navigator.vibrate) navigator.vibrate(100);
+      await processUrl(text);
+    } catch (_) {
+      setStatus('Não encontrei um QR Code de cupom nessa foto. Tire outra mais de perto, com o QR nítido e sem reflexo.', { error: true });
+    }
   }
 
   // ---------- Busca + parse ----------
@@ -743,6 +859,15 @@
   btnScan.addEventListener('click', () => {
     if (scanner && scanner.isScanning) stopScanner();
     else startScanner();
+  });
+  $('btnTorch').addEventListener('click', toggleTorch);
+  $('photoInput').addEventListener('change', (e) => {
+    scanFromPhoto(e.target.files[0]);
+    e.target.value = '';
+  });
+  // desliga a câmera quando o app vai para segundo plano (economiza bateria e libera a câmera)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopScanner();
   });
   $('btnToggleManual').addEventListener('click', () => {
     $('manualBox').classList.toggle('hidden');
