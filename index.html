@@ -87,10 +87,19 @@
     display: flex; align-items: center; justify-content: center;
   }
   .torch.on { background: #facc15; color: #1a1f1c; }
+  .torch.cam-switch { right: auto; left: 10px; }
   .torch svg { width: 22px; height: 22px; stroke: currentColor; }
   .reader-hint { margin: 8px 0 0; text-align: center; font-size: .82rem; color: var(--muted); }
   .reader-hint.warn { color: var(--orange); font-weight: 600; }
   .photo-btn { margin-top: 10px; }
+  .inapp-warn {
+    background: #fff7e6; border: 1px solid #f5c26b; border-radius: 10px;
+    padding: 12px 14px; margin: 8px 0 12px; font-size: .88rem; color: #7a4a00;
+  }
+  .inapp-warn b { color: #5c3700; }
+  .inapp-warn .btn { margin-top: 10px; }
+  .diag { display: block; margin-top: 6px; font-size: .75rem; color: var(--muted); word-break: break-all; }
+  .version { text-align: center; font-size: .72rem; color: var(--muted); margin: 8px 0 0; }
 
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -262,6 +271,13 @@
       <h2>Escaneie o QR Code</h2>
       <p class="lead">Aponte a câmera para o QR code do cupom fiscal NFC-e e valide automaticamente com a SEFAZ</p>
 
+      <div class="inapp-warn hidden" id="inAppWarn">
+        Você abriu este link <b>dentro de outro app</b> (WhatsApp, Instagram...), que pode bloquear a câmera.
+        Toque nos <b>⋮</b> ou em <b>compartilhar</b> e escolha <b>"Abrir no navegador"</b> (Chrome ou Safari).
+        Ou use o botão <b>"Ler de uma foto"</b> abaixo.
+        <button class="btn small ghost" id="btnCopyLink">Copiar link do app</button>
+      </div>
+
       <svg class="illustration" id="illustration" viewBox="0 0 260 190" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <ellipse cx="185" cy="95" rx="70" ry="60" fill="#e6efe8"/>
         <ellipse cx="70" cy="120" rx="50" ry="45" fill="#eef4ef"/>
@@ -296,6 +312,9 @@
         <div id="reader"></div>
         <button class="torch hidden" id="btnTorch" aria-label="Lanterna">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+        </button>
+        <button class="torch cam-switch hidden" id="btnCamSwitch" aria-label="Trocar câmera">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M15 12.5a3 3 0 0 0-5.2-2M9 13.5a3 3 0 0 0 5.2 2"/><path d="M9.8 8.5v2h2M14.2 17.5v-2h-2"/></svg>
         </button>
         <p class="reader-hint" id="readerHint">Centralize o QR Code no quadro e aproxime até ficar nítido.</p>
       </div>
@@ -341,6 +360,7 @@
       <ul class="history" id="historyList"></ul>
       <p class="empty-history hidden" id="historyEmpty">Nenhum cupom escaneado ainda.<br>Escaneie seu primeiro cupom acima.</p>
     </section>
+    <p class="version" id="appVersion"></p>
   </main>
 </div>
 
@@ -472,18 +492,57 @@
   // ---------- Câmera ----------
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
+  // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
+  const APP_VERSION = '2026-10-30.2';
+  // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
+  const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
+  const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  // Linha pequena com detalhes técnicos, para a pessoa mandar print quando der erro
+  function diag(extra) {
+    return '<small class="diag">' + escapeHtml(browserInfo() + (extra ? ' · ' + extra : '')) + '</small>';
+  }
+
+  function browserInfo() {
+    const ua = navigator.userAgent;
+    const os = /iPhone|iPad|iPod/i.test(ua) ? 'iOS' : /Android/i.test(ua) ? 'Android' : 'PC';
+    const br = /FBAN|FBAV|FB_IAB/i.test(ua) ? 'Facebook' : /Instagram/i.test(ua) ? 'Instagram' : /WhatsApp/i.test(ua) ? 'WhatsApp'
+      : /; wv\)/i.test(ua) ? 'WebView' : /EdgA?\//i.test(ua) ? 'Edge' : /SamsungBrowser/i.test(ua) ? 'Samsung Internet'
+      : /CriOS|Chrome/i.test(ua) ? 'Chrome' : /FxiOS|Firefox/i.test(ua) ? 'Firefox' : /Safari/i.test(ua) ? 'Safari' : 'outro';
+    return os + ' · ' + br + ' · v' + APP_VERSION;
+  }
   let torchOn = false;
   let hintTimer = null;
+  let engineTimer = null;
+  let nativeOk = false;     // BarcodeDetector existe E suporta qr_code
+  let useNative = false;    // leitor em uso agora
+  let backCameras = null;   // câmeras traseiras, para o botão "Trocar câmera"
+  let cameraIdx = -1;       // -1 = deixa o navegador escolher
 
-  function getScanner() {
-    if (!scanner) {
-      scanner = new Html5Qrcode('reader', {
-        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], // só QR: não perde tempo com outros formatos
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-        verbose: false
-      });
-    }
+  // Alguns Androids têm BarcodeDetector sem suporte a QR (módulo do Google ausente): aí ele nunca lê nada
+  const nativeCheck = (async () => {
+    if (!HAS_NATIVE_DETECTOR) return;
+    try { nativeOk = (await BarcodeDetector.getSupportedFormats()).includes('qr_code'); } catch (_) {}
+  })();
+
+  function getScanner(native) {
+    if (scanner && scanner._native === native) return scanner;
+    if (scanner) { try { scanner.clear(); } catch (_) {} }
+    scanner = new Html5Qrcode('reader', {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], // só QR: não perde tempo com outros formatos
+      experimentalFeatures: { useBarCodeDetectorIfSupported: native },
+      verbose: false
+    });
+    scanner._native = native;
     return scanner;
+  }
+
+  // Extrai a URL da NFC-e do texto lido (alguns QR vêm sem "http://")
+  function nfceUrl(text) {
+    text = (text || '').trim();
+    if (/^https?:\/\//i.test(text)) return text;
+    if (/^www\./i.test(text) || /^[\w.-]+\.gov\.br\//i.test(text)) return 'http://' + text;
+    return null;
   }
 
   function setScanButton(scanning) {
@@ -501,6 +560,7 @@
 
   function cameraErrorMessage(err) {
     const name = err?.name || String(err);
+    if (IN_APP_BROWSER || !CAMERA_API) return 'Este navegador não liberou a câmera. Abra o link no Chrome (Android) ou Safari (iPhone), ou use "Ler de uma foto".';
     if (/NotAllowed|Permission/i.test(name)) return 'Permissão da câmera negada. Libere o acesso à câmera nas configurações do navegador e tente de novo.';
     if (/NotFound|Overconstrained/i.test(name)) return 'Nenhuma câmera encontrada neste aparelho.';
     if (/NotReadable|TrackStart/i.test(name)) return 'A câmera está sendo usada por outro app. Feche-o e tente de novo.';
@@ -508,53 +568,94 @@
     return 'Não foi possível abrir a câmera: ' + (err?.message || err);
   }
 
-  async function startScanner() {
-    const sc = getScanner();
-    setScanButton(true);
-    setHint('Centralize o QR Code no quadro e aproxime até ficar nítido.');
+  async function startScanner(opts = {}) {
     btnScan.disabled = true;
+    await nativeCheck;
+    useNative = opts.native === undefined ? nativeOk : opts.native;
+    const sc = getScanner(useNative);
+    setScanButton(true);
+    if (!opts.keepHint) setHint('Centralize o QR Code no quadro e aproxime até ficar nítido.');
 
-    // Resolução alta ajuda a ler o QR pequeno do cupom; foco contínuo onde o aparelho suportar
-    const res = HAS_NATIVE_DETECTOR ? { width: { ideal: 1920 }, height: { ideal: 1080 } } : { width: { ideal: 1280 }, height: { ideal: 720 } };
+    const cam = cameraIdx >= 0 && backCameras ? { deviceId: { exact: backCameras[cameraIdx].deviceId } } : { facingMode: 'environment' };
     const config = {
-      fps: HAS_NATIVE_DETECTOR ? 20 : 12,
+      fps: useNative ? 15 : 10,
       qrbox: (w, h) => { const s = Math.max(180, Math.floor(Math.min(w, h) * 0.8)); return { width: s, height: s }; },
       disableFlip: true,
-      videoConstraints: { facingMode: 'environment', ...res, advanced: [{ focusMode: 'continuous' }] }
+      // 720p: resoluções maiores fazem alguns celulares escolherem uma lente sem foco automático
+      videoConstraints: { ...cam, width: { ideal: 1280 }, height: { ideal: 720 }, advanced: [{ focusMode: 'continuous' }] }
     };
 
     try {
       try {
-        await sc.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
+        await sc.start(cam, config, onScanSuccess, () => {});
       } catch (err) {
         // alguns aparelhos recusam as restrições avançadas: tenta de novo no modo básico
         if (/NotAllowed|Permission/i.test(err?.name || String(err))) throw err;
         delete config.videoConstraints;
-        await sc.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
+        await sc.start(cam, config, onScanSuccess, () => {});
       }
-      setupTorch();
-      // se demorar, dá uma dica
-      clearTimeout(hintTimer);
-      hintTimer = setTimeout(() => {
-        if (sc.isScanning) setHint('Difícil de ler? Afaste um pouco o celular, evite reflexo, use a lanterna ou "Ler de uma foto".', true);
-      }, 8000);
+      setupControls();
+      scheduleHelp(sc);
     } catch (err) {
       setScanButton(false);
       resultEl.innerHTML = '';
-      setStatus(escapeHtml(cameraErrorMessage(err)), { error: true });
+      setStatus(escapeHtml(cameraErrorMessage(err)) + diag(err?.name || err), { error: true });
       openResultCard();
     } finally {
       btnScan.disabled = false;
     }
   }
 
-  function setupTorch() {
+  async function restartScanner(opts) {
+    clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
+    if (scanner && scanner.isScanning) {
+      try { await scanner.stop(); } catch (_) {}
+    }
+    await startScanner(opts);
+  }
+
+  function scheduleHelp(sc) {
+    clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
+    if (useNative) {
+      // leitor nativo não leu em 6s: troca para o leitor em JS, que funciona em qualquer aparelho
+      engineTimer = setTimeout(() => {
+        if (!sc.isScanning || busy) return;
+        setHint('Tentando outro modo de leitura...', true);
+        restartScanner({ native: false, keepHint: true });
+      }, 6000);
+    } else {
+      hintTimer = setTimeout(() => {
+        if (sc.isScanning) setHint('Difícil de ler? Afaste um pouco o celular, evite reflexo, toque em "Trocar câmera", use a lanterna ou "Ler de uma foto".', true);
+      }, 8000);
+    }
+  }
+
+  async function setupControls() {
     const btn = $('btnTorch');
     torchOn = false;
     btn.classList.remove('on');
     let supported = false;
     try { supported = !!scanner.getRunningTrackCapabilities().torch; } catch (_) {}
     btn.classList.toggle('hidden', !supported);
+
+    if (!backCameras) {
+      try {
+        const all = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+        const back = all.filter(d => /back|rear|traseira|environment/i.test(d.label));
+        backCameras = back.length ? back : all;
+      } catch (_) { backCameras = []; }
+    }
+    $('btnCamSwitch').classList.toggle('hidden', backCameras.length < 2);
+  }
+
+  // Celulares com várias lentes: deixa a pessoa trocar até achar a que foca de perto
+  async function switchCamera() {
+    if (!backCameras || backCameras.length < 2) return;
+    cameraIdx = (cameraIdx + 1) % backCameras.length;
+    setHint('Câmera ' + (cameraIdx + 1) + ' de ' + backCameras.length + ': veja qual fica mais nítida.');
+    await restartScanner({ native: useNative, keepHint: true });
   }
 
   async function toggleTorch() {
@@ -570,6 +671,7 @@
 
   async function stopScanner() {
     clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
     if (scanner && scanner.isScanning) {
       try { await scanner.stop(); } catch (_) {}
     }
@@ -579,17 +681,32 @@
 
   async function onScanSuccess(text) {
     if (busy) return;
-    text = (text || '').trim();
+    const url = nfceUrl(text);
     // QR que não é de nota fiscal: avisa e continua escaneando
-    if (!/^https?:\/\//i.test(text)) {
+    if (!url) {
       setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR da NFC-e.', true);
       return;
     }
     busy = true;
     if (navigator.vibrate) navigator.vibrate(100);
     await stopScanner();
-    await processUrl(text);
+    await processUrl(url);
     busy = false;
+  }
+
+  // Fotos de 12MP+ costumam falhar no leitor em JS; uma versão reduzida lê melhor
+  async function downscale(file, max = 1600) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      if (scale === 1) return null;
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+      return blob ? new File([blob], 'foto.jpg', { type: 'image/jpeg' }) : null;
+    } catch (_) { return null; }
   }
 
   // Lê o QR a partir de uma foto (câmera nativa foca melhor em cupons amassados/pequenos)
@@ -599,14 +716,26 @@
     resultEl.innerHTML = '';
     setStatus('Lendo QR Code da foto...', { loading: true });
     openResultCard();
-    try {
-      const text = (await getScanner().scanFile(file, false)).trim();
-      if (!/^https?:\/\//i.test(text)) throw new Error('não é de cupom fiscal');
-      if (navigator.vibrate) navigator.vibrate(100);
-      await processUrl(text);
-    } catch (_) {
-      setStatus('Não encontrei um QR Code de cupom nessa foto. Tire outra mais de perto, com o QR nítido e sem reflexo.', { error: true });
+    await nativeCheck;
+
+    // tenta foto reduzida e original, com cada leitor disponível
+    const files = [await downscale(file), file].filter(Boolean);
+    const engines = nativeOk ? [true, false] : [false];
+    let url = null;
+    for (const f of files) {
+      for (const native of engines) {
+        try { url = nfceUrl(await getScanner(native).scanFile(f, false)); } catch (_) {}
+        if (url) break;
+      }
+      if (url) break;
     }
+
+    if (!url) {
+      setStatus('Não encontrei um QR Code de cupom nessa foto. Tire outra mais de perto, com o QR nítido e sem reflexo.' + diag(), { error: true });
+      return;
+    }
+    if (navigator.vibrate) navigator.vibrate(100);
+    await processUrl(url);
   }
 
   // ---------- Busca + parse ----------
@@ -657,7 +786,9 @@
       const data = parseNota(html);
 
       if (!data.items.length) {
-        setStatus('Não encontrei produtos na resposta da SEFAZ (o site pode ter pedido captcha).', { error: true });
+        let host = '';
+        try { host = new URL(url).hostname; } catch (_) {}
+        setStatus('Não encontrei produtos na resposta da SEFAZ (o site pode ter pedido captcha ou ter um layout diferente).' + diag(host), { error: true });
         showPasteBox(url);
         return;
       }
@@ -665,7 +796,7 @@
       addToHistory(url, data);
       renderNota(data, url);
     } catch (err) {
-      setStatus('Não consegui buscar a nota automaticamente: ' + err.message +
+      setStatus('Não consegui buscar a nota automaticamente: ' + err.message + diag() +
         '<br><button class="btn small ghost" id="btnRetry" style="margin-top:10px">Tentar novamente</button>', { error: true });
       $('btnRetry').addEventListener('click', () => processUrl(url));
       showPasteBox(url);
@@ -861,9 +992,21 @@
     else startScanner();
   });
   $('btnTorch').addEventListener('click', toggleTorch);
+  $('btnCamSwitch').addEventListener('click', switchCamera);
   $('photoInput').addEventListener('change', (e) => {
     scanFromPhoto(e.target.files[0]);
     e.target.value = '';
+  });
+  $('appVersion').textContent = browserInfo();
+  if (IN_APP_BROWSER || !CAMERA_API) $('inAppWarn').classList.remove('hidden');
+  $('btnCopyLink').addEventListener('click', async () => {
+    const link = location.href.split('#')[0];
+    try {
+      await navigator.clipboard.writeText(link);
+      $('btnCopyLink').textContent = 'Link copiado! Cole no Chrome/Safari';
+    } catch (_) {
+      prompt('Copie o link e abra no Chrome ou Safari:', link);
+    }
   });
   // desliga a câmera quando o app vai para segundo plano (economiza bateria e libera a câmera)
   document.addEventListener('visibilitychange', () => {
