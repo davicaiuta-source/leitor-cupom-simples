@@ -990,6 +990,8 @@
       } catch (_) {
         db = fb.getFirestore(app);
       }
+      // continua logado depois de fechar o site (até tocar em "Sair da conta")
+      await fb.setPersistence(auth, fb.browserLocalPersistence).catch(() => {});
       fb.onAuthStateChanged(auth, onUser);
       setTimeout(() => {
         if (authResolved) return;
@@ -1017,6 +1019,12 @@
     }
     me = { uid: user.uid, email: user.email, name: user.displayName || (user.email || '').split('@')[0], groupId: null };
     showApp();
+    // cupons salvos só neste celular (de antes do login) vão sozinhos para a conta
+    if (localHistory().length) {
+      importLocal()
+        .then(n => toast(n + (n === 1 ? ' cupom deste celular foi salvo' : ' cupons deste celular foram salvos') + ' na sua conta.'))
+        .catch(cloudError);
+    }
     unsubs.user = fb.onSnapshot(fb.doc(db, 'users', user.uid), snap => {
       const d = snap.data() || {};
       if (d.name) me.name = d.name;
@@ -1437,13 +1445,6 @@
     }
     html += '<p class="form-error hidden" id="accError"></p></section>';
     if (inGroup()) html += myShareCard();
-
-    const local = localHistory().length;
-    if (local) {
-      html += '<section class="card"><h3 class="card-title">Cupons deste aparelho</h3>' +
-        '<p class="muted">Você tem ' + local + (local === 1 ? ' cupom salvo' : ' cupons salvos') + ' só neste celular, de antes do login.</p>' +
-        '<button class="btn small ghost" data-action="import">Enviar para minha conta</button></section>';
-    }
 
     html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
     $('accountContent').innerHTML = html;
@@ -1961,7 +1962,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.8';
+  const APP_VERSION = '2026-10-31.10';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
