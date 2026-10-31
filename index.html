@@ -686,6 +686,19 @@
     </div>
   </div>
 
+  <!-- Pergunta se a nota recém-escaneada vai para o grupo -->
+  <div class="modal hidden" id="shareModal">
+    <div class="modal-card">
+      <h3>Enviar para o grupo?</h3>
+      <p id="shareModalInfo"></p>
+      <p style="margin-top:10px">Você quer subir essa nota para o grupo ou quer que essa nota fique apenas armazenada nas suas notas pessoais?</p>
+      <div style="display:grid;gap:8px;margin-top:16px">
+        <button class="btn small" id="btnShareYes">Subir para o grupo</button>
+        <button class="btn small ghost" id="btnShareNo">Só nas minhas notas</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="tabbar">
     <button class="active" data-tab="scan">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v4M7 13v4h4"/></svg>
@@ -877,6 +890,23 @@
     return syncToGroup([h]);
   }
 
+  // Pergunta se a nota vai para o grupo; resolve com true (subir) ou false (só pessoal)
+  function askShare(h) {
+    $('shareModalInfo').innerHTML = '<b>' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</b> · ' + brl(h.total || 0) +
+      '<br>Esta nota é de <b>' + escapeHtml(cupomCat(h).name) + '</b>, uma categoria que você mostra para o grupo <b>' +
+      escapeHtml(group.name) + '</b>.';
+    $('shareModal').classList.remove('hidden');
+    return new Promise(resolve => {
+      const done = (yes) => {
+        $('shareModal').classList.add('hidden');
+        $('btnShareYes').onclick = $('btnShareNo').onclick = null;
+        resolve(yes);
+      };
+      $('btnShareYes').onclick = () => done(true);
+      $('btnShareNo').onclick = () => done(false);
+    });
+  }
+
   function addToHistory(url, data) {
     if (CLOUD) {
       cloudSaveCupom(url, data).then(async (saved) => {
@@ -886,10 +916,17 @@
           toast('Essa nota já está no grupo: foi escaneada por ' + firstName(other.addedByName) + '.', 4000);
           return;
         }
-        const wasThere = !!other;
-        if (await syncToGroup([saved]) && !wasThere) {
-          toast('Nota de ' + cupomCat(saved).name + ' enviada para o grupo ' + group.name + '.', 3500);
+        const id = await hashId(url);
+        // nota nova que se encaixa nas categorias do grupo: pergunta antes de subir
+        if (!other && (me.shareOv || {})[id] === undefined && wantsShare(saved, id)) {
+          const yes = await askShare(saved);
+          await setShareOv(saved, yes);
+          toast(yes ? 'Nota enviada para o grupo ' + group.name + '.' : 'Nota salva só nas suas notas.', 3500);
+          // atualiza o detalhe aberto (botão Enviar/Tirar do grupo)
+          if (!resultCard.classList.contains('hidden') && $('btnRemove')) renderNota(saved, url);
+          return;
         }
+        await syncToGroup([saved]); // nota já decidida antes: só atualiza
       }).catch(cloudError);
       return;
     }
@@ -1962,7 +1999,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.10';
+  const APP_VERSION = '2026-10-31.11';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
