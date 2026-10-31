@@ -312,9 +312,77 @@
   .s-tag { display: inline-block; font-size: .7rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-right: 6px; }
   .s-sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-weight: 600; color: var(--text); }
 
+  /* ---------- Contas e grupos ---------- */
+  .header-icons button { background: none; border: 0; padding: 0; cursor: pointer; color: #fff; display: flex; }
+  .space-pill {
+    position: relative; display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+    background: rgba(255, 255, 255, .16); border: 0; color: #fff; cursor: pointer;
+    font: 500 .8rem "Inter", sans-serif; padding: 5px 12px; border-radius: 999px;
+  }
+  .space-pill svg { width: 15px; height: 15px; stroke: currentColor; }
+  .seg { display: flex; background: #f1f4f2; border-radius: 10px; padding: 4px; margin-bottom: 18px; }
+  .seg button {
+    flex: 1; border: 0; background: none; padding: 10px; border-radius: 8px; cursor: pointer;
+    font: 600 .95rem "Inter", sans-serif; color: var(--muted);
+  }
+  .seg button.active { background: #fff; color: var(--green-dark); box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+  .seg.small { margin-bottom: 12px; }
+  .seg.small button { padding: 8px; font-size: .85rem; }
+  .field { display: block; margin-bottom: 14px; }
+  .field > span, .field-label { display: block; font-size: .85rem; font-weight: 600; margin: 0 0 6px; }
+  .field input, .inline-form input {
+    width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font: 400 1rem "Inter", sans-serif; background: #f7f9f7; color: var(--text);
+  }
+  .field input:focus, .inline-form input:focus { outline: 2px solid var(--green-btn); outline-offset: -1px; background: #fff; }
+  input.code-input { text-transform: uppercase; letter-spacing: .3em; font-weight: 700; text-align: center; }
+  .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .mode-card { position: relative; display: block; border: 2px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; }
+  .mode-card input { position: absolute; opacity: 0; pointer-events: none; }
+  .mode-card b { display: block; margin-bottom: 4px; }
+  .mode-card span { font-size: .78rem; color: var(--muted); }
+  .mode-card.selected { border-color: var(--green-btn); background: #f3fbf5; }
+  .group-box { background: #f6f8f6; border-radius: 12px; padding: 12px 12px 2px; margin-bottom: 14px; }
+  .form-error { color: var(--danger); font-size: .85rem; margin: 0 0 12px; }
+  .form-error.ok { color: var(--green-text); }
+  .auth-card .link-btn { margin-top: 14px; }
+  .auth-loading { text-align: center; color: var(--muted); padding: 24px 0; }
+  .group-code {
+    font: 800 2rem "Inter", sans-serif; letter-spacing: .25em; text-align: center;
+    color: var(--green-dark); background: var(--green-soft); border-radius: 12px; padding: 14px 8px; margin: 12px 0;
+  }
+  .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn-row .btn { flex: 1; }
+  .modal { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .45); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-card { background: #fff; border-radius: 16px; padding: 22px; width: 100%; max-width: 400px; }
+  .modal-card h3 { margin: 0 0 6px; font-size: 1.3rem; }
+  .modal-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40;
+    background: #1a1f1c; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .88rem;
+    max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow);
+  }
+  .account-head { display: flex; align-items: center; gap: 14px; }
+  .account-head b { display: block; font-size: 1.1rem; }
+  .account-head span { color: var(--muted); font-size: .85rem; word-break: break-all; }
+  .avatar {
+    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 50%; background: var(--green-btn); color: #fff;
+    display: flex; align-items: center; justify-content: center; font: 700 1.3rem "Inter", sans-serif;
+  }
+  .card-title { margin: 0 0 8px; font-size: 1.15rem; }
+  .muted { color: var(--muted); font-size: .88rem; margin: 0 0 14px; }
+  .members { list-style: none; margin: 4px 0 14px; padding: 0; }
+  .members li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .92rem; }
+  .members .avatar { flex-basis: 32px; width: 32px; height: 32px; font-size: .85rem; }
+  .tag-owner { margin-left: auto; font-size: .72rem; font-weight: 600; background: var(--green-soft); color: var(--green-text); padding: 2px 8px; border-radius: 999px; }
+  .inline-form { display: flex; gap: 8px; margin-bottom: 14px; }
+  .inline-form input { flex: 1; min-width: 0; min-height: 44px; }
+  .inline-form .btn { width: auto; flex: 0 0 auto; padding: 0 16px; }
+
   .hidden { display: none !important; }
 
   @media (max-width: 360px) {
+    .mode-cards { grid-template-columns: 1fr; }
     ul.stock-list { margin: 0 -16px; }
     .stock-list li { padding: 12px 16px; }
     header h1 { font-size: 1.55rem; }
@@ -339,14 +407,59 @@
     </svg>
     <div class="header-row">
       <h1>Leitor de<br>Cupom Fiscal</h1>
-      <div class="header-icons" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a6 6 0 0 1 10 0"/></svg>
+      <div class="header-icons">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <button id="btnHeaderUser" aria-label="Minha conta">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a6 6 0 0 1 10 0"/></svg>
+        </button>
       </div>
     </div>
+    <button class="space-pill hidden" id="headerSpace"></button>
   </header>
 
   <main>
+  <!-- Login / cadastro (só aparece quando o Firebase está configurado) -->
+  <div id="authView" class="hidden">
+    <section class="card auth-card">
+      <p class="auth-loading" id="authLoading"><span class="spinner"></span>Carregando...</p>
+      <div id="authForms" class="hidden">
+        <div class="seg" id="authSeg">
+          <button class="active" data-auth="login">Entrar</button>
+          <button data-auth="signup">Criar conta</button>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <label class="field"><span>E-mail</span><input type="email" id="loginEmail" autocomplete="email"></label>
+          <label class="field"><span>Senha</span><input type="password" id="loginPass" autocomplete="current-password"></label>
+          <p class="form-error hidden" id="loginError"></p>
+          <button class="btn" type="submit">Entrar</button>
+          <button class="link-btn" type="button" id="btnForgot">Esqueci minha senha</button>
+        </form>
+
+        <form id="signupForm" class="hidden" novalidate>
+          <label class="field"><span>Seu nome</span><input id="suName" autocomplete="name"></label>
+          <label class="field"><span>E-mail</span><input type="email" id="suEmail" autocomplete="email"></label>
+          <label class="field"><span>Senha (mínimo 6 caracteres)</span><input type="password" id="suPass" autocomplete="new-password"></label>
+          <p class="field-label">Tipo de cadastro</p>
+          <div class="mode-cards" id="modeCards">
+            <label class="mode-card selected"><input type="radio" name="suMode" value="individual" checked><b>Individual</b><span>Só você vê seus cupons e seu estoque.</span></label>
+            <label class="mode-card"><input type="radio" name="suMode" value="group"><b>Coletivo</b><span>Família ou equipe compartilham cupons e estoque.</span></label>
+          </div>
+          <div class="group-box hidden" id="suGroupBox">
+            <div class="seg small" id="suGroupSeg">
+              <button type="button" class="active" data-ga="create">Criar grupo</button>
+              <button type="button" data-ga="join">Tenho um código</button>
+            </div>
+            <label class="field" id="suGroupNameField"><span>Nome do grupo</span><input id="suGroupName" placeholder="Ex.: Família Silva"></label>
+            <label class="field hidden" id="suCodeField"><span>Código do grupo</span><input id="suCode" class="code-input" maxlength="6" placeholder="K7P2QX" autocapitalize="characters" autocomplete="off"></label>
+          </div>
+          <p class="form-error hidden" id="signupError"></p>
+          <button class="btn" type="submit">Criar conta</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
   <div id="tabScan">
     <!-- Card de scan -->
     <section class="card scan-card" id="scanCard">
@@ -472,8 +585,25 @@
     </section>
   </div>
 
+  <!-- Aba Conta: dados do usuário e do grupo -->
+  <div id="tabAccount" class="hidden"><div id="accountContent"></div></div>
+
     <p class="version" id="appVersion"></p>
   </main>
+
+  <!-- Código do grupo recém-criado -->
+  <div class="modal hidden" id="codeModal">
+    <div class="modal-card">
+      <h3>Grupo criado!</h3>
+      <p>Mande este código para quem vai participar. Só entra no grupo quem tiver o código.</p>
+      <div class="group-code" id="modalCode"></div>
+      <div class="btn-row">
+        <button class="btn small ghost" id="btnModalCopy">Copiar</button>
+        <button class="btn small ghost" id="btnModalShare">Compartilhar</button>
+      </div>
+      <button class="btn small" id="btnModalClose">Continuar</button>
+    </div>
+  </div>
 
   <nav class="tabbar">
     <button class="active" data-tab="scan">
@@ -484,10 +614,19 @@
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
       Estoque
     </button>
+    <button data-tab="account" id="tabBtnAccount">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>
+      Conta
+    </button>
   </nav>
 </div>
 
 <script>
+  // Configuração do seu projeto Firebase (Console → Configurações do projeto → Seus apps → Web).
+  // Enquanto for null, o app funciona sem login e salva tudo só no aparelho.
+  const FIREBASE_CONFIG = null;
+  const CLOUD = !!FIREBASE_CONFIG;
+
   // URL do seu proxy no Cloudflare Workers (ver worker.js). Ex.: 'https://nota-proxy.seunome.workers.dev'
   const WORKER_URL = 'https://dry-base-52b4.davi-caiuta.workers.dev';
 
@@ -558,9 +697,14 @@
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ---------- Histórico (localStorage) ----------
-  function loadHistory() {
+  // ---------- Histórico ----------
+  // Sem Firebase: salvo só no aparelho (localStorage). Com Firebase: na conta ou no grupo, sincronizado em tempo real.
+  function localHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (_) { return []; }
+  }
+
+  function loadHistory() {
+    return CLOUD ? cloudCupons : localHistory();
   }
 
   function saveHistory(list) {
@@ -568,15 +712,495 @@
   }
 
   function addToHistory(url, data) {
-    const list = loadHistory().filter(h => h.url !== url);
+    if (CLOUD) {
+      cloudSaveCupom(url, data).catch(cloudError); // o onSnapshot redesenha a lista
+      return;
+    }
+    const list = localHistory().filter(h => h.url !== url);
     list.unshift({ url, scannedAt: Date.now(), ...data });
     saveHistory(list.slice(0, 100));
     renderHistory();
   }
 
   function removeFromHistory(url) {
-    saveHistory(loadHistory().filter(h => h.url !== url));
+    if (CLOUD) {
+      cloudDeleteCupom(url).catch(cloudError);
+      return;
+    }
+    saveHistory(localHistory().filter(h => h.url !== url));
     renderHistory();
+  }
+
+  // ---------- Contas e grupos (Firebase) ----------
+  const FB_VER = '10.12.2';
+  let fb = null, auth = null, db = null;
+  let me = null;          // { uid, email, name, groupId }
+  let group = null;       // grupo atual { id, name, code, ownerUid, members, memberNames }
+  let cloudCupons = [];
+  let spaceKey = null;    // espaço com listeners ativos: 'users/uid' ou 'groups/gid'
+  const unsubs = {};
+
+  function unsub(...names) {
+    names.forEach(n => { if (unsubs[n]) { unsubs[n](); delete unsubs[n]; } });
+  }
+
+  // Cupons e categorias ficam em users/{uid}/... (individual) ou groups/{gid}/... (coletivo)
+  function spacePath() {
+    return me.groupId ? ['groups', me.groupId] : ['users', me.uid];
+  }
+  const metaRef = () => fb.doc(db, ...spacePath(), 'meta', 'categorias');
+
+  // ID do cupom = hash da URL do QR: escanear o mesmo cupom duas vezes não duplica
+  async function hashId(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].slice(0, 20).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  let toastTimer = null;
+  function toast(msg, ms = 2800) {
+    let el = $('toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast';
+      el.className = 'toast';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.add('hidden'), ms);
+  }
+
+  function authMsg(err) {
+    const msgs = {
+      'auth/email-already-in-use': 'Este e-mail já tem conta. Use "Entrar".',
+      'auth/invalid-email': 'E-mail inválido.',
+      'auth/missing-email': 'Digite seu e-mail.',
+      'auth/missing-password': 'Digite sua senha.',
+      'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+      'auth/invalid-credential': 'E-mail ou senha incorretos.',
+      'auth/wrong-password': 'E-mail ou senha incorretos.',
+      'auth/user-not-found': 'E-mail ou senha incorretos.',
+      'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos.',
+      'auth/network-request-failed': 'Sem internet. Tente de novo.',
+      'auth/operation-not-allowed': 'Login por e-mail não está ativado no Firebase.',
+      'permission-denied': 'Sem permissão no banco de dados. Confira as regras do Firestore.',
+      'unavailable': 'Sem conexão com o servidor. Tente de novo.'
+    };
+    return msgs[err?.code] || err?.message || String(err);
+  }
+
+  function cloudError(err) {
+    console.error(err);
+    toast(err?.code === 'unavailable' ? 'Sem internet: vai sincronizar quando a conexão voltar.' : authMsg(err));
+  }
+
+  async function initCloud() {
+    try {
+      const base = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/';
+      const [appM, authM, fsM] = await Promise.all([
+        import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')
+      ]);
+      fb = { ...appM, ...authM, ...fsM };
+      const app = fb.initializeApp(FIREBASE_CONFIG);
+      auth = fb.getAuth(app);
+      // cache local: o app abre rápido e funciona sem internet
+      try {
+        db = fb.initializeFirestore(app, { localCache: fb.persistentLocalCache({ tabManager: fb.persistentMultipleTabManager() }) });
+      } catch (_) {
+        db = fb.getFirestore(app);
+      }
+      fb.onAuthStateChanged(auth, onUser);
+      setTimeout(() => {
+        if (authResolved) return;
+        $('authLoading').innerHTML = 'Está demorando para conectar. Confira a internet.' +
+          '<br><button class="btn small ghost" style="margin-top:12px" onclick="location.reload()">Recarregar</button>';
+      }, 12000);
+    } catch (err) {
+      $('authLoading').innerHTML = 'Não foi possível conectar. Verifique a internet e recarregue a página.' + diag(err?.message);
+    }
+  }
+
+  let authResolved = false;
+  function onUser(user) {
+    authResolved = true;
+    unsub('user', 'group', 'cupons', 'meta');
+    spaceKey = null;
+    group = null;
+    cloudCupons = [];
+    catOv = { stores: {}, products: {} };
+    if (!user) {
+      me = null;
+      showAuth();
+      return;
+    }
+    me = { uid: user.uid, email: user.email, name: user.displayName || (user.email || '').split('@')[0], groupId: null };
+    showApp();
+    unsubs.user = fb.onSnapshot(fb.doc(db, 'users', user.uid), snap => {
+      const d = snap.data() || {};
+      if (d.name) me.name = d.name;
+      me.groupId = d.groupId || null;
+      subscribeSpace();
+      renderAccount();
+      renderHeaderSpace();
+    }, cloudError);
+  }
+
+  function subscribeSpace() {
+    const key = spacePath().join('/');
+    if (key === spaceKey) return;
+    spaceKey = key;
+    unsub('group', 'cupons', 'meta');
+    cloudCupons = [];
+    group = null;
+    catOv = { stores: {}, products: {} };
+    refreshViews();
+
+    const q = fb.query(fb.collection(db, ...spacePath(), 'cupons'), fb.orderBy('scannedAt', 'desc'), fb.limit(500));
+    unsubs.cupons = fb.onSnapshot(q, snap => {
+      cloudCupons = snap.docs.map(d => d.data());
+      refreshViews();
+    }, cloudError);
+
+    unsubs.meta = fb.onSnapshot(metaRef(), snap => {
+      const o = snap.data() || {};
+      catOv = { stores: o.stores || {}, products: o.products || {} };
+      refreshViews();
+    }, cloudError);
+
+    if (me.groupId) {
+      unsubs.group = fb.onSnapshot(fb.doc(db, 'groups', me.groupId), snap => {
+        group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
+        // saiu do grupo ou o grupo sumiu: volta para o modo individual
+        if (!group || !(group.members || []).includes(me.uid)) { detachGroup(); return; }
+        renderAccount();
+        renderHeaderSpace();
+      }, err => { if (err.code === 'permission-denied') detachGroup(); else cloudError(err); });
+    }
+  }
+
+  function detachGroup() {
+    fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true }).catch(cloudError);
+  }
+
+  function refreshViews() {
+    renderHistory();
+    if (!$('tabStock').classList.contains('hidden')) renderStock();
+    renderAccount();
+  }
+
+  async function cloudSaveCupom(url, data) {
+    // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
+    const docData = JSON.parse(JSON.stringify({
+      ...data, url, scannedAt: data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+    }));
+    await fb.setDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)), docData);
+  }
+
+  async function cloudDeleteCupom(url) {
+    await fb.deleteDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)));
+  }
+
+  // Código de 6 caracteres sem os que confundem (0/O, 1/I/L)
+  const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  function genCode() {
+    const r = new Uint32Array(6);
+    crypto.getRandomValues(r);
+    return [...r].map(n => CODE_CHARS[n % CODE_CHARS.length]).join('');
+  }
+  const normCode = (s) => (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  async function createGroup(groupName, userName) {
+    const uid = auth.currentUser.uid;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = genCode();
+      const codeRef = fb.doc(db, 'groupCodes', code);
+      const groupRef = fb.doc(fb.collection(db, 'groups'));
+      try {
+        await fb.runTransaction(db, async (tx) => {
+          if ((await tx.get(codeRef)).exists()) throw new Error('code-taken');
+          tx.set(groupRef, {
+            name: groupName, code, ownerUid: uid, members: [uid], memberNames: { [uid]: userName }, createdAt: fb.serverTimestamp()
+          });
+          tx.set(codeRef, { groupId: groupRef.id, ownerUid: uid });
+          tx.set(fb.doc(db, 'users', uid), { groupId: groupRef.id }, { merge: true });
+        });
+        return code;
+      } catch (err) {
+        if (err.message !== 'code-taken') throw err;
+      }
+    }
+    throw new Error('Não foi possível gerar um código. Tente de novo.');
+  }
+
+  async function findGroupByCode(code) {
+    const snap = await fb.getDoc(fb.doc(db, 'groupCodes', code));
+    if (!snap.exists()) throw new Error('Código não encontrado. Confira as letras e os números.');
+    return snap.data().groupId;
+  }
+
+  async function joinGroup(code, userName) {
+    const gid = await findGroupByCode(code);
+    const uid = auth.currentUser.uid;
+    await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayUnion(uid), ['memberNames.' + uid]: userName });
+    await fb.setDoc(fb.doc(db, 'users', uid), { groupId: gid }, { merge: true });
+  }
+
+  async function leaveGroup() {
+    await fb.updateDoc(fb.doc(db, 'groups', me.groupId), { members: fb.arrayRemove(me.uid), ['memberNames.' + me.uid]: fb.deleteField() });
+    await fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true });
+  }
+
+  // Envia para a conta/grupo os cupons que estavam salvos só neste aparelho
+  async function importLocal() {
+    const list = localHistory();
+    const ov = loadCatOv();
+    const batch = fb.writeBatch(db);
+    for (const h of list.slice(0, 450)) {
+      batch.set(fb.doc(db, ...spacePath(), 'cupons', await hashId(h.url)),
+        JSON.parse(JSON.stringify({ ...h, addedBy: me.uid, addedByName: me.name })));
+    }
+    if (Object.keys(ov.stores).length || Object.keys(ov.products).length) batch.set(metaRef(), ov, { merge: true });
+    await batch.commit();
+    localStorage.removeItem(HISTORY_KEY);
+    localStorage.removeItem(CAT_KEY);
+    return list.length;
+  }
+
+  async function shareCode(code, groupName) {
+    const link = location.href.split('#')[0];
+    const text = 'Entre no grupo "' + groupName + '" do Leitor de Cupom Fiscal.\nAbra ' + link + ', crie sua conta, escolha "Coletivo" e use o código: ' + code;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Código do grupo', text }); return; } catch (_) { return; }
+    }
+    copyText(text, 'Convite copiado!');
+  }
+
+  async function copyText(text, okMsg = 'Copiado!') {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(okMsg);
+    } catch (_) {
+      prompt('Copie:', text);
+    }
+  }
+
+  function showCodeModal(code, groupName) {
+    $('modalCode').textContent = code;
+    $('codeModal').dataset.code = code;
+    $('codeModal').dataset.name = groupName;
+    $('codeModal').classList.remove('hidden');
+  }
+
+  // ---------- Telas de login / app ----------
+  function showAuth() {
+    stopScanner();
+    ['tabScan', 'tabStock', 'tabAccount', 'resultCard', 'headerSpace'].forEach(id => $(id).classList.add('hidden'));
+    document.querySelector('.tabbar').classList.add('hidden');
+    $('codeModal').classList.add('hidden');
+    $('authView').classList.remove('hidden');
+    $('authLoading').classList.add('hidden');
+    $('authForms').classList.remove('hidden');
+  }
+
+  function showApp() {
+    $('authView').classList.add('hidden');
+    document.querySelector('.tabbar').classList.remove('hidden');
+    showTab('scan');
+    renderHeaderSpace();
+  }
+
+  function setAuthTab(tab) {
+    $('authSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.auth === tab));
+    $('loginForm').classList.toggle('hidden', tab !== 'login');
+    $('signupForm').classList.toggle('hidden', tab !== 'signup');
+  }
+
+  let signupGroupAction = 'create';
+  function setSignupGroupAction(action) {
+    signupGroupAction = action;
+    $('suGroupSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.ga === action));
+    $('suGroupNameField').classList.toggle('hidden', action !== 'create');
+    $('suCodeField').classList.toggle('hidden', action !== 'join');
+  }
+
+  function formMsg(id, msg, ok = false) {
+    const el = $(id);
+    el.textContent = msg;
+    el.classList.toggle('ok', ok);
+    el.classList.toggle('hidden', !msg);
+  }
+
+  async function withBusy(btn, fn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Aguarde...';
+    try { await fn(); } finally { btn.disabled = false; btn.textContent = label; }
+  }
+
+  async function onLogin(e) {
+    e.preventDefault();
+    formMsg('loginError', '');
+    await withBusy(e.submitter || $('loginForm').querySelector('[type=submit]'), async () => {
+      try {
+        await fb.signInWithEmailAndPassword(auth, $('loginEmail').value.trim(), $('loginPass').value);
+      } catch (err) {
+        formMsg('loginError', authMsg(err));
+      }
+    });
+  }
+
+  async function onForgot() {
+    const email = $('loginEmail').value.trim();
+    if (!email) { formMsg('loginError', 'Digite seu e-mail acima e toque de novo em "Esqueci minha senha".'); return; }
+    try {
+      await fb.sendPasswordResetEmail(auth, email);
+      formMsg('loginError', 'Enviamos um e-mail para redefinir sua senha.', true);
+    } catch (err) {
+      formMsg('loginError', authMsg(err));
+    }
+  }
+
+  async function onSignup(e) {
+    e.preventDefault();
+    formMsg('signupError', '');
+    const name = $('suName').value.trim();
+    const email = $('suEmail').value.trim();
+    const pass = $('suPass').value;
+    const mode = document.querySelector('input[name="suMode"]:checked').value;
+    const groupName = $('suGroupName').value.trim();
+    const code = normCode($('suCode').value);
+
+    await withBusy(e.submitter || $('signupForm').querySelector('[type=submit]'), async () => {
+      try {
+        if (!name) throw new Error('Digite seu nome.');
+        if (mode === 'group' && signupGroupAction === 'create' && !groupName) throw new Error('Dê um nome para o grupo.');
+        if (mode === 'group' && signupGroupAction === 'join') {
+          if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
+          await findGroupByCode(code); // confere o código antes de criar a conta
+        }
+        const cred = await fb.createUserWithEmailAndPassword(auth, email, pass);
+        await fb.updateProfile(cred.user, { displayName: name });
+        if (me) me.name = name;
+        await fb.setDoc(fb.doc(db, 'users', cred.user.uid), { name, email, createdAt: fb.serverTimestamp() }, { merge: true });
+        if (mode === 'group') {
+          if (signupGroupAction === 'create') showCodeModal(await createGroup(groupName, name), groupName);
+          else { await joinGroup(code, name); toast('Você entrou no grupo!'); }
+        }
+      } catch (err) {
+        formMsg('signupError', authMsg(err));
+        // a conta já foi criada e a tela de cadastro sumiu: avisa por toast (dá para tentar de novo na aba Conta)
+        if (auth.currentUser) toast('Conta criada, mas o grupo falhou: ' + authMsg(err) + ' Tente pela aba Conta.', 6000);
+      }
+    });
+  }
+
+  const firstName = (n) => (n || '').trim().split(/\s+/)[0];
+  const initial = (n) => escapeHtml((n || '?').trim().charAt(0).toUpperCase());
+
+  function renderHeaderSpace() {
+    const el = $('headerSpace');
+    if (!CLOUD || !me) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    if (me.groupId && group) {
+      const n = (group.members || []).length;
+      el.innerHTML = ICON_GROUP + escapeHtml(group.name) + ' · ' + n + (n === 1 ? ' pessoa' : ' pessoas');
+    } else if (me.groupId) {
+      el.innerHTML = ICON_GROUP + 'Carregando grupo...';
+    } else {
+      el.innerHTML = ICON_USER + 'Individual · ' + escapeHtml(firstName(me.name));
+    }
+  }
+
+  function renderAccount() {
+    if (!CLOUD || !me || $('tabAccount').classList.contains('hidden')) return;
+    // guarda o que a pessoa estava digitando (a tela é redesenhada a cada sincronização)
+    const keep = {};
+    ['accGroupName', 'accCode'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
+
+    let html = '<section class="card"><div class="account-head"><div class="avatar">' + initial(me.name) + '</div>' +
+      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div></div></section>';
+
+    html += '<section class="card">';
+    if (me.groupId && group) {
+      const members = group.members || [];
+      html += '<h3 class="card-title">Cadastro coletivo</h3>' +
+        '<p class="muted">Todos do grupo <b>' + escapeHtml(group.name) + '</b> veem e adicionam cupons no mesmo histórico e estoque.</p>' +
+        '<p class="field-label">Código do grupo</p><div class="group-code">' + escapeHtml(group.code) + '</div>' +
+        '<div class="btn-row"><button class="btn small ghost" data-action="copy-code">Copiar código</button>' +
+        '<button class="btn small ghost" data-action="share-code">Convidar</button></div>' +
+        '<p class="field-label">Participantes (' + members.length + ')</p><ul class="members">' +
+        members.map(uid => {
+          const n = (group.memberNames || {})[uid] || 'Participante';
+          return '<li><div class="avatar">' + initial(n) + '</div>' + escapeHtml(n) + (uid === me.uid ? ' (você)' : '') +
+            (uid === group.ownerUid ? '<span class="tag-owner">criador</span>' : '') + '</li>';
+        }).join('') + '</ul>' +
+        '<button class="btn small stop" data-action="leave">Sair do grupo</button>';
+    } else if (me.groupId) {
+      html += '<p class="auth-loading"><span class="spinner"></span>Carregando grupo...</p>';
+    } else {
+      html += '<h3 class="card-title">Cadastro individual</h3>' +
+        '<p class="muted">Só você vê seus cupons. Para dividir com a família ou a equipe, crie um grupo ou entre em um com o código.</p>' +
+        '<p class="field-label">Criar um grupo</p>' +
+        '<div class="inline-form"><input id="accGroupName" placeholder="Nome do grupo"><button class="btn small" data-action="create-group">Criar</button></div>' +
+        '<p class="field-label">Entrar em um grupo</p>' +
+        '<div class="inline-form"><input id="accCode" class="code-input" maxlength="6" placeholder="CÓDIGO" autocomplete="off"><button class="btn small" data-action="join-group">Entrar</button></div>' +
+        '<p class="muted">Ao entrar num grupo, você passa a ver os cupons do grupo. Seus cupons individuais continuam guardados e voltam se você sair do grupo.</p>';
+    }
+    html += '<p class="form-error hidden" id="accError"></p></section>';
+
+    const local = localHistory().length;
+    if (local) {
+      html += '<section class="card"><h3 class="card-title">Cupons deste aparelho</h3>' +
+        '<p class="muted">Você tem ' + local + (local === 1 ? ' cupom salvo' : ' cupons salvos') + ' só neste celular, de antes do login.</p>' +
+        '<button class="btn small ghost" data-action="import">Enviar para ' + (me.groupId ? 'o grupo' : 'minha conta') + '</button></section>';
+    }
+
+    html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
+    $('accountContent').innerHTML = html;
+    Object.entries(keep).forEach(([id, v]) => { if ($(id)) $(id).value = v; });
+  }
+
+  async function onAccountAction(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    formMsg('accError', '');
+    try {
+      if (action === 'copy-code') return copyText(group.code, 'Código copiado!');
+      if (action === 'share-code') return shareCode(group.code, group.name);
+      if (action === 'logout') {
+        if (confirm('Sair da conta neste aparelho?')) await fb.signOut(auth);
+        return;
+      }
+      if (action === 'leave') {
+        if (!confirm('Sair do grupo "' + group.name + '"? Os cupons continuam no grupo para os outros participantes.')) return;
+        await withBusy(btn, leaveGroup);
+        toast('Você saiu do grupo.');
+        return;
+      }
+      if (action === 'create-group') {
+        const name = $('accGroupName').value.trim();
+        if (!name) throw new Error('Dê um nome para o grupo.');
+        await withBusy(btn, async () => showCodeModal(await createGroup(name, me.name), name));
+        return;
+      }
+      if (action === 'join-group') {
+        const code = normCode($('accCode').value);
+        if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
+        await withBusy(btn, () => joinGroup(code, me.name));
+        toast('Você entrou no grupo!');
+        return;
+      }
+      if (action === 'import') {
+        let n = 0;
+        await withBusy(btn, async () => { n = await importLocal(); });
+        toast(n + (n === 1 ? ' cupom enviado!' : ' cupons enviados!'));
+        renderAccount();
+      }
+    } catch (err) {
+      formMsg('accError', authMsg(err));
+    }
   }
 
   const ICON_STORE = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>';
@@ -588,6 +1212,8 @@
   const ICON_FOOD = svgIcon('<path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v6M9 3v6M17 21V3c-2 1-3 4-3 7h3"/>');
   const ICON_FUEL = svgIcon('<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10"/><path d="M14 8h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>');
   const ICON_BAG = svgIcon('<path d="M6 7h12l1 14H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>');
+  const ICON_USER = svgIcon('<circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/>');
+  const ICON_GROUP = svgIcon('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/>');
 
   // ---------- Categorias (loja) e subcategorias (produto) ----------
   // Palavras-chave comparadas com o nome normalizado (sem acento, maiúsculo).
@@ -656,10 +1282,17 @@
       return { stores: o.stores || {}, products: o.products || {} };
     } catch (_) { return { stores: {}, products: {} }; }
   }
-  let catOv = loadCatOv(); // escolhas manuais: stores[url] = idCategoria · products["cat|NOME"] = subcategoria
+  // escolhas manuais: stores[url] = idCategoria · products["cat|NOME"] = subcategoria
+  // (com login, vêm da conta/grupo pelo onSnapshot)
+  let catOv = CLOUD ? { stores: {}, products: {} } : loadCatOv();
   const subCache = new Map();
 
-  function saveCatOv() {
+  // partial = só o que mudou; no Firestore o merge evita apagar o que outra pessoa do grupo mudou ao mesmo tempo
+  function saveCatOv(partial) {
+    if (CLOUD) {
+      fb.setDoc(metaRef(), partial, { merge: true }).catch(cloudError);
+      return;
+    }
     try { localStorage.setItem(CAT_KEY, JSON.stringify(catOv)); } catch (_) {}
   }
 
@@ -705,12 +1338,13 @@
 
   function setCupomCat(url, id) {
     catOv.stores[url] = id;
-    saveCatOv();
+    saveCatOv({ stores: { [url]: id } });
   }
 
   function setItemSub(cat, name, sub) {
-    catOv.products[cat.id + '|' + normName(name)] = sub;
-    saveCatOv();
+    const key = cat.id + '|' + normName(name);
+    catOv.products[key] = sub;
+    saveCatOv({ products: { [key]: sub } });
   }
 
   function catOptions(selectedId) {
@@ -735,7 +1369,8 @@
       return '<li data-idx="' + idx + '">' +
         '<div class="h-icon" style="background:' + cat.soft + ';color:' + cat.color + '">' + cat.icon + '</div>' +
         '<div class="h-info"><div class="h-name">' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</div>' +
-        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) + '</div></div>' +
+        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) +
+        (CLOUD && group && h.addedByName ? ' · por ' + escapeHtml(firstName(h.addedByName)) : '') + '</div></div>' +
         '<div class="h-right"><div class="h-total">' + brl(h.total || 0) + '</div>' +
         '<span class="badge">' + ICON_CHECK + 'Validado</span></div></li>';
     }).join('');
@@ -892,10 +1527,10 @@
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     $('tabScan').classList.toggle('hidden', tab !== 'scan');
     $('tabStock').classList.toggle('hidden', tab !== 'stock');
-    if (tab === 'stock') {
-      stopScanner();
-      renderStock();
-    }
+    $('tabAccount').classList.toggle('hidden', tab !== 'account');
+    if (tab !== 'scan') stopScanner();
+    if (tab === 'stock') renderStock();
+    if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
   }
 
@@ -903,7 +1538,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.2';
+  const APP_VERSION = '2026-10-31.3';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -1490,7 +2125,40 @@
     renderHistory();
   });
 
-  renderHistory();
+  // ---------- Contas: eventos e inicialização ----------
+  $('authSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-auth]');
+    if (b) setAuthTab(b.dataset.auth);
+  });
+  $('loginForm').addEventListener('submit', onLogin);
+  $('signupForm').addEventListener('submit', onSignup);
+  $('btnForgot').addEventListener('click', onForgot);
+  $('modeCards').addEventListener('change', () => {
+    const mode = document.querySelector('input[name="suMode"]:checked').value;
+    $('modeCards').querySelectorAll('.mode-card').forEach(c => c.classList.toggle('selected', c.querySelector('input').checked));
+    $('suGroupBox').classList.toggle('hidden', mode !== 'group');
+  });
+  $('suGroupSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ga]');
+    if (b) setSignupGroupAction(b.dataset.ga);
+  });
+  $('accountContent').addEventListener('click', onAccountAction);
+  $('btnModalCopy').addEventListener('click', () => copyText($('codeModal').dataset.code, 'Código copiado!'));
+  $('btnModalShare').addEventListener('click', () => shareCode($('codeModal').dataset.code, $('codeModal').dataset.name));
+  $('btnModalClose').addEventListener('click', () => $('codeModal').classList.add('hidden'));
+  $('btnHeaderUser').addEventListener('click', () => { if (CLOUD && me) showTab('account'); });
+  $('headerSpace').addEventListener('click', () => { if (CLOUD && me) showTab('account'); });
+
+  if (CLOUD) {
+    // espera o Firebase dizer se há alguém logado
+    $('tabScan').classList.add('hidden');
+    document.querySelector('.tabbar').classList.add('hidden');
+    $('authView').classList.remove('hidden');
+    initCloud();
+  } else {
+    $('tabBtnAccount').classList.add('hidden');
+    renderHistory();
+  }
 </script>
 </body>
 </html>
