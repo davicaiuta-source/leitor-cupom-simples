@@ -233,9 +233,52 @@
   .paste-error { color: var(--danger); font-size: .85rem; margin: 0 0 10px; }
   .link-btn.inline { margin-top: 10px; }
 
+  /* ---------- Abas (barra inferior) ---------- */
+  .app { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .tabbar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+    width: 100%; max-width: 480px; display: flex;
+    background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(20, 50, 30, .08);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tabbar button {
+    flex: 1; background: none; border: 0; cursor: pointer; padding: 10px 0 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font: 500 .78rem "Inter", sans-serif; color: var(--muted);
+  }
+  .tabbar button.active { color: var(--green-text); font-weight: 700; }
+  .tabbar svg { width: 24px; height: 24px; stroke: currentColor; }
+
+  /* ---------- Estoque ---------- */
+  .stock-card h2 { margin: 0 0 6px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .stock-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .stat { background: var(--green-soft); border-radius: 10px; padding: 10px 6px; text-align: center; min-width: 0; }
+  .stat b { display: block; font-size: 1rem; font-weight: 800; color: var(--green-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .72rem; color: var(--muted); }
+  .chips { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px; }
+  .chip {
+    flex: 0 0 auto; border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 12px; font: 500 .82rem "Inter", sans-serif; color: var(--muted); cursor: pointer;
+  }
+  .chip.active { background: var(--green-btn); border-color: var(--green-btn); color: #fff; }
+  ul.stock-list { list-style: none; margin: 0 -22px; padding: 0; }
+  .stock-list li { padding: 12px 22px; border-top: 1px solid var(--border); cursor: pointer; }
+  .stock-list li:nth-child(odd) { background: #f6f8f6; }
+  .s-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .s-name { color: var(--green-dark); font-weight: 600; text-transform: uppercase; word-break: break-word; }
+  .s-qty { font-weight: 800; font-size: 1.15rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .s-qty small { font-weight: 500; color: var(--muted); font-size: .8rem; }
+  .s-meta { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .s-detail { margin-top: 10px; padding-left: 10px; border-left: 3px solid var(--green-soft); font-size: .8rem; }
+  .s-detail div { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+  .s-detail span:last-child { white-space: nowrap; color: var(--text); }
+  .stock-note { font-size: .75rem; color: var(--muted); margin: 14px 0 0; }
+
   .hidden { display: none !important; }
 
   @media (max-width: 360px) {
+    ul.stock-list { margin: 0 -16px; }
+    .stock-list li { padding: 12px 16px; }
     header h1 { font-size: 1.55rem; }
     .scan-card h2 { font-size: 1.35rem; }
     main { padding: 0 14px 28px; }
@@ -266,6 +309,7 @@
   </header>
 
   <main>
+  <div id="tabScan">
     <!-- Card de scan -->
     <section class="card scan-card" id="scanCard">
       <h2>Escaneie o QR Code</h2>
@@ -360,8 +404,44 @@
       <ul class="history" id="historyList"></ul>
       <p class="empty-history hidden" id="historyEmpty">Nenhum cupom escaneado ainda.<br>Escaneie seu primeiro cupom acima.</p>
     </section>
+  </div>
+
+  <!-- Aba Estoque: soma os produtos de todos os cupons -->
+  <div id="tabStock" class="hidden">
+    <section class="card stock-card">
+      <h2>Estoque</h2>
+      <p class="lead">Todos os produtos dos cupons escaneados, somados.</p>
+      <div class="stock-stats">
+        <div class="stat"><b id="statProducts">0</b><span>produtos</span></div>
+        <div class="stat"><b id="statCupons">0</b><span>cupons</span></div>
+        <div class="stat"><b id="statSpent">R$ 0,00</b><span>total gasto</span></div>
+      </div>
+      <input type="search" class="filter" id="stockFilter" placeholder="Buscar produto...">
+      <div class="chips" id="stockSort">
+        <button class="chip active" data-sort="qty">Mais comprados</button>
+        <button class="chip" data-sort="spent">Maior gasto</button>
+        <button class="chip" data-sort="recent">Recentes</button>
+        <button class="chip" data-sort="name">A–Z</button>
+      </div>
+      <ul class="stock-list" id="stockList"></ul>
+      <p class="empty hidden" id="stockEmpty"></p>
+      <p class="stock-note">Toque num produto para ver em quais cupons ele aparece. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
+    </section>
+  </div>
+
     <p class="version" id="appVersion"></p>
   </main>
+
+  <nav class="tabbar">
+    <button class="active" data-tab="scan">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v4M7 13v4h4"/></svg>
+      Escanear
+    </button>
+    <button data-tab="stock">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+      Estoque
+    </button>
+  </nav>
 </div>
 
 <script>
@@ -489,11 +569,93 @@
     });
   }
 
+  // ---------- Estoque: junta os itens de todos os cupons ----------
+  let stockSort = 'qty';
+  let openStockKey = null;
+
+  // "BISC.BAUD.CHAM" e "Bisc Baud Cham" viram a mesma chave
+  function normName(s) {
+    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+  }
+
+  function buildStock(history) {
+    const nn = (v) => (v === null || v === undefined) ? NaN : v; // NaN vira null no JSON
+    const groups = new Map();
+    history.forEach(h => {
+      (h.items || []).forEach(i => {
+        const unit = (i.un || 'un').toLowerCase().trim();
+        const key = normName(i.name) + '|' + unit;
+        let qtd = nn(i.qtd);
+        if (isNaN(qtd)) qtd = 1;
+        let total = nn(i.total);
+        if (isNaN(total)) total = isNaN(nn(i.unit)) ? 0 : qtd * nn(i.unit);
+
+        if (!groups.has(key)) groups.set(key, { key, name: i.name, unit, qty: 0, spent: 0, cupons: new Set(), purchases: [], last: 0 });
+        const g = groups.get(key);
+        g.qty += qtd;
+        g.spent += total;
+        g.cupons.add(h.url);
+        g.last = Math.max(g.last, h.scannedAt || 0);
+        g.purchases.push({ store: h.store, date: h.scannedAt, qty: qtd, total });
+      });
+    });
+    return [...groups.values()];
+  }
+
+  function renderStock() {
+    const history = loadHistory();
+    const all = buildStock(history);
+    const q = normName($('stockFilter').value);
+
+    $('statProducts').textContent = all.length;
+    $('statCupons').textContent = history.length;
+    $('statSpent').textContent = brl(history.reduce((s, h) => s + (h.total || 0), 0));
+
+    const sorters = {
+      qty: (a, b) => b.qty - a.qty || b.spent - a.spent,
+      spent: (a, b) => b.spent - a.spent,
+      recent: (a, b) => b.last - a.last,
+      name: (a, b) => a.name.localeCompare(b.name, 'pt-BR')
+    };
+    const list = all.filter(g => !q || g.key.includes(q)).sort(sorters[stockSort]);
+
+    const empty = $('stockEmpty');
+    empty.textContent = !history.length ? 'Nenhum cupom escaneado ainda. Escaneie cupons na aba Escanear.' : 'Nenhum produto encontrado.';
+    empty.classList.toggle('hidden', list.length > 0);
+
+    $('stockList').innerHTML = list.map(g => {
+      const n = g.cupons.size;
+      let html = '<li data-key="' + escapeHtml(g.key) + '">' +
+        '<div class="s-row"><span class="s-name">' + escapeHtml(g.name) + '</span>' +
+        '<span class="s-qty">' + fmtQtd(g.qty) + ' <small>' + escapeHtml(g.unit) + '</small></span></div>' +
+        '<div class="s-meta">' + n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
+        (g.qty > 0 ? ' · Média ' + brl(g.spent / g.qty) + '/' + escapeHtml(g.unit) : '') + '</div>';
+      if (openStockKey === g.key) {
+        html += '<div class="s-detail">' + g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
+          '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') + '</span>' +
+          '<span>' + fmtQtd(p.qty) + ' ' + escapeHtml(g.unit) + ' · ' + brl(p.total) + '</span></div>'
+        ).join('') + '</div>';
+      }
+      return html + '</li>';
+    }).join('');
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('tabScan').classList.toggle('hidden', tab !== 'scan');
+    $('tabStock').classList.toggle('hidden', tab !== 'stock');
+    if (tab === 'stock') {
+      stopScanner();
+      renderStock();
+    }
+    window.scrollTo({ top: 0 });
+  }
+
   // ---------- Câmera ----------
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-30.2';
+  const APP_VERSION = '2026-10-31';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -993,6 +1155,21 @@
   });
   $('btnTorch').addEventListener('click', toggleTorch);
   $('btnCamSwitch').addEventListener('click', switchCamera);
+  document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  $('stockFilter').addEventListener('input', renderStock);
+  $('stockSort').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    stockSort = chip.dataset.sort;
+    $('stockSort').querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+    renderStock();
+  });
+  $('stockList').addEventListener('click', (e) => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    openStockKey = openStockKey === li.dataset.key ? null : li.dataset.key;
+    renderStock();
+  });
   $('photoInput').addEventListener('change', (e) => {
     scanFromPhoto(e.target.files[0]);
     e.target.value = '';
