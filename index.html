@@ -2,181 +2,2227 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leitor de Cupom - Estoque</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14532d">
+<title>Leitor de Cupom Fiscal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-body{font-family:Arial,sans-serif;margin:0;padding:15px;background:#f5f5f5}
-.card{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:15px}
-button{width:100%;padding:12px;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
-.btn-blue{background:#1976d2;color:white}
-.btn-green{background:#2e7d32;color:white}
-.btn-orange{background:#ef6c00;color:white}
-.btn-gray{background:#757575;color:white}
-input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;margin-top:8px;box-sizing:border-box}
-#reader{width:100%;border-radius:12px;overflow:hidden}
-.hidden{display:none}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;color:white}
-.badge-ind{background:#1976d2}
-.badge-col{background:#ef6c00}
+  :root {
+    color-scheme: light;
+    --bg: #eef1ee;
+    --card: #ffffff;
+    --text: #1a1f1c;
+    --muted: #5f6b64;
+    --green: #16a34a;
+    --green-btn: #1e9a4b;
+    --green-btn-dark: #187d3d;
+    --green-dark: #14532d;
+    --green-deep: #0f3d22;
+    --green-soft: #dcf2e3;
+    --green-text: #15803d;
+    --orange-soft: #fbd38d;
+    --orange: #b45309;
+    --border: #e3e8e4;
+    --danger: #b91c1c;
+    --shadow: 0 6px 24px rgba(20, 50, 30, .10);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+  .app { max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; min-height: 100vh; }
+
+  /* blobs decorativos do fundo */
+  .app::before, .app::after {
+    content: ""; position: absolute; z-index: 0; border-radius: 50%;
+    background: #dfe8e1; pointer-events: none;
+  }
+  .app::before { width: 260px; height: 220px; right: -60px; top: 150px; }
+  .app::after { width: 220px; height: 220px; left: -120px; top: 640px; }
+
+  /* ---------- Header ---------- */
+  header {
+    position: relative; z-index: 1;
+    background: linear-gradient(135deg, var(--green-deep), var(--green-dark));
+    color: #fff;
+    padding: calc(28px + env(safe-area-inset-top)) 20px 80px;
+    overflow: hidden;
+  }
+  header .leaves { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .18; pointer-events: none; }
+  .header-row { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  header h1 { margin: 0; font-size: 1.85rem; font-weight: 800; line-height: 1.12; letter-spacing: -.01em; }
+  .header-icons { display: flex; gap: 14px; padding-top: 6px; }
+  .header-icons svg { width: 26px; height: 26px; stroke: #fff; }
+
+  main { position: relative; z-index: 1; padding: 0 20px 32px; margin-top: -48px; }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 24px 22px;
+    margin-bottom: 28px;
+  }
+
+  /* ---------- Card de scan ---------- */
+  .scan-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .scan-card p.lead { margin: 0 0 8px; color: var(--muted); font-size: .9rem; }
+  .illustration { display: block; width: 100%; max-width: 260px; margin: 4px auto 12px; }
+  .reader-wrap { position: relative; margin: 12px 0; }
+  #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 200px; }
+  #reader video { border-radius: 12px; display: block; }
+  .torch {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(0, 0, 0, .55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .torch.on { background: #facc15; color: #1a1f1c; }
+  .torch.cam-switch { right: auto; left: 10px; }
+  .torch svg { width: 22px; height: 22px; stroke: currentColor; }
+  .reader-hint { margin: 8px 0 0; text-align: center; font-size: .82rem; color: var(--muted); }
+  .reader-hint.warn { color: var(--orange); font-weight: 600; }
+  .photo-btn { margin-top: 10px; }
+  .inapp-warn {
+    background: #fff7e6; border: 1px solid #f5c26b; border-radius: 10px;
+    padding: 12px 14px; margin: 8px 0 12px; font-size: .88rem; color: #7a4a00;
+  }
+  .inapp-warn b { color: #5c3700; }
+  .inapp-warn .btn { margin-top: 10px; }
+  .diag { display: block; margin-top: 6px; font-size: .75rem; color: var(--muted); word-break: break-all; }
+  .version { text-align: center; font-size: .72rem; color: var(--muted); margin: 8px 0 0; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; min-height: 54px; border: 0; border-radius: 10px;
+    font: 600 1.1rem "Inter", sans-serif;
+    cursor: pointer; background: var(--green-btn); color: #fff;
+    transition: background .15s;
+  }
+  .btn:hover { background: var(--green-btn-dark); }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { width: 26px; height: 26px; stroke: currentColor; }
+  .btn.stop { background: #fff; color: var(--danger); border: 2px solid var(--danger); }
+  .btn.small { min-height: 44px; font-size: .95rem; }
+  .btn.ghost { background: #fff; color: var(--green-text); border: 2px solid var(--green-btn); }
+
+  .link-btn {
+    display: flex; align-items: center; gap: 6px; margin: 16px auto 0;
+    background: none; border: 0; padding: 4px 0; cursor: pointer;
+    font: 500 .9rem "Inter", sans-serif; color: var(--text);
+    border-bottom: 1.5px solid var(--text);
+  }
+  .link-btn svg { width: 15px; height: 15px; stroke: currentColor; }
+  .manual { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .manual input {
+    flex: 1 1 200px; min-height: 44px; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    font: 400 1rem "Inter", sans-serif; background: #f7f9f7; color: var(--text);
+  }
+  .manual .btn { flex: 0 0 auto; width: auto; padding: 0 18px; }
+
+  /* ---------- Lista de cupons ---------- */
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 14px; }
+  .section-head h3 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+  .section-head button {
+    background: none; border: 0; cursor: pointer; padding: 4px;
+    font: 500 .95rem "Inter", sans-serif; color: var(--green-text);
+  }
+  .history { list-style: none; margin: 0; padding: 0; }
+  .history li {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border-radius: 12px; box-shadow: var(--shadow);
+    padding: 14px 16px; margin-bottom: 12px; cursor: pointer;
+    transition: transform .1s;
+  }
+  .history li:active { transform: scale(.99); }
+  .h-icon {
+    flex: 0 0 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--green-soft); color: var(--green-text);
+  }
+  .h-icon.pharma { background: var(--orange-soft); color: var(--orange); }
+  .h-icon svg { width: 24px; height: 24px; stroke: currentColor; }
+  .h-info { flex: 1; min-width: 0; }
+  .h-name { font-weight: 700; font-size: 1rem; line-height: 1.2; word-break: break-word; }
+  .h-date { color: var(--muted); font-size: .8rem; margin-top: 3px; }
+  .h-right { text-align: right; flex: 0 0 auto; }
+  .h-total { color: var(--green-dark); font-weight: 800; font-size: 1.15rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+    background: var(--green-soft); color: var(--green-text);
+    font-size: .78rem; font-weight: 500; padding: 2px 8px; border-radius: 4px;
+  }
+  .badge svg { width: 13px; height: 13px; stroke: currentColor; }
+  .empty-history {
+    text-align: center; color: var(--muted); font-size: .9rem;
+    background: var(--card); border-radius: 12px; padding: 24px 16px; box-shadow: var(--shadow);
+  }
+
+  /* ---------- Detalhe da nota ---------- */
+  .detail-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-head h2 { margin: 0; font-size: 1.2rem; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer;
+    background: #f1f4f2; color: var(--text); display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+  #status { font-size: .9rem; color: var(--muted); margin: 0 0 12px; word-break: break-word; }
+  #status:empty { display: none; }
+  #status.error { color: var(--danger); }
+  #status a { color: var(--green-text); }
+  .spinner {
+    display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px;
+    border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .nota-head { text-align: center; margin-bottom: 14px; }
+  .store { font-weight: 700; color: var(--green-dark); font-size: 1.05rem; margin: 0 0 4px; text-transform: uppercase; }
+  .store-info { font-size: .8rem; color: var(--muted); margin: 0; }
+  .filter {
+    width: 100%; min-height: 42px; padding: 8px 12px 8px 36px; margin-bottom: 10px;
+    border: 1px solid var(--border); border-radius: 10px; font: 400 .95rem "Inter", sans-serif;
+    background: #f7f9f7 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235f6b64' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E") no-repeat 12px center;
+    color: var(--text);
+  }
+  ul.items { list-style: none; margin: 0 -22px; padding: 0; }
+  ul.items li { padding: 11px 22px; border-top: 1px solid var(--border); }
+  ul.items li:nth-child(odd) { background: #f6f8f6; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .row + .row { margin-top: 7px; }
+  .item-name { color: var(--green-dark); font-weight: 600; text-transform: uppercase; word-break: break-word; }
+  .item-code { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  .label-total { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  .item-meta { font-size: .82rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 3px 12px; }
+  .item-meta b { color: var(--text); font-weight: 600; }
+  .item-total { color: var(--green-dark); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .empty { text-align: center; color: var(--muted); padding: 16px 0; }
+  .summary {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 2px solid var(--green-dark); margin-top: 0; padding-top: 14px;
+    font-size: 1.2rem; font-weight: 800; color: var(--green-dark);
+  }
+  .summary small { font-weight: 400; color: var(--muted); font-size: .82rem; display: block; }
+  .detail-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .detail-actions .btn { flex: 1 1 140px; }
+  .detail-actions a { flex: 1 1 140px; text-decoration: none; }
+
+  /* ---------- Plano B: colar texto ---------- */
+  .paste-box { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .paste-title { margin: 0 0 8px; font-weight: 700; color: var(--green-dark); }
+  .steps { margin: 0 0 12px; padding-left: 20px; font-size: .9rem; color: var(--muted); }
+  .steps li { margin-bottom: 4px; }
+  .steps b { color: var(--text); }
+  .steps a { color: var(--green-text); font-weight: 600; }
+  .paste-box textarea {
+    width: 100%; min-height: 110px; padding: 10px 12px; margin-bottom: 10px; resize: vertical;
+    border: 1px solid var(--border); border-radius: 10px;
+    font: 400 .9rem "Inter", sans-serif; background: #f7f9f7; color: var(--text);
+  }
+  .paste-error { color: var(--danger); font-size: .85rem; margin: 0 0 10px; }
+  .link-btn.inline { margin-top: 10px; }
+
+  /* ---------- Abas (barra inferior) ---------- */
+  .app { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .tabbar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 10;
+    width: 100%; max-width: 480px; display: flex;
+    background: #fff; border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(20, 50, 30, .08);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tabbar button {
+    flex: 1; background: none; border: 0; cursor: pointer; padding: 10px 0 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font: 500 .78rem "Inter", sans-serif; color: var(--muted);
+  }
+  .tabbar button.active { color: var(--green-text); font-weight: 700; }
+  .tabbar svg { width: 24px; height: 24px; stroke: currentColor; }
+
+  /* ---------- Estoque ---------- */
+  .stock-card h2 { margin: 0 0 6px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .stock-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .stat { background: var(--green-soft); border-radius: 10px; padding: 10px 6px; text-align: center; min-width: 0; }
+  .stat b { display: block; font-size: 1rem; font-weight: 800; color: var(--green-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .72rem; color: var(--muted); }
+  .chips { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px; }
+  .chip {
+    flex: 0 0 auto; border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 12px; font: 500 .82rem "Inter", sans-serif; color: var(--muted); cursor: pointer;
+  }
+  .chip.active { background: var(--green-btn); border-color: var(--green-btn); color: #fff; }
+  ul.stock-list { list-style: none; margin: 0 -22px; padding: 0; }
+  .stock-list li { padding: 12px 22px; border-top: 1px solid var(--border); cursor: pointer; }
+  .stock-list li:nth-child(odd) { background: #f6f8f6; }
+  .s-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .s-name { color: var(--green-dark); font-weight: 600; text-transform: uppercase; word-break: break-word; }
+  .s-qty { font-weight: 800; font-size: 1.15rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .s-qty small { font-weight: 500; color: var(--muted); font-size: .8rem; }
+  .s-meta { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .s-detail { margin-top: 10px; padding-left: 10px; border-left: 3px solid var(--green-soft); font-size: .8rem; }
+  .s-detail div { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+  .s-detail span:last-child { white-space: nowrap; color: var(--text); }
+  .stock-note { font-size: .75rem; color: var(--muted); margin: 14px 0 0; }
+
+  /* ---------- Categorias ---------- */
+  .cat-select {
+    font: 500 .85rem "Inter", sans-serif; color: var(--text); cursor: pointer;
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 30px 7px 12px;
+    -webkit-appearance: none; appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235f6b64' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 11px center;
+  }
+  .cat-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin: 0 0 12px; padding: 10px 12px; background: #f6f8f6; border-radius: 10px;
+    font-size: .9rem; font-weight: 600;
+  }
+  .sub-pill {
+    margin-top: 6px; border: 0; border-radius: 999px; cursor: pointer;
+    font: 600 .72rem "Inter", sans-serif; padding: 3px 22px 3px 9px;
+    -webkit-appearance: none; appearance: none; color: var(--green-text);
+    background: var(--green-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%2315803d' stroke-width='2'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") no-repeat right 7px center;
+  }
+  .sub-summary { margin: 12px 0; font-size: .85rem; }
+  .sub-summary div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; color: var(--muted); }
+  .sub-summary b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .breakdown { margin: 0 0 12px; }
+  .bd-title { font-size: .75rem; font-weight: 700; color: var(--muted); margin: 0 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .bd-row { padding: 6px 4px; border-radius: 8px; cursor: pointer; }
+  .bd-row.active { background: #f1f4f2; }
+  .bd-top { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; }
+  .bd-top span:first-child { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .bd-top span:last-child { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bd-top svg { width: 16px; height: 16px; stroke: currentColor; flex: 0 0 auto; }
+  .bd-bar { height: 8px; background: #eef1ee; border-radius: 4px; margin-top: 4px; overflow: hidden; }
+  .bd-bar i { display: block; height: 100%; border-radius: 4px; }
+  .chip.sub { font-size: .78rem; padding: 5px 11px; }
+  .chip.sub.active { background: var(--green-dark); border-color: var(--green-dark); }
+  .search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .search-row .filter { flex: 1; margin-bottom: 0; min-width: 0; }
+  .s-tag { display: inline-block; font-size: .7rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-right: 6px; }
+  .s-sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-weight: 600; color: var(--text); }
+
+  /* ---------- Contas e grupos ---------- */
+  .header-icons button { background: none; border: 0; padding: 0; cursor: pointer; color: #fff; display: flex; border-radius: 50%; }
+  .header-icons button.active { box-shadow: 0 0 0 3px rgba(255, 255, 255, .35); }
+  .avatar svg { width: 26px; height: 26px; stroke: currentColor; }
+  .account-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .account-card .account-head { margin: 14px 0 4px; padding: 14px; background: #f6f8f6; border-radius: 12px; }
+  .check-row { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 14px; font-size: .88rem; color: var(--muted); cursor: pointer; }
+  .check-row input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--green-btn); flex: 0 0 auto; }
+  .divider { border: 0; border-top: 1px solid var(--border); margin: 18px 0; }
+  .notice { background: #fff7e6; border: 1px solid #f5c26b; border-radius: 10px; padding: 12px 14px; font-size: .88rem; color: #7a4a00; margin: 0 0 14px; }
+  .auth-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .auth-card p.lead { margin: 0 0 18px; color: var(--muted); font-size: .9rem; }
+  .space-pill {
+    position: relative; display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+    background: rgba(255, 255, 255, .16); border: 0; color: #fff; cursor: pointer;
+    font: 500 .8rem "Inter", sans-serif; padding: 5px 12px; border-radius: 999px;
+  }
+  .space-pill svg { width: 15px; height: 15px; stroke: currentColor; }
+  .seg { display: flex; background: #f1f4f2; border-radius: 10px; padding: 4px; margin-bottom: 18px; }
+  .seg button {
+    flex: 1; border: 0; background: none; padding: 10px; border-radius: 8px; cursor: pointer;
+    font: 600 .95rem "Inter", sans-serif; color: var(--muted);
+  }
+  .seg button.active { background: #fff; color: var(--green-dark); box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+  .seg.small { margin-bottom: 12px; }
+  .seg.small button { padding: 8px; font-size: .85rem; }
+  .field { display: block; margin-bottom: 14px; }
+  .field > span, .field-label { display: block; font-size: .85rem; font-weight: 600; margin: 0 0 6px; }
+  .field input, .inline-form input {
+    width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font: 400 1rem "Inter", sans-serif; background: #f7f9f7; color: var(--text);
+  }
+  .field input:focus, .inline-form input:focus { outline: 2px solid var(--green-btn); outline-offset: -1px; background: #fff; }
+  input.code-input { text-transform: uppercase; letter-spacing: .3em; font-weight: 700; text-align: center; }
+  .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .mode-card { position: relative; display: block; border: 2px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; }
+  .mode-card input { position: absolute; opacity: 0; pointer-events: none; }
+  .mode-card b { display: block; margin-bottom: 4px; }
+  .mode-card span { font-size: .78rem; color: var(--muted); }
+  .mode-card.selected { border-color: var(--green-btn); background: #f3fbf5; }
+  .group-box { background: #f6f8f6; border-radius: 12px; padding: 12px 12px 2px; margin-bottom: 14px; }
+  .form-error { color: var(--danger); font-size: .85rem; margin: 0 0 12px; }
+  .form-error.ok { color: var(--green-text); }
+  .auth-card .link-btn { margin-top: 14px; }
+  .auth-loading { text-align: center; color: var(--muted); padding: 24px 0; }
+  .group-code {
+    font: 800 2rem "Inter", sans-serif; letter-spacing: .25em; text-align: center;
+    color: var(--green-dark); background: var(--green-soft); border-radius: 12px; padding: 14px 8px; margin: 12px 0;
+  }
+  .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn-row .btn { flex: 1; }
+  .modal { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, .45); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-card { background: #fff; border-radius: 16px; padding: 22px; width: 100%; max-width: 400px; }
+  .modal-card h3 { margin: 0 0 6px; font-size: 1.3rem; }
+  .modal-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40;
+    background: #1a1f1c; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .88rem;
+    max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow);
+  }
+  .account-head { display: flex; align-items: center; gap: 14px; }
+  .account-head b { display: block; font-size: 1.1rem; }
+  .account-head span { color: var(--muted); font-size: .85rem; word-break: break-all; }
+  .avatar {
+    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 50%; background: var(--green-btn); color: #fff;
+    display: flex; align-items: center; justify-content: center; font: 700 1.3rem "Inter", sans-serif;
+  }
+  .card-title { margin: 0 0 8px; font-size: 1.15rem; }
+  .muted { color: var(--muted); font-size: .88rem; margin: 0 0 14px; }
+  .members { list-style: none; margin: 4px 0 14px; padding: 0; }
+  .members li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .92rem; }
+  .members .avatar { flex-basis: 32px; width: 32px; height: 32px; font-size: .85rem; }
+  .tag-owner { margin-left: auto; font-size: .72rem; font-weight: 600; background: var(--green-soft); color: var(--green-text); padding: 2px 8px; border-radius: 999px; }
+  .inline-form { display: flex; gap: 8px; margin-bottom: 14px; }
+  .inline-form input { flex: 1; min-width: 0; min-height: 44px; }
+  .inline-form .btn { width: auto; flex: 0 0 auto; padding: 0 16px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 360px) {
+    .mode-cards { grid-template-columns: 1fr; }
+    ul.stock-list { margin: 0 -16px; }
+    .stock-list li { padding: 12px 16px; }
+    header h1 { font-size: 1.55rem; }
+    .scan-card h2 { font-size: 1.35rem; }
+    main { padding: 0 14px 28px; }
+    .card { padding: 20px 16px; }
+    ul.items { margin: 0 -16px; }
+    ul.items li { padding: 11px 16px; }
+  }
 </style>
 </head>
 <body>
+<div class="app">
+  <header>
+    <svg class="leaves" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-width="1.2" aria-hidden="true">
+      <path d="M250 200 C 280 140, 330 100, 400 80"/>
+      <path d="M280 200 C 310 150, 350 125, 400 115"/>
+      <path d="M320 0 L 400 70 M340 0 L 400 50 M300 0 L 400 90 M360 0 L 400 32"/>
+      <path d="M180 200 C 200 150, 240 120, 230 60 C 200 100, 180 150, 180 200 Z" fill="#fff" fill-opacity=".25"/>
+      <path d="M300 200 C 340 170, 380 170, 400 150 C 360 140, 320 160, 300 200 Z" fill="#fff" fill-opacity=".2"/>
+      <path d="M20 200 C 40 160, 80 140, 110 150 C 80 170, 50 180, 20 200 Z" fill="#fff" fill-opacity=".15"/>
+    </svg>
+    <div class="header-row">
+      <h1>Leitor de<br>Cupom Fiscal</h1>
+      <div class="header-icons">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <button id="btnHeaderUser" aria-label="Minha conta">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a6 6 0 0 1 10 0"/></svg>
+        </button>
+      </div>
+    </div>
+    <button class="space-pill hidden" id="headerSpace"></button>
+  </header>
 
-<div id="tela-login" class="card">
-<h2>🔐 Entrar</h2>
-<p style="font-size:14px;color:#666">Cadastro Individual e Coletivo ativado</p>
-<input id="email" type="email" placeholder="Seu e-mail">
-<input id="senha" type="password" placeholder="Sua senha">
-<button class="btn-blue" onclick="fazerLogin()">Entrar / Criar Conta</button>
-<p id="msg-login" style="font-size:13px;color:#d32f2f"></p>
+  <main>
+  <!-- Login / cadastro (só aparece quando o Firebase está configurado) -->
+  <div id="authView" class="hidden">
+    <section class="card auth-card">
+      <p class="auth-loading" id="authLoading"><span class="spinner"></span>Carregando...</p>
+      <div id="authForms" class="hidden">
+        <h2>Bem-vindo</h2>
+        <p class="lead">Entre para guardar seus cupons e montar o estoque sozinho ou em grupo.</p>
+        <div class="seg" id="authSeg">
+          <button class="active" data-auth="login">Entrar</button>
+          <button data-auth="signup">Criar conta</button>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <label class="field"><span>E-mail</span><input type="email" id="loginEmail" autocomplete="email"></label>
+          <label class="field"><span>Senha</span><input type="password" id="loginPass" autocomplete="current-password"></label>
+          <p class="form-error hidden" id="loginError"></p>
+          <button class="btn" type="submit">Entrar</button>
+          <button class="link-btn" type="button" id="btnForgot">Esqueci minha senha</button>
+        </form>
+
+        <form id="signupForm" class="hidden" novalidate>
+          <label class="field"><span>Seu nome</span><input id="suName" autocomplete="name"></label>
+          <label class="field"><span>E-mail</span><input type="email" id="suEmail" autocomplete="email"></label>
+          <label class="field"><span>Senha (mínimo 6 caracteres)</span><input type="password" id="suPass" autocomplete="new-password"></label>
+          <p class="field-label">Tipo de cadastro</p>
+          <div class="mode-cards" id="modeCards">
+            <label class="mode-card selected"><input type="radio" name="suMode" value="individual" checked><b>Individual</b><span>Só você vê seus cupons e seu estoque.</span></label>
+            <label class="mode-card"><input type="radio" name="suMode" value="group"><b>Coletivo</b><span>Família ou equipe compartilham cupons e estoque.</span></label>
+          </div>
+          <div class="group-box hidden" id="suGroupBox">
+            <div class="seg small" id="suGroupSeg">
+              <button type="button" class="active" data-ga="create">Criar grupo</button>
+              <button type="button" data-ga="join">Tenho um código</button>
+            </div>
+            <label class="field" id="suGroupNameField"><span>Nome do grupo</span><input id="suGroupName" placeholder="Ex.: Família Silva"></label>
+            <label class="field hidden" id="suCodeField"><span>Código do grupo</span><input id="suCode" class="code-input" maxlength="6" placeholder="K7P2QX" autocapitalize="characters" autocomplete="off"></label>
+          </div>
+          <p class="form-error hidden" id="signupError"></p>
+          <button class="btn" type="submit">Criar conta</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <div id="tabScan">
+    <!-- Card de scan -->
+    <section class="card scan-card" id="scanCard">
+      <h2>Escaneie o QR Code</h2>
+      <p class="lead">Aponte a câmera para o QR code do cupom fiscal NFC-e e valide automaticamente com a SEFAZ</p>
+
+      <div class="inapp-warn hidden" id="inAppWarn">
+        Você abriu este link <b>dentro de outro app</b> (WhatsApp, Instagram...), que pode bloquear a câmera.
+        Toque nos <b>⋮</b> ou em <b>compartilhar</b> e escolha <b>"Abrir no navegador"</b> (Chrome ou Safari).
+        Ou use o botão <b>"Ler de uma foto"</b> abaixo.
+        <button class="btn small ghost" id="btnCopyLink">Copiar link do app</button>
+      </div>
+
+      <svg class="illustration" id="illustration" viewBox="0 0 260 190" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <ellipse cx="185" cy="95" rx="70" ry="60" fill="#e6efe8"/>
+        <ellipse cx="70" cy="120" rx="50" ry="45" fill="#eef4ef"/>
+        <!-- cantos verdes -->
+        <g stroke="#16a34a" stroke-width="4">
+          <path d="M72 30 v-8 a12 12 0 0 1 12 -12 h8"/>
+          <path d="M168 10 h8 a12 12 0 0 1 12 12 v8"/>
+        </g>
+        <!-- celular -->
+        <rect x="82" y="18" width="96" height="160" rx="14" fill="#fff" stroke="#1a1f1c" stroke-width="3"/>
+        <path d="M118 26 h24" stroke="#1a1f1c" stroke-width="3"/>
+        <!-- moldura de scan -->
+        <g stroke="#16a34a" stroke-width="3">
+          <path d="M98 70 v-10 h10 M162 60 h10 v10 M172 124 v10 h-10 M108 134 h-10 v-10"/>
+        </g>
+        <!-- QR -->
+        <g fill="#1a1f1c">
+          <rect x="108" y="70" width="16" height="16"/><rect x="146" y="70" width="16" height="16"/><rect x="108" y="108" width="16" height="16"/>
+          <rect x="112" y="74" width="8" height="8" fill="#fff"/><rect x="150" y="74" width="8" height="8" fill="#fff"/><rect x="112" y="112" width="8" height="8" fill="#fff"/>
+          <rect x="128" y="70" width="5" height="5"/><rect x="136" y="76" width="5" height="5"/><rect x="128" y="82" width="5" height="5"/>
+          <rect x="128" y="92" width="5" height="5"/><rect x="138" y="92" width="5" height="5"/><rect x="108" y="92" width="5" height="5"/>
+          <rect x="116" y="98" width="5" height="5"/><rect x="146" y="92" width="5" height="5"/><rect x="156" y="98" width="5" height="5"/>
+          <rect x="132" y="104" width="5" height="5"/><rect x="146" y="108" width="5" height="5"/><rect x="156" y="114" width="5" height="5"/>
+          <rect x="132" y="116" width="5" height="5"/><rect x="140" y="120" width="5" height="5"/><rect x="150" y="120" width="5" height="5"/>
+        </g>
+        <!-- mão -->
+        <path d="M150 190 C 150 170, 140 160, 146 148 L 176 120 C 182 114, 192 120, 186 128 L 172 142 L 196 118 C 202 112, 212 120, 205 127 L 210 122 C 216 116, 226 124, 219 131 L 222 128 C 228 123, 236 131, 230 137 L 200 172 C 196 180, 196 186, 196 190"
+              fill="#fff" stroke="#1a1f1c" stroke-width="3"/>
+      </svg>
+
+      <div class="reader-wrap hidden" id="readerWrap">
+        <div id="reader"></div>
+        <button class="torch hidden" id="btnTorch" aria-label="Lanterna">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+        </button>
+        <button class="torch cam-switch hidden" id="btnCamSwitch" aria-label="Trocar câmera">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M15 12.5a3 3 0 0 0-5.2-2M9 13.5a3 3 0 0 0 5.2 2"/><path d="M9.8 8.5v2h2M14.2 17.5v-2h-2"/></svg>
+        </button>
+        <p class="reader-hint" id="readerHint">Centralize o QR Code no quadro e aproxime até ficar nítido.</p>
+      </div>
+
+      <button class="btn" id="btnScan">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span>Escanear QR Code</span>
+      </button>
+      <label class="btn small ghost photo-btn">
+        <input type="file" accept="image/*" id="photoInput" hidden>
+        Ler de uma foto
+      </label>
+
+      <button class="link-btn" id="btnToggleManual">
+        Inserir URL manualmente
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </button>
+      <div class="manual hidden" id="manualBox">
+        <input id="manualUrl" type="url" placeholder="https://...sefaz...">
+        <button class="btn small" id="btnManual">Buscar</button>
+        <button class="link-btn inline" id="btnPasteMode">Ou colar o texto da nota</button>
+      </div>
+    </section>
+
+    <!-- Detalhe da nota -->
+    <section class="card hidden" id="resultCard">
+      <div class="detail-head">
+        <h2>Detalhes do cupom</h2>
+        <button class="icon-btn" id="btnClose" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p id="status"></p>
+      <div id="result"></div>
+    </section>
+
+    <!-- Histórico -->
+    <section>
+      <div class="section-head">
+        <h3>Últimos Cupons Escaneados</h3>
+        <button id="btnSeeAll" class="hidden">Ver todos</button>
+      </div>
+      <ul class="history" id="historyList"></ul>
+      <p class="empty-history hidden" id="historyEmpty">Nenhum cupom escaneado ainda.<br>Escaneie seu primeiro cupom acima.</p>
+    </section>
+  </div>
+
+  <!-- Aba Estoque: soma os produtos de todos os cupons -->
+  <div id="tabStock" class="hidden">
+    <section class="card stock-card">
+      <h2>Estoque</h2>
+      <p class="lead">Todos os produtos dos cupons escaneados, somados.</p>
+      <div class="stock-stats">
+        <div class="stat"><b id="statProducts">0</b><span>produtos</span></div>
+        <div class="stat"><b id="statCupons">0</b><span>cupons</span></div>
+        <div class="stat"><b id="statSpent">R$ 0,00</b><span>total gasto</span></div>
+      </div>
+      <div class="breakdown" id="stockBreakdown"></div>
+      <div class="chips" id="catChips"></div>
+      <div class="chips" id="subChips"></div>
+      <div class="search-row">
+        <input type="search" class="filter" id="stockFilter" placeholder="Buscar produto...">
+        <select class="cat-select" id="stockSort" aria-label="Ordenar">
+          <option value="qty">Mais comprados</option>
+          <option value="spent">Maior gasto</option>
+          <option value="recent">Recentes</option>
+          <option value="name">A–Z</option>
+        </select>
+      </div>
+      <ul class="stock-list" id="stockList"></ul>
+      <p class="empty hidden" id="stockEmpty"></p>
+      <p class="stock-note">Toque num produto para ver em quais cupons ele aparece e para trocar a subcategoria. A categoria vem da loja: troque no detalhe do cupom. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
+    </section>
+  </div>
+
+  <!-- Aba Conta: dados do usuário e do grupo -->
+  <div id="tabAccount" class="hidden"><div id="accountContent"></div></div>
+
+    <p class="version" id="appVersion"></p>
+  </main>
+
+  <!-- Código do grupo recém-criado -->
+  <div class="modal hidden" id="codeModal">
+    <div class="modal-card">
+      <h3>Grupo criado!</h3>
+      <p>Mande este código para quem vai participar. Só entra no grupo quem tiver o código.</p>
+      <div class="group-code" id="modalCode"></div>
+      <div class="btn-row">
+        <button class="btn small ghost" id="btnModalCopy">Copiar</button>
+        <button class="btn small ghost" id="btnModalShare">Compartilhar</button>
+      </div>
+      <button class="btn small" id="btnModalClose">Continuar</button>
+    </div>
+  </div>
+
+  <nav class="tabbar">
+    <button class="active" data-tab="scan">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v4M7 13v4h4"/></svg>
+      Escanear
+    </button>
+    <button data-tab="stock">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+      Estoque
+    </button>
+  </nav>
 </div>
 
-<div id="tela-app" class="hidden">
-<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<span id="user-info" style="font-weight:bold"></span>
-<button onclick="sair()" style="width:auto;padding:6px 12px;background:#eee;color:#333">Sair</button>
-</div>
-</div>
+<script>
+  // Configuração do seu projeto Firebase (Console → Configurações do projeto → Seus apps → Web).
+  // Enquanto for null, o app funciona sem login e salva tudo só no aparelho.
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyBYIkBLBlP4QSfkC3VluXRzUlcbz_phepY',
+    authDomain: 'cupons-77a31.firebaseapp.com',
+    projectId: 'cupons-77a31',
+    storageBucket: 'cupons-77a31.firebasestorage.app',
+    messagingSenderId: '558288714197',
+    appId: '1:558288714197:web:e64c0f8af27d96861fe55c'
+  };
+  const CLOUD = !!FIREBASE_CONFIG;
 
-<div class="card">
-<h3>📷 Leitor de Cupom</h3>
-<div id="reader"></div>
-<button class="btn-gray" onclick="iniciarScanner()">Iniciar Câmera</button>
-<button class="btn-gray" onclick="pararScanner()">Parar Câmera</button>
-<input id="codigo-manual" placeholder="Código do cupom / nota" style="margin-top:15px">
-<button class="btn-blue" onclick="processarCodigo(document.getElementById('codigo-manual').value)">Processar Código</button>
-</div>
+  // URL do seu proxy no Cloudflare Workers (ver worker.js). Ex.: 'https://nota-proxy.seunome.workers.dev'
+  const WORKER_URL = 'https://dry-base-52b4.davi-caiuta.workers.dev';
 
-<div id="tela-produto" class="card hidden">
-<h3>✅ Cupom Lido</h3>
-<p id="codigo-lido" style="word-break:break-all;background:#f0f0f0;padding:10px;border-radius:8px"></p>
-<label>Tipo de Cadastro:</label>
-<select id="tipo-cadastro" onchange="alternarTipo()">
-<option value="individual">Individual - só meu</option>
-<option value="coletivo">Coletivo - grupo / família</option>
-</select>
-<div id="campo-grupo" class="hidden">
-<input id="nome-grupo" placeholder="Nome do grupo ex: familia-silva">
-</div>
-<input id="nome-produto" placeholder="Nome do produto">
-<input id="qtd-produto" type="number" value="1">
-<button class="btn-green" onclick="salvarEstoque()">💾 Salvar no Estoque</button>
-<p id="msg-salvar" style="font-size:13px"></p>
-</div>
+  // Proxies CORS tentados em ordem; se um falhar, passa para o próximo
+  const PROXIES = [
+    // formato de caminho: WORKER_URL/https://sefaz... (sem codificar a URL)
+    ...(WORKER_URL ? [{ name: 'proxy próprio', build: (u) => WORKER_URL.replace(/\/$/, '') + '/' + u }] : []),
+    { name: 'allorigins', build: (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
+    { name: 'allorigins (json)', build: (u) => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true },
+    { name: 'codetabs', build: (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) }
+  ];
+  const TIMEOUT_MS = 12000;
+  const HISTORY_KEY = 'cupons_historico';
+  const HISTORY_PREVIEW = 3;
+  const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
-<div class="card">
-<h3>📦 Meu Estoque</h3>
-<div style="display:flex;gap:8px">
-<button class="btn-blue" style="flex:1" onclick="carregarEstoque('individual')">Ver Individual</button>
-<button class="btn-orange" style="flex:1" onclick="carregarEstoque('coletivo')">Ver Coletivo</button>
-</div>
-<div id="lista-estoque" style="margin-top:15px"></div>
-</div>
-</div>
+  const $ = (id) => document.getElementById(id);
+  const btnScan = $('btnScan');
+  const resultCard = $('resultCard');
+  const statusEl = $('status');
+  const resultEl = $('result');
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
-import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+  let scanner = null;
+  let busy = false;
+  let showAllHistory = false;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBYIkBLBlP4QSfkC3VluXRzUlcbz_phepY",
-  authDomain: "cupons-77a31.firebaseapp.com",
-  projectId: "cupons-77a31",
-  storageBucket: "cupons-77a31.firebasestorage.app",
-  messagingSenderId: "558288714197",
-  appId: "1:558288714197:web:e64c0f8af27d96861fe55c"
-};
+  // ---------- Helpers ----------
+  const brl = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const fmtNum = (n) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtQtd = (q) => isNaN(q) ? '' : q.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-let html5QrCode = null;
-let codigoAtual = "";
-
-window.fazerLogin = async function(){
-  const email = document.getElementById('email').value.trim();
-  const senha = document.getElementById('senha').value.trim();
-  const msg = document.getElementById('msg-login');
-  if(!email || !senha){ msg.innerText="Preencha e-mail e senha"; return; }
-  try{ await signInWithEmailAndPassword(auth, email, senha); }
-  catch(e){
-    try{ await createUserWithEmailAndPassword(auth, email, senha); msg.style.color="green"; msg.innerText="Conta criada!"; }
-    catch(e2){ msg.innerText="Erro: "+e2.message; }
+  function toNumber(str) {
+    if (!str) return NaN;
+    const m = String(str).replace(/\s/g, '').match(/-?[\d.]*,?\d+/);
+    if (!m) return NaN;
+    return parseFloat(m[0].replace(/\./g, '').replace(',', '.'));
   }
-}
-window.sair = function(){ signOut(auth); }
-onAuthStateChanged(auth, (user)=>{
-  if(user){
-    document.getElementById('tela-login').classList.add('hidden');
-    document.getElementById('tela-app').classList.remove('hidden');
-    document.getElementById('user-info').innerText = "👤 "+user.email;
-  }else{
-    document.getElementById('tela-login').classList.remove('hidden');
-    document.getElementById('tela-app').classList.add('hidden');
+
+  function clean(str) {
+    return (str || '').replace(/\s+/g, ' ').trim();
   }
-});
-window.iniciarScanner = function(){
-  if(html5QrCode) return;
-  html5QrCode = new Html5Qrcode("reader");
-  html5QrCode.start({facingMode:"environment"}, {fps:10, qrbox:{width:250,height:250}},
-    (decoded)=>{ processarCodigo(decoded); pararScanner(); }, (err)=>{}
-  ).catch(e=>alert("Erro câmera: "+e));
-}
-window.pararScanner = function(){ if(html5QrCode){ html5QrCode.stop().then(()=>{ html5QrCode=null; }); } }
-window.processarCodigo = function(codigo){
-  if(!codigo) return;
-  codigoAtual = codigo;
-  document.getElementById('codigo-lido').innerText = codigo;
-  document.getElementById('tela-produto').classList.remove('hidden');
-}
-window.alternarTipo = function(){
-  const tipo = document.getElementById('tipo-cadastro').value;
-  document.getElementById('campo-grupo').classList.toggle('hidden', tipo!=='coletivo');
-}
-window.salvarEstoque = async function(){
-  const user = auth.currentUser;
-  if(!user){ alert("Faça login primeiro"); return; }
-  const tipo = document.getElementById('tipo-cadastro').value;
-  const nomeGrupo = document.getElementById('nome-grupo').value.trim().toLowerCase().replace(/\s+/g,'-');
-  const nomeProd = document.getElementById('nome-produto').value.trim() || "Produto";
-  const qtd = parseInt(document.getElementById('qtd-produto').value) || 1;
-  const msg = document.getElementById('msg-salvar');
-  if(tipo==='coletivo' && !nomeGrupo){ msg.innerText="Digite o nome do grupo"; return; }
-  try{
-    const dados = { codigo: codigoAtual, produto: nomeProd, quantidade: qtd, criadoPor: user.email, uid: user.uid, data: new Date().toISOString(), tipo: tipo };
-    let caminho;
-    if(tipo==='individual'){ caminho = ref(db, 'users/'+user.uid+'/estoque'); }
-    else{ caminho = ref(db, 'groups/'+nomeGrupo+'/estoque'); }
-    await push(caminho, dados);
-    msg.style.color="green";
-    msg.innerText = tipo==='individual' ? "✅ Salvo individual!" : "✅ Salvo no grupo "+nomeGrupo+"!";
-  }catch(e){ msg.style.color="red"; msg.innerText="Erro: "+e.message; }
-}
-window.carregarEstoque = async function(tipo, nomeGrupoParam=null){
-  const user = auth.currentUser;
-  const lista = document.getElementById('lista-estoque');
-  lista.innerHTML="Carregando...";
-  try{
-    let caminhoStr;
-    if(tipo==='individual'){ caminhoStr = 'users/'+user.uid+'/estoque'; }
-    else{
-      let nomeGrupo = nomeGrupoParam || document.getElementById('nome-grupo').value.trim().toLowerCase().replace(/\s+/g,'-');
-      if(!nomeGrupo){ lista.innerHTML="Digite o nome do grupo"; return; }
-      caminhoStr = 'groups/'+nomeGrupo+'/estoque';
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function titleCase(str) {
+    const small = ['de', 'da', 'do', 'das', 'dos', 'e'];
+    return str.toLowerCase().split(' ').map((w, i) =>
+      (i > 0 && small.includes(w)) || /^(ltda|me|epp|s\/?a)\.?$/.test(w) ? (/^(ltda|me|epp|s\/?a)\.?$/.test(w) ? w.toUpperCase() : w)
+        : w.charAt(0).toUpperCase() + w.slice(1)
+    ).join(' ');
+  }
+
+  function fmtDate(ts) {
+    const d = new Date(ts);
+    const pad = (n) => String(n).padStart(2, '0');
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' • ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function setStatus(msg, { loading = false, error = false } = {}) {
+    statusEl.className = error ? 'error' : '';
+    statusEl.innerHTML = (loading ? '<span class="spinner"></span>' : '') + msg;
+  }
+
+  function openResultCard() {
+    resultCard.classList.remove('hidden');
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- Histórico ----------
+  // Sem Firebase: salvo só no aparelho (localStorage). Com Firebase: na conta ou no grupo, sincronizado em tempo real.
+  function localHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (_) { return []; }
+  }
+
+  function loadHistory() {
+    return CLOUD ? cloudCupons : localHistory();
+  }
+
+  function saveHistory(list) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (_) {}
+  }
+
+  function addToHistory(url, data) {
+    if (CLOUD) {
+      cloudSaveCupom(url, data).catch(cloudError); // o onSnapshot redesenha a lista
+      return;
     }
-    const snap = await get(child(ref(db), caminhoStr));
-    if(!snap.exists()){ lista.innerHTML="Nenhum item"; return; }
-    let html="";
-    snap.forEach(childSnap=>{
-      const v = childSnap.val();
-      html+=`<div style="border-bottom:1px solid #eee;padding:10px 0"><b>${v.produto}</b> - Qtd: ${v.quantidade}<br><small>${v.codigo.substring(0,40)}... por ${v.criadoPor}</small></div>`;
+    const list = localHistory().filter(h => h.url !== url);
+    list.unshift({ url, scannedAt: Date.now(), ...data });
+    saveHistory(list.slice(0, 100));
+    renderHistory();
+  }
+
+  function removeFromHistory(url) {
+    if (CLOUD) {
+      cloudDeleteCupom(url).catch(cloudError);
+      return;
+    }
+    saveHistory(localHistory().filter(h => h.url !== url));
+    renderHistory();
+  }
+
+  // ---------- Contas e grupos (Firebase) ----------
+  const FB_VER = '10.12.2';
+  let fb = null, auth = null, db = null;
+  let me = null;          // { uid, email, name, groupId }
+  let group = null;       // grupo atual { id, name, code, ownerUid, members, memberNames }
+  let cloudCupons = [];
+  let spaceKey = null;    // espaço com listeners ativos: 'users/uid' ou 'groups/gid'
+  const unsubs = {};
+
+  function unsub(...names) {
+    names.forEach(n => { if (unsubs[n]) { unsubs[n](); delete unsubs[n]; } });
+  }
+
+  // Cupons e categorias ficam em users/{uid}/... (individual) ou groups/{gid}/... (coletivo)
+  function spacePath() {
+    return me.groupId ? ['groups', me.groupId] : ['users', me.uid];
+  }
+  const metaRef = () => fb.doc(db, ...spacePath(), 'meta', 'categorias');
+
+  // ID do cupom = hash da URL do QR: escanear o mesmo cupom duas vezes não duplica
+  async function hashId(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].slice(0, 20).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  let toastTimer = null;
+  function toast(msg, ms = 2800) {
+    let el = $('toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast';
+      el.className = 'toast';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.add('hidden'), ms);
+  }
+
+  function authMsg(err) {
+    const msgs = {
+      'auth/email-already-in-use': 'Este e-mail já tem conta. Use "Entrar".',
+      'auth/invalid-email': 'E-mail inválido.',
+      'auth/missing-email': 'Digite seu e-mail.',
+      'auth/missing-password': 'Digite sua senha.',
+      'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+      'auth/invalid-credential': 'E-mail ou senha incorretos.',
+      'auth/wrong-password': 'E-mail ou senha incorretos.',
+      'auth/user-not-found': 'E-mail ou senha incorretos.',
+      'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos.',
+      'auth/network-request-failed': 'Sem internet. Tente de novo.',
+      'auth/operation-not-allowed': 'Login por e-mail não está ativado no Firebase.',
+      'permission-denied': 'Sem permissão no banco de dados. Confira as regras do Firestore.',
+      'unavailable': 'Sem conexão com o servidor. Tente de novo.'
+    };
+    return msgs[err?.code] || err?.message || String(err);
+  }
+
+  function cloudError(err) {
+    console.error(err);
+    toast(err?.code === 'unavailable' ? 'Sem internet: vai sincronizar quando a conexão voltar.' : authMsg(err));
+  }
+
+  async function initCloud() {
+    try {
+      const base = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/';
+      const [appM, authM, fsM] = await Promise.all([
+        import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')
+      ]);
+      fb = { ...appM, ...authM, ...fsM };
+      const app = fb.initializeApp(FIREBASE_CONFIG);
+      auth = fb.getAuth(app);
+      // cache local: o app abre rápido e funciona sem internet
+      try {
+        db = fb.initializeFirestore(app, { localCache: fb.persistentLocalCache({ tabManager: fb.persistentMultipleTabManager() }) });
+      } catch (_) {
+        db = fb.getFirestore(app);
+      }
+      fb.onAuthStateChanged(auth, onUser);
+      setTimeout(() => {
+        if (authResolved) return;
+        $('authLoading').innerHTML = 'Está demorando para conectar. Confira a internet.' +
+          '<br><button class="btn small ghost" style="margin-top:12px" onclick="location.reload()">Recarregar</button>';
+      }, 12000);
+    } catch (err) {
+      $('authLoading').innerHTML = 'Não foi possível conectar. Verifique a internet e recarregue a página.' + diag(err?.message);
+    }
+  }
+
+  let authResolved = false;
+  function onUser(user) {
+    authResolved = true;
+    unsub('user', 'group', 'cupons', 'meta');
+    spaceKey = null;
+    group = null;
+    cloudCupons = [];
+    catOv = { stores: {}, products: {} };
+    if (!user) {
+      me = null;
+      showAuth();
+      return;
+    }
+    me = { uid: user.uid, email: user.email, name: user.displayName || (user.email || '').split('@')[0], groupId: null };
+    showApp();
+    unsubs.user = fb.onSnapshot(fb.doc(db, 'users', user.uid), snap => {
+      const d = snap.data() || {};
+      if (d.name) me.name = d.name;
+      me.groupId = d.groupId || null;
+      subscribeSpace();
+      renderAccount();
+      renderHeaderSpace();
+    }, cloudError);
+  }
+
+  function subscribeSpace() {
+    const key = spacePath().join('/');
+    if (key === spaceKey) return;
+    spaceKey = key;
+    unsub('group', 'cupons', 'meta');
+    cloudCupons = [];
+    group = null;
+    catOv = { stores: {}, products: {} };
+    refreshViews();
+
+    const q = fb.query(fb.collection(db, ...spacePath(), 'cupons'), fb.orderBy('scannedAt', 'desc'), fb.limit(500));
+    unsubs.cupons = fb.onSnapshot(q, snap => {
+      cloudCupons = snap.docs.map(d => d.data());
+      refreshViews();
+    }, cloudError);
+
+    unsubs.meta = fb.onSnapshot(metaRef(), snap => {
+      const o = snap.data() || {};
+      catOv = { stores: o.stores || {}, products: o.products || {} };
+      refreshViews();
+    }, cloudError);
+
+    if (me.groupId) {
+      unsubs.group = fb.onSnapshot(fb.doc(db, 'groups', me.groupId), snap => {
+        group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
+        // saiu do grupo ou o grupo sumiu: volta para o modo individual
+        if (!group || !(group.members || []).includes(me.uid)) { detachGroup(); return; }
+        renderAccount();
+        renderHeaderSpace();
+      }, err => { if (err.code === 'permission-denied') detachGroup(); else cloudError(err); });
+    }
+  }
+
+  function detachGroup() {
+    fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true }).catch(cloudError);
+  }
+
+  function refreshViews() {
+    renderHistory();
+    if (!$('tabStock').classList.contains('hidden')) renderStock();
+    renderAccount();
+  }
+
+  async function cloudSaveCupom(url, data) {
+    // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
+    const docData = JSON.parse(JSON.stringify({
+      ...data, url, scannedAt: data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+    }));
+    await fb.setDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)), docData);
+  }
+
+  async function cloudDeleteCupom(url) {
+    await fb.deleteDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)));
+  }
+
+  // Código de 6 caracteres sem os que confundem (0/O, 1/I/L)
+  const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  function genCode() {
+    const r = new Uint32Array(6);
+    crypto.getRandomValues(r);
+    return [...r].map(n => CODE_CHARS[n % CODE_CHARS.length]).join('');
+  }
+  const normCode = (s) => (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  async function createGroup(groupName, userName) {
+    const uid = auth.currentUser.uid;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = genCode();
+      const codeRef = fb.doc(db, 'groupCodes', code);
+      const groupRef = fb.doc(fb.collection(db, 'groups'));
+      try {
+        await fb.runTransaction(db, async (tx) => {
+          if ((await tx.get(codeRef)).exists()) throw new Error('code-taken');
+          tx.set(groupRef, {
+            name: groupName, code, ownerUid: uid, members: [uid], memberNames: { [uid]: userName }, createdAt: fb.serverTimestamp()
+          });
+          tx.set(codeRef, { groupId: groupRef.id, ownerUid: uid });
+          tx.set(fb.doc(db, 'users', uid), { groupId: groupRef.id }, { merge: true });
+        });
+        return code;
+      } catch (err) {
+        if (err.message !== 'code-taken') throw err;
+      }
+    }
+    throw new Error('Não foi possível gerar um código. Tente de novo.');
+  }
+
+  async function findGroupByCode(code) {
+    const snap = await fb.getDoc(fb.doc(db, 'groupCodes', code));
+    if (!snap.exists()) throw new Error('Código não encontrado. Confira as letras e os números.');
+    return snap.data().groupId;
+  }
+
+  async function joinGroup(code, userName) {
+    const gid = await findGroupByCode(code);
+    const uid = auth.currentUser.uid;
+    await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayUnion(uid), ['memberNames.' + uid]: userName });
+    await fb.setDoc(fb.doc(db, 'users', uid), { groupId: gid }, { merge: true });
+  }
+
+  // Leva os cupons e categorias do cadastro individual para o grupo, para somar no estoque de todos
+  async function copyPersonalToGroup(gid) {
+    const uid = me.uid;
+    const snap = await fb.getDocs(fb.collection(db, 'users', uid, 'cupons'));
+    const docs = snap.docs;
+    for (let i = 0; i < docs.length; i += 450) {
+      const batch = fb.writeBatch(db);
+      docs.slice(i, i + 450).forEach(d => batch.set(fb.doc(db, 'groups', gid, 'cupons', d.id), d.data()));
+      await batch.commit();
+    }
+    const meta = await fb.getDoc(fb.doc(db, 'users', uid, 'meta', 'categorias'));
+    if (meta.exists()) await fb.setDoc(fb.doc(db, 'groups', gid, 'meta', 'categorias'), meta.data(), { merge: true });
+    return docs.length;
+  }
+
+  async function leaveGroup() {
+    await fb.updateDoc(fb.doc(db, 'groups', me.groupId), { members: fb.arrayRemove(me.uid), ['memberNames.' + me.uid]: fb.deleteField() });
+    await fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true });
+  }
+
+  // Envia para a conta/grupo os cupons que estavam salvos só neste aparelho
+  async function importLocal() {
+    const list = localHistory();
+    const ov = loadCatOv();
+    const batch = fb.writeBatch(db);
+    for (const h of list.slice(0, 450)) {
+      batch.set(fb.doc(db, ...spacePath(), 'cupons', await hashId(h.url)),
+        JSON.parse(JSON.stringify({ ...h, addedBy: me.uid, addedByName: me.name })));
+    }
+    if (Object.keys(ov.stores).length || Object.keys(ov.products).length) batch.set(metaRef(), ov, { merge: true });
+    await batch.commit();
+    localStorage.removeItem(HISTORY_KEY);
+    localStorage.removeItem(CAT_KEY);
+    return list.length;
+  }
+
+  async function shareCode(code, groupName) {
+    const link = location.href.split('#')[0];
+    const text = 'Entre no grupo "' + groupName + '" do Leitor de Cupom Fiscal.\nAbra ' + link + ', crie sua conta, escolha "Coletivo" e use o código: ' + code;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Código do grupo', text }); return; } catch (_) { return; }
+    }
+    copyText(text, 'Convite copiado!');
+  }
+
+  async function copyText(text, okMsg = 'Copiado!') {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(okMsg);
+    } catch (_) {
+      prompt('Copie:', text);
+    }
+  }
+
+  function showCodeModal(code, groupName) {
+    $('modalCode').textContent = code;
+    $('codeModal').dataset.code = code;
+    $('codeModal').dataset.name = groupName;
+    $('codeModal').classList.remove('hidden');
+  }
+
+  // ---------- Telas de login / app ----------
+  function showAuth() {
+    stopScanner();
+    ['tabScan', 'tabStock', 'tabAccount', 'resultCard', 'headerSpace'].forEach(id => $(id).classList.add('hidden'));
+    document.querySelector('.tabbar').classList.add('hidden');
+    $('codeModal').classList.add('hidden');
+    $('authView').classList.remove('hidden');
+    $('authLoading').classList.add('hidden');
+    $('authForms').classList.remove('hidden');
+  }
+
+  function showApp() {
+    $('authView').classList.add('hidden');
+    document.querySelector('.tabbar').classList.remove('hidden');
+    showTab('scan');
+    renderHeaderSpace();
+  }
+
+  function setAuthTab(tab) {
+    $('authSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.auth === tab));
+    $('loginForm').classList.toggle('hidden', tab !== 'login');
+    $('signupForm').classList.toggle('hidden', tab !== 'signup');
+  }
+
+  let signupGroupAction = 'create';
+  function setSignupGroupAction(action) {
+    signupGroupAction = action;
+    $('suGroupSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.ga === action));
+    $('suGroupNameField').classList.toggle('hidden', action !== 'create');
+    $('suCodeField').classList.toggle('hidden', action !== 'join');
+  }
+
+  function formMsg(id, msg, ok = false) {
+    const el = $(id);
+    el.textContent = msg;
+    el.classList.toggle('ok', ok);
+    el.classList.toggle('hidden', !msg);
+  }
+
+  async function withBusy(btn, fn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Aguarde...';
+    try { await fn(); } finally { btn.disabled = false; btn.textContent = label; }
+  }
+
+  async function onLogin(e) {
+    e.preventDefault();
+    formMsg('loginError', '');
+    await withBusy(e.submitter || $('loginForm').querySelector('[type=submit]'), async () => {
+      try {
+        await fb.signInWithEmailAndPassword(auth, $('loginEmail').value.trim(), $('loginPass').value);
+      } catch (err) {
+        formMsg('loginError', authMsg(err));
+      }
     });
-    lista.innerHTML=html;
-  }catch(e){ lista.innerHTML="Erro: "+e.message; }
-}
+  }
+
+  async function onForgot() {
+    const email = $('loginEmail').value.trim();
+    if (!email) { formMsg('loginError', 'Digite seu e-mail acima e toque de novo em "Esqueci minha senha".'); return; }
+    try {
+      await fb.sendPasswordResetEmail(auth, email);
+      formMsg('loginError', 'Enviamos um e-mail para redefinir sua senha.', true);
+    } catch (err) {
+      formMsg('loginError', authMsg(err));
+    }
+  }
+
+  async function onSignup(e) {
+    e.preventDefault();
+    formMsg('signupError', '');
+    const name = $('suName').value.trim();
+    const email = $('suEmail').value.trim();
+    const pass = $('suPass').value;
+    const mode = document.querySelector('input[name="suMode"]:checked').value;
+    const groupName = $('suGroupName').value.trim();
+    const code = normCode($('suCode').value);
+
+    await withBusy(e.submitter || $('signupForm').querySelector('[type=submit]'), async () => {
+      try {
+        if (!name) throw new Error('Digite seu nome.');
+        if (mode === 'group' && signupGroupAction === 'create' && !groupName) throw new Error('Dê um nome para o grupo.');
+        if (mode === 'group' && signupGroupAction === 'join') {
+          if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
+          await findGroupByCode(code); // confere o código antes de criar a conta
+        }
+        const cred = await fb.createUserWithEmailAndPassword(auth, email, pass);
+        await fb.updateProfile(cred.user, { displayName: name });
+        if (me) me.name = name;
+        await fb.setDoc(fb.doc(db, 'users', cred.user.uid), { name, email, createdAt: fb.serverTimestamp() }, { merge: true });
+        if (mode === 'group') {
+          if (signupGroupAction === 'create') showCodeModal(await createGroup(groupName, name), groupName);
+          else { await joinGroup(code, name); toast('Você entrou no grupo!'); }
+        }
+      } catch (err) {
+        formMsg('signupError', authMsg(err));
+        // a conta já foi criada e a tela de cadastro sumiu: avisa por toast (dá para tentar de novo na aba Conta)
+        if (auth.currentUser) toast('Conta criada, mas o grupo falhou: ' + authMsg(err) + ' Tente pela aba Conta.', 6000);
+      }
+    });
+  }
+
+  const firstName = (n) => (n || '').trim().split(/\s+/)[0];
+  const initial = (n) => escapeHtml((n || '?').trim().charAt(0).toUpperCase());
+
+  function renderHeaderSpace() {
+    const el = $('headerSpace');
+    if (!CLOUD || !me) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    if (me.groupId && group) {
+      const n = (group.members || []).length;
+      el.innerHTML = ICON_GROUP + escapeHtml(group.name) + ' · ' + n + (n === 1 ? ' pessoa' : ' pessoas');
+    } else if (me.groupId) {
+      el.innerHTML = ICON_GROUP + 'Carregando grupo...';
+    } else {
+      el.innerHTML = ICON_USER + 'Individual · ' + escapeHtml(firstName(me.name));
+    }
+  }
+
+  // Sem Firebase configurado não há contas: explica o que falta
+  function renderAccountOffline() {
+    $('accountContent').innerHTML =
+      '<section class="card account-card"><h2>Minha conta</h2>' +
+      '<p class="lead muted">Você está usando o app sem conta: os cupons ficam salvos só neste celular.</p>' +
+      '<div class="account-head"><div class="avatar">' + ICON_USER + '</div><div><b>Modo sem conta</b>' +
+      '<span>' + loadHistory().length + ' cupons neste aparelho</span></div></div>' +
+      '<hr class="divider"><h3 class="card-title">Criar um grupo</h3>' +
+      '<p class="muted">Com um grupo, a família ou a equipe junta as notas fiscais no mesmo estoque. ' +
+      'Quem entra no grupo usa um código único de 6 caracteres.</p>' +
+      '<p class="notice">Os grupos ainda não estão ligados: falta colocar a configuração do Firebase no arquivo do app (<b>FIREBASE_CONFIG</b>). ' +
+      'Depois disso, esta tela vira o seu cadastro, com login e criação de grupo.</p>' +
+      '<button class="btn small" disabled style="opacity:.5">Criar grupo</button></section>';
+  }
+
+  function renderAccount() {
+    if ($('tabAccount').classList.contains('hidden')) return;
+    if (!CLOUD) return renderAccountOffline();
+    if (!me) return;
+    // guarda o que a pessoa estava digitando (a tela é redesenhada a cada sincronização)
+    const keep = {};
+    ['accGroupName', 'accCode'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
+    const keepBring = $('accBring') ? $('accBring').checked : true;
+
+    let html = '<section class="card account-card"><h2>Minha conta</h2>' +
+      '<div class="account-head"><div class="avatar">' + initial(me.name) + '</div>' +
+      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div></div>';
+
+    html += '<hr class="divider">';
+    if (me.groupId && group) {
+      const members = group.members || [];
+      html += '<h3 class="card-title">Cadastro coletivo</h3>' +
+        '<p class="muted">Todos do grupo <b>' + escapeHtml(group.name) + '</b> veem e adicionam cupons no mesmo histórico e estoque.</p>' +
+        '<p class="field-label">Código do grupo</p><div class="group-code">' + escapeHtml(group.code) + '</div>' +
+        '<div class="btn-row"><button class="btn small ghost" data-action="copy-code">Copiar código</button>' +
+        '<button class="btn small ghost" data-action="share-code">Convidar</button></div>' +
+        '<p class="field-label">Participantes (' + members.length + ')</p><ul class="members">' +
+        members.map(uid => {
+          const n = (group.memberNames || {})[uid] || 'Participante';
+          return '<li><div class="avatar">' + initial(n) + '</div>' + escapeHtml(n) + (uid === me.uid ? ' (você)' : '') +
+            (uid === group.ownerUid ? '<span class="tag-owner">criador</span>' : '') + '</li>';
+        }).join('') + '</ul>' +
+        '<button class="btn small stop" data-action="leave">Sair do grupo</button>';
+    } else if (me.groupId) {
+      html += '<p class="auth-loading"><span class="spinner"></span>Carregando grupo...</p>';
+    } else {
+      html += '<h3 class="card-title">Cadastro individual</h3>' +
+        '<p class="muted">Só você vê seus cupons. Crie um grupo para juntar as notas fiscais de todos no mesmo estoque, ou entre em um com o código.</p>' +
+        '<p class="field-label">Criar um grupo</p>' +
+        '<div class="inline-form"><input id="accGroupName" placeholder="Ex.: Família Silva"><button class="btn small" data-action="create-group">Criar</button></div>' +
+        '<p class="field-label">Entrar em um grupo</p>' +
+        '<div class="inline-form"><input id="accCode" class="code-input" maxlength="6" placeholder="CÓDIGO" autocomplete="off"><button class="btn small" data-action="join-group">Entrar</button></div>' +
+        '<label class="check-row"><input type="checkbox" id="accBring"' + (keepBring ? ' checked' : '') + '>' +
+        '<span>Levar meus cupons para o grupo (somam no estoque do grupo). Eles também continuam guardados na sua conta individual.</span></label>';
+    }
+    html += '<p class="form-error hidden" id="accError"></p></section>';
+
+    const local = localHistory().length;
+    if (local) {
+      html += '<section class="card"><h3 class="card-title">Cupons deste aparelho</h3>' +
+        '<p class="muted">Você tem ' + local + (local === 1 ? ' cupom salvo' : ' cupons salvos') + ' só neste celular, de antes do login.</p>' +
+        '<button class="btn small ghost" data-action="import">Enviar para ' + (me.groupId ? 'o grupo' : 'minha conta') + '</button></section>';
+    }
+
+    html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
+    $('accountContent').innerHTML = html;
+    Object.entries(keep).forEach(([id, v]) => { if ($(id)) $(id).value = v; });
+  }
+
+  async function onAccountAction(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    formMsg('accError', '');
+    try {
+      if (action === 'copy-code') return copyText(group.code, 'Código copiado!');
+      if (action === 'share-code') return shareCode(group.code, group.name);
+      if (action === 'logout') {
+        if (confirm('Sair da conta neste aparelho?')) await fb.signOut(auth);
+        return;
+      }
+      if (action === 'leave') {
+        if (!confirm('Sair do grupo "' + group.name + '"? Os cupons continuam no grupo para os outros participantes.')) return;
+        await withBusy(btn, leaveGroup);
+        toast('Você saiu do grupo.');
+        return;
+      }
+      if (action === 'create-group' || action === 'join-group') {
+        const bring = $('accBring').checked;
+        let moved = 0;
+        if (action === 'create-group') {
+          const name = $('accGroupName').value.trim();
+          if (!name) throw new Error('Dê um nome para o grupo.');
+          await withBusy(btn, async () => {
+            const code = await createGroup(name, me.name);
+            if (bring) moved = await copyPersonalToGroup((await fb.getDoc(fb.doc(db, 'groupCodes', code))).data().groupId);
+            showCodeModal(code, name);
+          });
+        } else {
+          const code = normCode($('accCode').value);
+          if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
+          await withBusy(btn, async () => {
+            await joinGroup(code, me.name);
+            if (bring) moved = await copyPersonalToGroup(await findGroupByCode(code));
+          });
+          toast('Você entrou no grupo!');
+        }
+        if (moved) toast(moved + (moved === 1 ? ' cupom levado' : ' cupons levados') + ' para o grupo.');
+        return;
+      }
+      if (action === 'import') {
+        let n = 0;
+        await withBusy(btn, async () => { n = await importLocal(); });
+        toast(n + (n === 1 ? ' cupom enviado!' : ' cupons enviados!'));
+        renderAccount();
+      }
+    } catch (err) {
+      formMsg('accError', authMsg(err));
+    }
+  }
+
+  const ICON_STORE = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>';
+  const ICON_PHARMA = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>';
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const svgIcon = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  const ICON_MEAT = svgIcon('<path d="M14.5 13.5c2.5 0 6-1.5 6-5.5a4.5 4.5 0 0 0-9 0c0 1 .1 1.6.5 2.5L8 14.5"/><circle cx="6.5" cy="17.5" r="2.5"/>');
+  const ICON_BREAD = svgIcon('<path d="M5 11a3 3 0 0 1 0-6h14a3 3 0 0 1 0 6v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/>');
+  const ICON_FOOD = svgIcon('<path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v6M9 3v6M17 21V3c-2 1-3 4-3 7h3"/>');
+  const ICON_FUEL = svgIcon('<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10"/><path d="M14 8h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>');
+  const ICON_BAG = svgIcon('<path d="M6 7h12l1 14H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>');
+  const ICON_USER = svgIcon('<circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/>');
+  const ICON_GROUP = svgIcon('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/>');
+
+  // ---------- Categorias (loja) e subcategorias (produto) ----------
+  // Palavras-chave comparadas com o nome normalizado (sem acento, maiúsculo).
+  // "X" = palavra que começa com X · "X$" = palavra exatamente X · "X Y" = trecho que começa com "X Y"
+  const kw = (s) => s.split(',').map(k => k.trim()).filter(Boolean);
+  const KW = {
+    limpeza: kw('DETERG,SABAO,AMACIANTE,AMAC$,DESINF,AGUA SANIT,ALVEJ,LIMPA,LIMP$,ESPONJA,BOMBRIL,LA DE ACO,PALHA DE ACO,VASSOUR,RODO,PANO$,PANO DE,PANO MULTI,SACO LIXO,SC LIXO,SACO P LIXO,CANDIDA,MULTIUSO,LUSTRA,INSETIC,ODORIZ,PAPEL TOALHA,PAP TOALHA,GUARDANAPO,PAPEL ALUM,FILME PVC,LUVA,CLORO,VEJA$,YPE$,OMO$,DESENGORD,TIRA MANCHA,PEDRA SANIT,BOM AR'),
+    higiene: kw('SHAMPOO,SHAMP,CONDICIONADOR,CONDIC,SABONETE,SABONET,SAB LIQ,SAB BARRA,CREME DENT,CR DENT,ESCOVA DENT,ESC DENT,FIO DENT,DESOD,ANTITRANSP,PAPEL HIG,PAP HIG,P HIG,ABSORV,COTONETE,HASTES,ALGODAO,BARBEAD,APAR BARB,LAMINA,ENXAG,LISTERINE,COLGATE,ORAL B,REXONA,LENCO UMED,LENCOS UMED,CREME CORP'),
+    beleza: kw('BATOM,ESMALTE,MAQUI,RIMEL,MASCARA CILIOS,PERFUME,COLONIA,HIDRAT,PROTETOR,BRONZ,TINTURA,COLORACAO,ACETONA,REMOVEDOR,CREME FACIAL,SERUM,BASE LIQ,PO COMPACTO,DEPIL,CERA DEP,GEL CAB,POMADA MODEL,CREME P PENT,CREME PENT'),
+    pet: kw('RACAO,PET$,WHISKAS,PEDIGREE,GOLDEN,AREIA GATO,AREIA HIG,PETISCO,FRISKIES,DOG CHOW,CAT CHOW,PREMIER'),
+    bebidas: kw('REFR,REFRIG,COCA$,COCA COLA,COCA ZERO,GUARANA,FANTA,SPRITE,PEPSI,SODA,SUCO,NECTAR,AGUA,CERV,CHOPP,VHO,VINHO,ESPUM,WHISK,VODKA,CACHACA,GIN$,RUM$,LICOR,ENERG,ISOT,GATORADE,POWERADE,CHA$,CHA GELADO,MATE$,MATE LEAO,KOMBUCHA,BEBIDA,H2OH,SKOL,BRAHMA,HEINEKEN,AMSTEL,BUDWEISER,ITAIPAVA,ANTARCTICA,STELLA,CORONA,SPATEN,RED BULL,MONSTER,TONICA,AGUARDENTE'),
+    frios: kw('LEITE,IOG,IOGURTE,QUEIJO,QJO,QJ$,MUSSARELA,MUCARELA,MUSS,PRESUNTO,PRES$,APRESUNT,MORTADELA,MORT$,SALAME,PEITO PERU,PEITO DE PERU,REQUEIJ,REQ$,MANTEIGA,MANT$,MARGARINA,MARG$,CREME LEITE,CR LEITE,CREME DE LEITE,NATA,COALHADA,PETIT,BEB LACTEA,KEFIR,RICOTA,PARMES,PROVOLONE,CHEDDAR,COTTAGE,BRIE,GORGONZ,LEITE COND,DANONINHO,YAKULT'),
+    carnes: kw('CARNE,BOV,PATINHO,ACEM,ALCATRA,PICANHA,CONTRA FILE,CONTRAFILE,COXAO,MAMINHA,FRALDINHA,COSTELA,MUSCULO,PALETA,CUPIM,MOIDA,FGO,FRANGO,PEITO,COXA,SOBRECOXA,ASA$,ASINHA,FILE,SUINO,SUIN,LOMBO,PERNIL,BISTECA,LINGUICA,LING$,BACON,SALSICHA,TOUCINHO,PEIXE,TILAPIA,SALMAO,MERLUZA,CAMARAO,BACALHAU,HAMBURG,ALMONDEGA,KAFTA,CHARQUE,CALABRESA,CHESTER,PERU$,MIUDOS,FIGADO'),
+    paes: kw('PAO,PAES,BISNAG,BAGUETE,CROISSANT,BROA,TORRADA,FRANCES,CIABATTA,SOVADO,PAO DE FORMA,PULLMAN,WICKBOLD,SEVEN BOYS'),
+    doces: kw('BOLO,ROSCA,SONHO,CUCA,TORTA DOCE,BRIGADEIRO,BOMBA,CAROLINA,PUDIM,SAGU,DOCE,BOMBOM,CHOC,BEIJINHO,QUINDIM,PAVE,MOUSSE,TORTA'),
+    salgados: kw('SALGADO,COXINHA,PASTEL,ESFIHA,ESFIRRA,EMPADA,EMPADINHA,PAO DE QUEIJO,ENROLADO,ENROLADINHO,CROQUETE,QUIBE,KIBE,TORTA SALG,MINI PIZZA,PIZZA,SANDUICHE,LANCHE,MISTO,X SALADA,HOT DOG'),
+    comida: kw('ARROZ,FEIJAO,FEIJ$,MACARRAO,MAC$,MASSA,ESPAGUETE,PENNE,NHOQUE,LASANHA,MOLHO,MOL$,EXTRATO,ATOMATADO,OLEO,AZEITE,ACUCAR,ACUC$,SAL$,SAL REFIN,SAL GROSSO,FARINHA,FAR$,FUBA,AVEIA,CAFE,ACHOC,NESCAU,TODDY,BISC,BISCOITO,BOLACHA,BOL$,WAFER,ROSQ,CHOC,CHOCOLATE,BOMBOM,BALA,GOMA,CHICLE,DOCE,GELEIA,MEL$,CEREAL,GRANOLA,MILHO,ERVILHA,SELETA,AZEITONA,PALMITO,CONSERVA,MAIONESE,MAION,KETCHUP,KETCH,MOSTARDA,TEMPERO,CALDO,SAZON,MIOJO,LAMEN,SOPA,PIPOCA,AMENDOIM,CASTANHA,SALGADINHO,BATATA PALHA,CHIPS,DORITOS,RUFFLES,PRINGLES,CHEETOS,GELATINA,PUDIM,SORVETE,PIZZA,CONGEL,EMPANADO,NUGGET,FERMENTO,AMIDO,MAISENA,POLPA,TAPIOCA,GRAO,LENTILHA,QUINOA,SOJA,MIX$,PACOCA,CREME DE AVELA,NUTELLA,LEITE EM PO,LEITE PO,ATUM,SARDINHA,VINAGRE,SHOYU,CATCHUP,BARRA CEREAL,BARRINHA,COOKIE,TRAKINAS,OREO,PASSATEMPO,NEGRESCO,CREAM CRACKER,TORTILHA,GRANULADO,LEITE DE COCO,COCO RALADO,LEITE CONDENSADO,DOCE DE LEITE,PANETONE,CHOCOTONE,COCADA,PE DE MOLEQUE,BOLO PRONTO,MISTURA BOLO'),
+    horti: kw('ALFACE,TOMATE,BATATA,CEBOLA,ALHO,BANANA,MACA,LARANJA,LIMAO,FRUTA,VERDURA,LEGUME,CENOURA,BROCOLIS,COUVE,REPOLHO,ABOBRINHA,ABOBORA,PEPINO,PIMENTAO,MAMAO,MELANCIA,MELAO,UVA,ABACAXI,MANGA,MORANGO,CHEIRO VERDE,SALSINHA,CEBOLINHA,RUCULA,AGRIAO,ESPINAFRE,HORT,FLV$,KIWI,PERA,PESSEGO,AMEIXA,ABACATE,MARACUJA,MANDIOCA,AIPIM,INHAME,BETERRABA,CHUCHU,BERINJELA,QUIABO,VAGEM,GENGIBRE,TANGERINA,MEXERICA,PONKAN,COENTRO,MANJERICAO,HORTELA,OVO,OVOS'),
+    suplementos: kw('VITAM,VIT$,WHEY,CREATINA,OMEGA,COLAGENO,SUPLEM,POLIVIT,CENTRUM,MAGNESIO,ZINCO,CALCIO,BCAA,PROTEINA'),
+    bebe: kw('FRALDA,LENCO UMED,LENCOS UMED,MAMADEIRA,CHUPETA,POMADA ASSAD,BEBE,INFANT,NAN$,APTAMIL,MILNUTRI,HUGGIES,PAMPERS,TURMA DA MONICA'),
+    medicamentos: kw('CPR,COMP$,CAPS,GTS,XPE,XAROPE,POMADA,DIPIRONA,PARACET,IBUPROF,AMOXI,LOSART,OMEPRAZ,NOVALGINA,DORFLEX,NEOSALDINA,BENEGRIPE,GENERICO,CURATIVO,BAND AID,GAZE,ESPARADRAPO,SORO,TERMOMETRO,TESTE,ANTIAC,ANTIALERG,LORATAD,SIMETICONA,LUFTAL,ENGOV,EPOCLER,COLIRIO,SPRAY NASAL,NASAL'),
+    bovina: kw('BOV,CARNE,PATINHO,ACEM,ALCATRA,PICANHA,CONTRA FILE,CONTRAFILE,COXAO,MAMINHA,FRALDINHA,COSTELA,MUSCULO,PALETA,CUPIM,MOIDA,FILE MIGNON,MIGNON,CHARQUE,CARNE SECA,HAMBURG,KAFTA,ALMONDEGA,ENTRECOT,ANCHO,CHORIZO,T BONE,PEITO BOV,LAGARTO,FIGADO,BUCHO,RABADA'),
+    frango: kw('FGO,FRANGO,PEITO,COXA,SOBRECOXA,ASA$,ASINHA,CORACAO,MOELA,GALINHA,CHESTER,PERU$,COXINHA DA ASA,TULIPA,DRUMETE'),
+    suina: kw('SUIN,PORCO,LOMBO,PERNIL,BISTECA,COSTELINHA,PANCETA,TOUCINHO,BACON,LEITAO,PANCETTA,CARRE,COPA LOMBO,ORELHA,PE DE PORCO'),
+    embutidos: kw('LINGUICA,LING$,SALSICHA,SALAME,CALABRESA,PAIO,BLUMENAU,TOSCANA,CHOURICO'),
+    peixes: kw('PEIXE,TILAPIA,SALMAO,MERLUZA,CAMARAO,BACALHAU,PESCADA,SARDINHA,ATUM,LULA,POLVO,MARISCO,PINTADO,TAMBAQUI'),
+    churrasco: kw('CARVAO,ACENDEDOR,SAL GROSSO,ESPETO,GRELHA,FAROFA,VINAGRETE,PAO DE ALHO'),
+    sobremesa: kw('SORVETE,PUDIM,MOUSSE,TORTA,BOLO,PETIT GATEAU,BROWNIE,ACAI,SUNDAE,MILK SHAKE,MILKSHAKE,DOCE,BRIGADEIRO,CHURROS'),
+    combustivel: kw('GASOL,ETANOL,ALCOOL,DIESEL,GNV,ADITIV,COMBUST,S10$,S500$'),
+    lubrificantes: kw('OLEO MOTOR,OLEO LUBR,LUBRIF,ARLA,FLUIDO,ADITIVO RADIADOR,AGUA RADIADOR,LIMPADOR PARABRISA,PALHETA,FILTRO')
+  };
+
+  // subs: [nome, palavras-chave] na ordem de prioridade · def: subcategoria quando nada bate
+  const CATEGORIES = [
+    { id: 'mercado', name: 'Mercado', color: '#15803d', soft: '#dcf2e3', icon: ICON_STORE, def: 'Outros',
+      subs: [['Limpeza', KW.limpeza], ['Higiene', KW.higiene], ['Pet', KW.pet], ['Bebidas', KW.bebidas], ['Frios e Laticínios', KW.frios],
+             ['Carnes', KW.carnes], ['Padaria', KW.paes], ['Comida', KW.comida], ['Hortifruti', KW.horti]] },
+    { id: 'farmacia', name: 'Farmácia', color: '#b45309', soft: '#fde7c2', icon: ICON_PHARMA, def: 'Medicamentos',
+      subs: [['Bebê', KW.bebe], ['Higiene', KW.higiene], ['Beleza', KW.beleza], ['Suplementos', KW.suplementos], ['Medicamentos', KW.medicamentos]] },
+    { id: 'acougue', name: 'Açougue', color: '#b91c1c', soft: '#fde2e2', icon: ICON_MEAT, def: 'Outros',
+      // Suína antes de Bovina (COSTELINHA x COSTELA) e Bovina antes de Frango (COXAO x COXA, PEITO BOV x PEITO)
+      subs: [['Embutidos', KW.embutidos], ['Suína', KW.suina], ['Peixes', KW.peixes], ['Bovina', KW.bovina], ['Frango', KW.frango],
+             ['Churrasco', KW.churrasco], ['Bebidas', KW.bebidas]] },
+    { id: 'padaria', name: 'Padaria', color: '#92400e', soft: '#fbe8d3', icon: ICON_BREAD, def: 'Outros',
+      subs: [['Bebidas', KW.bebidas], ['Frios e Laticínios', KW.frios], ['Salgados', KW.salgados], ['Doces e Bolos', KW.doces], ['Pães', KW.paes]] },
+    { id: 'restaurante', name: 'Restaurante', color: '#7c3aed', soft: '#ede9fe', icon: ICON_FOOD, def: 'Refeição',
+      subs: [['Bebidas', KW.bebidas], ['Sobremesa', KW.sobremesa]] },
+    { id: 'posto', name: 'Posto', color: '#1d4ed8', soft: '#dbeafe', icon: ICON_FUEL, def: 'Conveniência',
+      subs: [['Combustível', KW.combustivel], ['Lubrificantes', KW.lubrificantes]] },
+    { id: 'outros', name: 'Outros', color: '#4b5563', soft: '#e5e7eb', icon: ICON_BAG, def: 'Geral', subs: [] }
+  ];
+
+  // Tipo de loja pelo nome do estabelecimento; o que não bater fica como Mercado
+  const STORE_RULES = [
+    ['farmacia', /FARMA|DROG|PHARMA|RAIA|PANVEL|PAGUE MENOS|NISSEI/],
+    ['acougue', /ACOUGUE|CASA D[AEO]S? CARNES?|\bCARNES\b|FRIGORIF|BOUTIQUE D[AEO] CARNE/],
+    ['padaria', /PADARIA|PANIFIC|CONFEIT|DOCERIA/],
+    ['posto', /POSTO|COMBUST|PETROBRAS|SHELL|IPIRANGA|PETROLEO/],
+    ['restaurante', /RESTAUR|LANCHON|PIZZAR|BURGER|HAMBURGUER|CHURRASCARIA|SUSHI|CAFETERIA|MC ?DONALD|SUBWAY|\bBAR\b|BISTRO|GASTRONOMIA/]
+  ];
+
+  const CAT_KEY = 'cupons_categorias';
+  function loadCatOv() {
+    try {
+      const o = JSON.parse(localStorage.getItem(CAT_KEY)) || {};
+      return { stores: o.stores || {}, products: o.products || {} };
+    } catch (_) { return { stores: {}, products: {} }; }
+  }
+  // escolhas manuais: stores[url] = idCategoria · products["cat|NOME"] = subcategoria
+  // (com login, vêm da conta/grupo pelo onSnapshot)
+  let catOv = CLOUD ? { stores: {}, products: {} } : loadCatOv();
+  const subCache = new Map();
+
+  // partial = só o que mudou; no Firestore o merge evita apagar o que outra pessoa do grupo mudou ao mesmo tempo
+  function saveCatOv(partial) {
+    if (CLOUD) {
+      fb.setDoc(metaRef(), partial, { merge: true }).catch(cloudError);
+      return;
+    }
+    try { localStorage.setItem(CAT_KEY, JSON.stringify(catOv)); } catch (_) {}
+  }
+
+  const catById = (id) => CATEGORIES.find(c => c.id === id) || CATEGORIES[CATEGORIES.length - 1];
+
+  function detectStoreCat(store) {
+    const n = normName(store);
+    const rule = STORE_RULES.find(([, re]) => re.test(n));
+    return rule ? rule[0] : 'mercado';
+  }
+
+  function cupomCat(h) {
+    return catById(catOv.stores[h.url] || detectStoreCat(h.store));
+  }
+
+  function kwMatchAt(tokens, i, k) {
+    if (k.endsWith('$')) return tokens[i] === k.slice(0, -1);
+    if (k.includes(' ')) return tokens.slice(i).join(' ').startsWith(k);
+    return tokens[i].startsWith(k);
+  }
+
+  // A palavra mais à esquerda que bater decide ("NHOQUE BATATA" = Comida, não Hortifruti)
+  function detectSub(cat, name) {
+    const tokens = normName(name).split(' ').filter(Boolean);
+    for (let i = 0; i < tokens.length; i++) {
+      for (const [sub, kws] of cat.subs) {
+        if (kws.some(k => kwMatchAt(tokens, i, k))) return sub;
+      }
+    }
+    return cat.def;
+  }
+
+  function itemSub(cat, name) {
+    const key = cat.id + '|' + normName(name);
+    if (catOv.products[key]) return catOv.products[key];
+    if (!subCache.has(key)) subCache.set(key, detectSub(cat, name));
+    return subCache.get(key);
+  }
+
+  function subNames(cat) {
+    return [...new Set([...cat.subs.map(s => s[0]), cat.def])];
+  }
+
+  function setCupomCat(url, id) {
+    catOv.stores[url] = id;
+    saveCatOv({ stores: { [url]: id } });
+  }
+
+  function setItemSub(cat, name, sub) {
+    const key = cat.id + '|' + normName(name);
+    catOv.products[key] = sub;
+    saveCatOv({ products: { [key]: sub } });
+  }
+
+  function catOptions(selectedId) {
+    return CATEGORIES.map(c => '<option value="' + c.id + '"' + (c.id === selectedId ? ' selected' : '') + '>' + c.name + '</option>').join('');
+  }
+
+  function subOptions(cat, selected) {
+    return subNames(cat).map(s => '<option' + (s === selected ? ' selected' : '') + '>' + escapeHtml(s) + '</option>').join('');
+  }
+
+  function renderHistory() {
+    const list = loadHistory();
+    const ul = $('historyList');
+    const btnSeeAll = $('btnSeeAll');
+    $('historyEmpty').classList.toggle('hidden', list.length > 0);
+    btnSeeAll.classList.toggle('hidden', list.length <= HISTORY_PREVIEW);
+    btnSeeAll.textContent = showAllHistory ? 'Ver menos' : 'Ver todos';
+
+    const visible = showAllHistory ? list : list.slice(0, HISTORY_PREVIEW);
+    ul.innerHTML = visible.map((h, idx) => {
+      const cat = cupomCat(h);
+      return '<li data-idx="' + idx + '">' +
+        '<div class="h-icon" style="background:' + cat.soft + ';color:' + cat.color + '">' + cat.icon + '</div>' +
+        '<div class="h-info"><div class="h-name">' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</div>' +
+        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) +
+        (CLOUD && group && h.addedByName ? ' · por ' + escapeHtml(firstName(h.addedByName)) : '') + '</div></div>' +
+        '<div class="h-right"><div class="h-total">' + brl(h.total || 0) + '</div>' +
+        '<span class="badge">' + ICON_CHECK + 'Validado</span></div></li>';
+    }).join('');
+
+    ul.querySelectorAll('li').forEach(li => {
+      li.addEventListener('click', () => {
+        const h = visible[+li.dataset.idx];
+        setStatus('');
+        renderNota(h, h.url);
+        openResultCard();
+      });
+    });
+  }
+
+  // ---------- Estoque: junta os itens de todos os cupons ----------
+  let stockSort = 'qty';
+  let stockCat = '';   // filtro de categoria ('' = todas)
+  let stockSub = '';   // filtro de subcategoria ('' = todas)
+  let openStockKey = null;
+
+  // "BISC.BAUD.CHAM" e "Bisc Baud Cham" viram a mesma chave
+  function normName(s) {
+    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+  }
+
+  function buildStock(history) {
+    const nn = (v) => (v === null || v === undefined) ? NaN : v; // NaN vira null no JSON
+    const groups = new Map();
+    history.forEach(h => {
+      const cat = cupomCat(h);
+      (h.items || []).forEach(i => {
+        const unit = (i.un || 'un').toLowerCase().trim();
+        const key = cat.id + '|' + normName(i.name) + '|' + unit;
+        let qtd = nn(i.qtd);
+        if (isNaN(qtd)) qtd = 1;
+        let total = nn(i.total);
+        if (isNaN(total)) total = isNaN(nn(i.unit)) ? 0 : qtd * nn(i.unit);
+
+        if (!groups.has(key)) groups.set(key, { key, name: i.name, unit, cat, sub: itemSub(cat, i.name), qty: 0, spent: 0, cupons: new Set(), purchases: [], last: 0 });
+        const g = groups.get(key);
+        g.qty += qtd;
+        g.spent += total;
+        g.cupons.add(h.url);
+        g.last = Math.max(g.last, h.scannedAt || 0);
+        g.purchases.push({ store: h.store, date: h.scannedAt, qty: qtd, total });
+      });
+    });
+    return [...groups.values()];
+  }
+
+  function renderStock() {
+    const history = loadHistory();
+    const all = buildStock(history);
+    const q = normName($('stockFilter').value);
+
+    // filtros de categoria/subcategoria (descarta filtro que não existe mais)
+    if (stockCat && !all.some(g => g.cat.id === stockCat)) { stockCat = ''; stockSub = ''; }
+    const inCat = all.filter(g => !stockCat || g.cat.id === stockCat);
+    if (stockSub && !inCat.some(g => g.sub === stockSub)) stockSub = '';
+    const filtered = inCat.filter(g => !stockSub || g.sub === stockSub);
+
+    const filteredCupons = new Set(filtered.flatMap(g => [...g.cupons]));
+    $('statProducts').textContent = filtered.length;
+    $('statCupons').textContent = filteredCupons.size;
+    $('statSpent').textContent = brl(stockCat
+      ? filtered.reduce((s, g) => s + g.spent, 0)
+      : history.reduce((s, h) => s + (h.total || 0), 0));
+
+    renderStockFilters(all, inCat);
+
+    const sorters = {
+      qty: (a, b) => b.qty - a.qty || b.spent - a.spent,
+      spent: (a, b) => b.spent - a.spent,
+      recent: (a, b) => b.last - a.last,
+      name: (a, b) => a.name.localeCompare(b.name, 'pt-BR')
+    };
+    const list = filtered.filter(g => !q || normName(g.name).includes(q)).sort(sorters[stockSort]);
+
+    const empty = $('stockEmpty');
+    empty.textContent = !history.length ? 'Nenhum cupom escaneado ainda. Escaneie cupons na aba Escanear.' : 'Nenhum produto encontrado.';
+    empty.classList.toggle('hidden', list.length > 0);
+
+    $('stockList').innerHTML = list.map(g => {
+      const n = g.cupons.size;
+      let html = '<li data-key="' + escapeHtml(g.key) + '">' +
+        '<div class="s-row"><span class="s-name">' + escapeHtml(g.name) + '</span>' +
+        '<span class="s-qty">' + fmtQtd(g.qty) + ' <small>' + escapeHtml(g.unit) + '</small></span></div>' +
+        '<div class="s-meta"><span class="s-tag" style="background:' + g.cat.soft + ';color:' + g.cat.color + '">' +
+        escapeHtml(g.cat.name) + ' › ' + escapeHtml(g.sub) + '</span>' +
+        n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
+        (g.qty > 0 ? ' · Média ' + brl(g.spent / g.qty) + '/' + escapeHtml(g.unit) : '') + '</div>';
+      if (openStockKey === g.key) {
+        html += '<div class="s-detail">' +
+          '<label class="s-sub">Subcategoria <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
+          subOptions(g.cat, g.sub) + '</select></label>' +
+          g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
+          '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') + '</span>' +
+          '<span>' + fmtQtd(p.qty) + ' ' + escapeHtml(g.unit) + ' · ' + brl(p.total) + '</span></div>'
+        ).join('') + '</div>';
+      }
+      return html + '</li>';
+    }).join('');
+  }
+
+  // Barras de gasto (por categoria, ou por subcategoria quando uma categoria está filtrada) + chips de filtro
+  function renderStockFilters(all, inCat) {
+    const cat = stockCat ? catById(stockCat) : null;
+    const totals = new Map();
+    (cat ? inCat : all).forEach(g => {
+      const k = cat ? g.sub : g.cat.id;
+      totals.set(k, (totals.get(k) || 0) + g.spent);
+    });
+    const rows = [...totals].sort((a, b) => b[1] - a[1]);
+    const max = Math.max(...rows.map(r => r[1]), 0.01);
+    const sum = rows.reduce((s, r) => s + r[1], 0) || 1;
+
+    $('stockBreakdown').innerHTML = !rows.length ? '' :
+      '<p class="bd-title">' + (cat ? 'Gastos em ' + escapeHtml(cat.name) + ' por subcategoria' : 'Gastos por categoria') + '</p>' +
+      rows.map(([k, v]) => {
+        const c = cat || catById(k);
+        const label = cat ? k : c.name;
+        const active = cat ? stockSub === k : false;
+        return '<div class="bd-row' + (active ? ' active' : '') + '" data-' + (cat ? 'sub' : 'cat') + '="' + escapeHtml(k) + '">' +
+          '<div class="bd-top"><span style="color:' + c.color + '">' + c.icon + escapeHtml(label) + '</span>' +
+          '<span>' + brl(v) + ' · ' + Math.round(v / sum * 100) + '%</span></div>' +
+          '<div class="bd-bar"><i style="width:' + (v / max * 100) + '%;background:' + c.color + '"></i></div></div>';
+      }).join('');
+
+    const catIds = [...new Set(all.map(g => g.cat.id))];
+    $('catChips').innerHTML = catIds.length < 1 ? '' :
+      '<button class="chip' + (!stockCat ? ' active' : '') + '" data-cat="">Todas</button>' +
+      CATEGORIES.filter(c => catIds.includes(c.id)).map(c =>
+        '<button class="chip' + (stockCat === c.id ? ' active' : '') + '" data-cat="' + c.id + '">' + c.name + '</button>').join('');
+
+    const subs = cat ? [...new Set(inCat.map(g => g.sub))].sort((a, b) => a.localeCompare(b, 'pt-BR')) : [];
+    $('subChips').classList.toggle('hidden', !cat);
+    $('subChips').innerHTML = !cat ? '' :
+      '<button class="chip sub' + (!stockSub ? ' active' : '') + '" data-sub="">Todas de ' + escapeHtml(cat.name) + '</button>' +
+      subs.map(s => '<button class="chip sub' + (stockSub === s ? ' active' : '') + '" data-sub="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>').join('');
+  }
+
+  function setStockFilter(el) {
+    if (el.dataset.cat !== undefined) {
+      stockCat = stockCat === el.dataset.cat && el.classList.contains('bd-row') ? '' : el.dataset.cat;
+      stockSub = '';
+    } else if (el.dataset.sub !== undefined) {
+      stockSub = stockSub === el.dataset.sub && el.classList.contains('bd-row') ? '' : el.dataset.sub;
+    }
+    openStockKey = null;
+    renderStock();
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('tabScan').classList.toggle('hidden', tab !== 'scan');
+    $('tabStock').classList.toggle('hidden', tab !== 'stock');
+    $('tabAccount').classList.toggle('hidden', tab !== 'account');
+    $('btnHeaderUser').classList.toggle('active', tab === 'account');
+    if (tab !== 'scan') stopScanner();
+    if (tab === 'stock') renderStock();
+    if (tab === 'account') renderAccount();
+    window.scrollTo({ top: 0 });
+  }
+
+  // ---------- Câmera ----------
+  // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
+  const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
+  // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
+  const APP_VERSION = '2026-10-31.5';
+  // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
+  const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
+  const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  // Linha pequena com detalhes técnicos, para a pessoa mandar print quando der erro
+  function diag(extra) {
+    return '<small class="diag">' + escapeHtml(browserInfo() + (extra ? ' · ' + extra : '')) + '</small>';
+  }
+
+  function browserInfo() {
+    const ua = navigator.userAgent;
+    const os = /iPhone|iPad|iPod/i.test(ua) ? 'iOS' : /Android/i.test(ua) ? 'Android' : 'PC';
+    const br = /FBAN|FBAV|FB_IAB/i.test(ua) ? 'Facebook' : /Instagram/i.test(ua) ? 'Instagram' : /WhatsApp/i.test(ua) ? 'WhatsApp'
+      : /; wv\)/i.test(ua) ? 'WebView' : /EdgA?\//i.test(ua) ? 'Edge' : /SamsungBrowser/i.test(ua) ? 'Samsung Internet'
+      : /CriOS|Chrome/i.test(ua) ? 'Chrome' : /FxiOS|Firefox/i.test(ua) ? 'Firefox' : /Safari/i.test(ua) ? 'Safari' : 'outro';
+    return os + ' · ' + br + ' · v' + APP_VERSION;
+  }
+  let torchOn = false;
+  let hintTimer = null;
+  let engineTimer = null;
+  let nativeOk = false;     // BarcodeDetector existe E suporta qr_code
+  let useNative = false;    // leitor em uso agora
+  let backCameras = null;   // câmeras traseiras, para o botão "Trocar câmera"
+  let cameraIdx = -1;       // -1 = deixa o navegador escolher
+
+  // Alguns Androids têm BarcodeDetector sem suporte a QR (módulo do Google ausente): aí ele nunca lê nada
+  const nativeCheck = (async () => {
+    if (!HAS_NATIVE_DETECTOR) return;
+    try { nativeOk = (await BarcodeDetector.getSupportedFormats()).includes('qr_code'); } catch (_) {}
+  })();
+
+  function getScanner(native) {
+    if (scanner && scanner._native === native) return scanner;
+    if (scanner) { try { scanner.clear(); } catch (_) {} }
+    scanner = new Html5Qrcode('reader', {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], // só QR: não perde tempo com outros formatos
+      experimentalFeatures: { useBarCodeDetectorIfSupported: native },
+      verbose: false
+    });
+    scanner._native = native;
+    return scanner;
+  }
+
+  // Extrai a URL da NFC-e do texto lido (alguns QR vêm sem "http://")
+  function nfceUrl(text) {
+    text = (text || '').trim();
+    if (/^https?:\/\//i.test(text)) return text;
+    if (/^www\./i.test(text) || /^[\w.-]+\.gov\.br\//i.test(text)) return 'http://' + text;
+    return null;
+  }
+
+  function setScanButton(scanning) {
+    btnScan.classList.toggle('stop', scanning);
+    btnScan.querySelector('span').textContent = scanning ? 'Parar câmera' : 'Escanear QR Code';
+    $('illustration').classList.toggle('hidden', scanning);
+    $('readerWrap').classList.toggle('hidden', !scanning);
+  }
+
+  function setHint(msg, warn = false) {
+    const el = $('readerHint');
+    el.textContent = msg;
+    el.classList.toggle('warn', warn);
+  }
+
+  function cameraErrorMessage(err) {
+    const name = err?.name || String(err);
+    if (IN_APP_BROWSER || !CAMERA_API) return 'Este navegador não liberou a câmera. Abra o link no Chrome (Android) ou Safari (iPhone), ou use "Ler de uma foto".';
+    if (/NotAllowed|Permission/i.test(name)) return 'Permissão da câmera negada. Libere o acesso à câmera nas configurações do navegador e tente de novo.';
+    if (/NotFound|Overconstrained/i.test(name)) return 'Nenhuma câmera encontrada neste aparelho.';
+    if (/NotReadable|TrackStart/i.test(name)) return 'A câmera está sendo usada por outro app. Feche-o e tente de novo.';
+    if (!window.isSecureContext) return 'A câmera só funciona em HTTPS ou localhost.';
+    return 'Não foi possível abrir a câmera: ' + (err?.message || err);
+  }
+
+  async function startScanner(opts = {}) {
+    btnScan.disabled = true;
+    await nativeCheck;
+    useNative = opts.native === undefined ? nativeOk : opts.native;
+    const sc = getScanner(useNative);
+    setScanButton(true);
+    if (!opts.keepHint) setHint('Centralize o QR Code no quadro e aproxime até ficar nítido.');
+
+    const cam = cameraIdx >= 0 && backCameras ? { deviceId: { exact: backCameras[cameraIdx].deviceId } } : { facingMode: 'environment' };
+    const config = {
+      fps: useNative ? 15 : 10,
+      qrbox: (w, h) => { const s = Math.max(180, Math.floor(Math.min(w, h) * 0.8)); return { width: s, height: s }; },
+      disableFlip: true,
+      // 720p: resoluções maiores fazem alguns celulares escolherem uma lente sem foco automático
+      videoConstraints: { ...cam, width: { ideal: 1280 }, height: { ideal: 720 }, advanced: [{ focusMode: 'continuous' }] }
+    };
+
+    try {
+      try {
+        await sc.start(cam, config, onScanSuccess, () => {});
+      } catch (err) {
+        // alguns aparelhos recusam as restrições avançadas: tenta de novo no modo básico
+        if (/NotAllowed|Permission/i.test(err?.name || String(err))) throw err;
+        delete config.videoConstraints;
+        await sc.start(cam, config, onScanSuccess, () => {});
+      }
+      setupControls();
+      scheduleHelp(sc);
+    } catch (err) {
+      setScanButton(false);
+      resultEl.innerHTML = '';
+      setStatus(escapeHtml(cameraErrorMessage(err)) + diag(err?.name || err), { error: true });
+      openResultCard();
+    } finally {
+      btnScan.disabled = false;
+    }
+  }
+
+  async function restartScanner(opts) {
+    clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
+    if (scanner && scanner.isScanning) {
+      try { await scanner.stop(); } catch (_) {}
+    }
+    await startScanner(opts);
+  }
+
+  function scheduleHelp(sc) {
+    clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
+    if (useNative) {
+      // leitor nativo não leu em 6s: troca para o leitor em JS, que funciona em qualquer aparelho
+      engineTimer = setTimeout(() => {
+        if (!sc.isScanning || busy) return;
+        setHint('Tentando outro modo de leitura...', true);
+        restartScanner({ native: false, keepHint: true });
+      }, 6000);
+    } else {
+      hintTimer = setTimeout(() => {
+        if (sc.isScanning) setHint('Difícil de ler? Afaste um pouco o celular, evite reflexo, toque em "Trocar câmera", use a lanterna ou "Ler de uma foto".', true);
+      }, 8000);
+    }
+  }
+
+  async function setupControls() {
+    const btn = $('btnTorch');
+    torchOn = false;
+    btn.classList.remove('on');
+    let supported = false;
+    try { supported = !!scanner.getRunningTrackCapabilities().torch; } catch (_) {}
+    btn.classList.toggle('hidden', !supported);
+
+    if (!backCameras) {
+      try {
+        const all = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+        const back = all.filter(d => /back|rear|traseira|environment/i.test(d.label));
+        backCameras = back.length ? back : all;
+      } catch (_) { backCameras = []; }
+    }
+    $('btnCamSwitch').classList.toggle('hidden', backCameras.length < 2);
+  }
+
+  // Celulares com várias lentes: deixa a pessoa trocar até achar a que foca de perto
+  async function switchCamera() {
+    if (!backCameras || backCameras.length < 2) return;
+    cameraIdx = (cameraIdx + 1) % backCameras.length;
+    setHint('Câmera ' + (cameraIdx + 1) + ' de ' + backCameras.length + ': veja qual fica mais nítida.');
+    await restartScanner({ native: useNative, keepHint: true });
+  }
+
+  async function toggleTorch() {
+    if (!scanner || !scanner.isScanning) return;
+    torchOn = !torchOn;
+    try {
+      await scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+    } catch (_) {
+      torchOn = !torchOn;
+    }
+    $('btnTorch').classList.toggle('on', torchOn);
+  }
+
+  async function stopScanner() {
+    clearTimeout(hintTimer);
+    clearTimeout(engineTimer);
+    if (scanner && scanner.isScanning) {
+      try { await scanner.stop(); } catch (_) {}
+    }
+    torchOn = false;
+    setScanButton(false);
+  }
+
+  async function onScanSuccess(text) {
+    if (busy) return;
+    const url = nfceUrl(text);
+    // QR que não é de nota fiscal: avisa e continua escaneando
+    if (!url) {
+      setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR da NFC-e.', true);
+      return;
+    }
+    busy = true;
+    if (navigator.vibrate) navigator.vibrate(100);
+    await stopScanner();
+    await processUrl(url);
+    busy = false;
+  }
+
+  // Fotos de 12MP+ costumam falhar no leitor em JS; uma versão reduzida lê melhor
+  async function downscale(file, max = 1600) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      if (scale === 1) return null;
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+      return blob ? new File([blob], 'foto.jpg', { type: 'image/jpeg' }) : null;
+    } catch (_) { return null; }
+  }
+
+  // Lê o QR a partir de uma foto (câmera nativa foca melhor em cupons amassados/pequenos)
+  async function scanFromPhoto(file) {
+    if (!file) return;
+    await stopScanner();
+    resultEl.innerHTML = '';
+    setStatus('Lendo QR Code da foto...', { loading: true });
+    openResultCard();
+    await nativeCheck;
+
+    // tenta foto reduzida e original, com cada leitor disponível
+    const files = [await downscale(file), file].filter(Boolean);
+    const engines = nativeOk ? [true, false] : [false];
+    let url = null;
+    for (const f of files) {
+      for (const native of engines) {
+        try { url = nfceUrl(await getScanner(native).scanFile(f, false)); } catch (_) {}
+        if (url) break;
+      }
+      if (url) break;
+    }
+
+    if (!url) {
+      setStatus('Não encontrei um QR Code de cupom nessa foto. Tire outra mais de perto, com o QR nítido e sem reflexo.' + diag(), { error: true });
+      return;
+    }
+    if (navigator.vibrate) navigator.vibrate(100);
+    await processUrl(url);
+  }
+
+  // ---------- Busca + parse ----------
+  async function fetchWithTimeout(url) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    try {
+      return await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // Algumas SEFAZ respondem em ISO-8859-1; res.text() sempre decodifica como UTF-8
+  async function decodeBody(res) {
+    const buf = await res.arrayBuffer();
+    const charset = ((res.headers.get('Content-Type') || '').match(/charset=([\w-]+)/i) || [])[1];
+    try { return new TextDecoder(charset || 'utf-8').decode(buf); } catch (_) { return new TextDecoder().decode(buf); }
+  }
+
+  async function fetchViaProxies(url) {
+    const errors = [];
+    for (let i = 0; i < PROXIES.length; i++) {
+      const p = PROXIES[i];
+      setStatus('Buscando nota na SEFAZ... (' + (i + 1) + '/' + PROXIES.length + ': ' + p.name + ')', { loading: true });
+      try {
+        const res = await fetchWithTimeout(p.build(url));
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const html = p.json ? (await res.json()).contents : await decodeBody(res);
+        if (!html || html.length < 200) throw new Error('resposta vazia');
+        return html;
+      } catch (err) {
+        errors.push(p.name + ': ' + (err.name === 'AbortError' ? 'tempo esgotado' : err.message));
+      }
+    }
+    throw new Error('Nenhum proxy respondeu.<br><small>' + errors.map(escapeHtml).join('<br>') + '</small>');
+  }
+
+  async function processUrl(url) {
+    resultEl.innerHTML = '';
+    openResultCard();
+    if (!/^https?:\/\//i.test(url)) {
+      setStatus('O QR Code lido não contém uma URL válida:<br><code>' + escapeHtml(url) + '</code>', { error: true });
+      return;
+    }
+    try {
+      const html = await fetchViaProxies(url);
+      const data = parseNota(html);
+
+      if (!data.items.length) {
+        let host = '';
+        try { host = new URL(url).hostname; } catch (_) {}
+        setStatus('Não encontrei produtos na resposta da SEFAZ (o site pode ter pedido captcha ou ter um layout diferente).' + diag(host), { error: true });
+        showPasteBox(url);
+        return;
+      }
+      setStatus('');
+      addToHistory(url, data);
+      renderNota(data, url);
+    } catch (err) {
+      setStatus('Não consegui buscar a nota automaticamente: ' + err.message + diag() +
+        '<br><button class="btn small ghost" id="btnRetry" style="margin-top:10px">Tentar novamente</button>', { error: true });
+      $('btnRetry').addEventListener('click', () => processUrl(url));
+      showPasteBox(url);
+    }
+  }
+
+  // ---------- Plano B: usuário copia o texto da nota original e cola aqui ----------
+  function showPasteBox(url) {
+    const hasUrl = /^https?:\/\//i.test(url || '');
+    resultEl.innerHTML = '<div class="paste-box">' +
+      '<p class="paste-title">Plano B: copie o texto da nota</p>' +
+      '<ol class="steps">' +
+        (hasUrl
+          ? '<li>Toque em <a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Abrir nota original</a></li>'
+          : '<li>Abra a nota no site da SEFAZ</li>') +
+        '<li>Pressione e segure o texto da página → <b>Selecionar tudo</b> → <b>Copiar</b></li>' +
+        '<li>Volte aqui, cole no campo abaixo e toque em <b>Ler produtos</b></li>' +
+      '</ol>' +
+      '<textarea id="pasteText" placeholder="Cole aqui o texto da nota..."></textarea>' +
+      '<p class="paste-error hidden" id="pasteError"></p>' +
+      '<button class="btn small" id="btnPaste">Ler produtos</button>' +
+      '</div>';
+    $('btnPaste').addEventListener('click', () => processText($('pasteText').value, url));
+  }
+
+  function processText(text, url) {
+    const data = parseNotaText(text || '');
+    if (!data.items.length) {
+      $('pasteError').textContent = 'Não reconheci produtos nesse texto. Confira se copiou a página inteira da nota (com os itens e os códigos).';
+      $('pasteError').classList.remove('hidden');
+      return;
+    }
+    const id = /^https?:\/\//i.test(url || '') ? url : 'manual:' + Date.now();
+    setStatus('');
+    addToHistory(id, data);
+    renderNota(data, id);
+  }
+
+  // Lê o texto copiado da página da SEFAZ. Tolera a página traduzida pelo Chrome ("ONU", "Unidade Vl.")
+  function parseNotaText(raw) {
+    const text = raw.replace(/\r/g, '').replace(/ /g, ' ');
+    const lines = text.split('\n').map(clean).filter(Boolean);
+    const data = { store: '', storeInfo: [], items: [], total: NaN };
+
+    const cnpjIdx = lines.findIndex(l => /CNPJ/i.test(l));
+    if (cnpjIdx >= 0) {
+      data.store = cnpjIdx > 0 ? lines[cnpjIdx - 1] : '';
+      data.storeInfo = lines.slice(cnpjIdx, cnpjIdx + 2).filter(l => !/C[óo]d|Code/i.test(l));
+    }
+
+    const MONEY = /\d{1,3}(?:\.\d{3})*,\d{2}(?!\d)/g;
+    const matches = [...text.matchAll(/\(\s*(?:C[óo]d(?:igo)?|Code)\.?\s*:?\s*(\d+)\s*\)/gi)];
+    matches.forEach((m, k) => {
+      const prevEnd = k === 0 ? 0 : matches[k - 1].index + matches[k - 1][0].length;
+      let name = clean(text.slice(prevEnd, m.index).split('\n').filter(l => l.trim()).pop());
+      // se tudo veio numa linha só, remove o resto do item anterior
+      if (/Qtde|Unit|Total/i.test(name)) name = clean(name.replace(/^.*\d,\d{2}(?!\d)/, ''));
+      if (!name) return;
+
+      const segEnd = k + 1 < matches.length ? matches[k + 1].index : text.length;
+      const seg = text.slice(m.index + m[0].length, segEnd);
+      const qtdM = seg.match(/Qtde?\.?\s*:?\s*([\d.,]+)/i);
+      const unM = seg.match(/(?:ONU|UN)\s*:\s*([A-Za-zÀ-ú]+?)(?=\s|Vl|Unid|\d|$)/i);
+      const unitPos = seg.search(/Unit|Unidade/i);
+      const afterUnit = unitPos >= 0 ? seg.slice(unitPos) : seg;
+      // valor unitário pode vir sem 2 casas ("79", "29,9"); o total vem logo depois com 2 casas
+      const unitM = afterUnit.match(/:\s*(\d[\d.]*(?:,\d+)?)/);
+      const rest = unitM ? afterUnit.slice(unitM.index + unitM[0].length) : afterUnit;
+
+      const qtd = qtdM ? toNumber(qtdM[1]) : NaN;
+      const unit = unitM ? toNumber(unitM[1]) : NaN;
+      let total = toNumber((rest.match(MONEY) || [])[0]);
+      if (isNaN(total) && !isNaN(qtd) && !isNaN(unit)) total = qtd * unit;
+      data.items.push({ name, code: m[1], qtd, un: unM ? unM[1] : '', unit, total });
+    });
+
+    const totM = text.match(/Valor\s+a\s+pagar\s*R?\$?\s*:?\s*([\d.]*\d,\d{2})/i)
+      || text.match(/Valor\s+total\s*R?\$?\s*:?\s*([\d.]*\d,\d{2})/i);
+    data.total = totM ? toNumber(totM[1]) : data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+    return data;
+  }
+
+  function parseNota(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const text = (sel, root = doc) => clean(root.querySelector(sel)?.textContent);
+
+    const data = {
+      store: text('#u20') || text('.txtTopo'),
+      storeInfo: Array.from(doc.querySelectorAll('.txtCenter .text')).map(e => clean(e.textContent)).filter(Boolean),
+      items: [],
+      total: NaN
+    };
+
+    // Layout padrão nacional da NFC-e (SP, BA, PR, RS, GO, etc.)
+    let rows = doc.querySelectorAll('#tabResult tr');
+    if (!rows.length) rows = Array.from(doc.querySelectorAll('tr')).filter(tr => tr.querySelector('.txtTit'));
+
+    rows.forEach(tr => {
+      const name = text('.txtTit', tr) || text('.txtTit2', tr);
+      if (!name) return;
+      const code = (text('.RCod', tr).match(/\d+/) || [''])[0];
+      const qtd = toNumber(text('.Rqtd', tr).replace(/qtde\.?:?/i, ''));
+      const un = clean(text('.RUN', tr).replace(/un:?/i, ''));
+      const unit = toNumber(text('.RvlUnit', tr).replace(/vl\.?\s*unit\.?:?/i, ''));
+      let total = toNumber(text('.valor', tr));
+      if (isNaN(total) && !isNaN(qtd) && !isNaN(unit)) total = qtd * unit;
+      data.items.push({ name, code, qtd, un, unit, total });
+    });
+
+    // Fallback genérico: tabelas com colunas descrição/qtd/valor
+    if (!data.items.length) {
+      doc.querySelectorAll('table tr').forEach(tr => {
+        const cells = Array.from(tr.querySelectorAll('td')).map(td => clean(td.textContent));
+        if (cells.length < 3) return;
+        const nums = cells.map(toNumber);
+        const name = cells.find((c, i) => isNaN(nums[i]) && c.length > 2);
+        const numeric = nums.filter(n => !isNaN(n));
+        if (!name || numeric.length < 2) return;
+        data.items.push({ name, code: '', qtd: numeric[0], un: '', unit: NaN, total: numeric[numeric.length - 1] });
+      });
+    }
+
+    // Total da nota
+    const totalEl = Array.from(doc.querySelectorAll('#totalNota #linhaTotal')).find(l => /valor a pagar/i.test(l.textContent))
+      || doc.querySelector('#totalNota .totalNumb.txtMax');
+    data.total = toNumber(totalEl ? (totalEl.querySelector('.totalNumb')?.textContent || totalEl.textContent) : '');
+    if (isNaN(data.total)) data.total = data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+
+    return data;
+  }
+
+  function renderNota(data, url) {
+    // NaN vira null no JSON do histórico; normaliza de volta
+    const num = (v) => (v === null || v === undefined) ? NaN : v;
+    const items = data.items.map(i => ({ ...i, qtd: num(i.qtd), unit: num(i.unit), total: num(i.total) }));
+    const sumItems = items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+
+    let html = '<div class="nota-head">';
+    if (data.store) html += '<p class="store">' + escapeHtml(data.store) + '</p>';
+    (data.storeInfo || []).forEach(line => { html += '<p class="store-info">' + escapeHtml(line) + '</p>'; });
+    if (data.scannedAt) html += '<p class="store-info">Escaneado em ' + fmtDate(data.scannedAt) + '</p>';
+    html += '</div>';
+
+    const cat = cupomCat({ url, store: data.store });
+    html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
+
+    html += '<input type="search" class="filter" id="filterItems" placeholder="Filtrar itens...">';
+    html += '<ul class="items" id="itemList">';
+    const bySub = new Map();
+    items.forEach(i => {
+      const sub = itemSub(cat, i.name);
+      bySub.set(sub, (bySub.get(sub) || 0) + (isNaN(i.total) ? 0 : i.total));
+      const meta = [];
+      if (!isNaN(i.qtd)) meta.push('<span><b>Qtde.:</b> ' + fmtQtd(i.qtd) + '</span>');
+      if (i.un) meta.push('<span><b>UN:</b> ' + escapeHtml(i.un) + '</span>');
+      if (!isNaN(i.unit)) meta.push('<span><b>Unidade Vl.:</b> ' + fmtNum(i.unit) + '</span>');
+      const search = (i.name + ' ' + (i.code || '')).toLowerCase();
+      html += '<li data-search="' + escapeHtml(search) + '">' +
+        '<div class="row"><div><span class="item-name">' + escapeHtml(i.name) + '</span>' +
+        (i.code ? ' <span class="item-code">(Código: ' + escapeHtml(i.code) + ')</span>' : '') + '</div>' +
+        '<span class="label-total">Total Vl.</span></div>' +
+        '<div class="row"><div class="item-meta">' + meta.join('') + '</div>' +
+        '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div>' +
+        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select></li>';
+    });
+    html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
+
+    html += '<div class="sub-summary">' + [...bySub].sort((a, b) => b[1] - a[1]).map(([sub, v]) =>
+      '<div><span>' + escapeHtml(cat.name) + ' › ' + escapeHtml(sub) + '</span><b>' + brl(v) + '</b></div>').join('') + '</div>';
+
+    html += '<div class="summary"><div>Total<small>' + items.length + ' ' +
+      (items.length === 1 ? 'item' : 'itens') +
+      (Math.abs(sumItems - data.total) > 0.009 ? ' · soma dos itens ' + brl(sumItems) : '') +
+      '</small></div><div>' + brl(data.total) + '</div></div>';
+
+    html += '<div class="detail-actions">' +
+      (/^https?:\/\//i.test(url) ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener"><span class="btn small ghost">Nota original</span></a>' : '') +
+      '<button class="btn small stop" id="btnRemove">Remover</button></div>';
+
+    resultEl.innerHTML = html;
+
+    $('filterItems').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      let visible = 0;
+      $('itemList').querySelectorAll('li').forEach(li => {
+        const show = !q || li.dataset.search.includes(q);
+        li.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      $('noItems').classList.toggle('hidden', visible > 0);
+    });
+
+    $('cupomCat').addEventListener('change', (e) => {
+      setCupomCat(url, e.target.value);
+      renderHistory();
+      renderNota(data, url);
+    });
+    $('itemList').addEventListener('change', (e) => {
+      if (!e.target.classList.contains('sub-pill')) return;
+      setItemSub(cat, e.target.dataset.name, e.target.value);
+      renderNota(data, url);
+    });
+
+    $('btnRemove').addEventListener('click', () => {
+      if (!confirm('Remover este cupom do histórico?')) return;
+      removeFromHistory(url);
+      resultCard.classList.add('hidden');
+    });
+  }
+
+  // ---------- Eventos ----------
+  btnScan.addEventListener('click', () => {
+    if (scanner && scanner.isScanning) stopScanner();
+    else startScanner();
+  });
+  $('btnTorch').addEventListener('click', toggleTorch);
+  $('btnCamSwitch').addEventListener('click', switchCamera);
+  document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  $('stockFilter').addEventListener('input', renderStock);
+  $('stockSort').addEventListener('change', (e) => {
+    stockSort = e.target.value;
+    renderStock();
+  });
+  ['catChips', 'subChips', 'stockBreakdown'].forEach(id => $(id).addEventListener('click', (e) => {
+    const el = e.target.closest('[data-cat],[data-sub]');
+    if (el) setStockFilter(el);
+  }));
+  $('stockList').addEventListener('click', (e) => {
+    if (e.target.closest('select, label')) return; // mexer na subcategoria não fecha o item
+    const li = e.target.closest('li');
+    if (!li) return;
+    openStockKey = openStockKey === li.dataset.key ? null : li.dataset.key;
+    renderStock();
+  });
+  $('stockList').addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-cat]');
+    if (!sel) return;
+    const cat = catById(sel.dataset.cat);
+    setItemSub(cat, sel.dataset.name, sel.value);
+    // a chave do grupo não muda (categoria|nome|unidade), então o item continua aberto
+    renderStock();
+  });
+  $('photoInput').addEventListener('change', (e) => {
+    scanFromPhoto(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('appVersion').textContent = browserInfo();
+  if (IN_APP_BROWSER || !CAMERA_API) $('inAppWarn').classList.remove('hidden');
+  $('btnCopyLink').addEventListener('click', async () => {
+    const link = location.href.split('#')[0];
+    try {
+      await navigator.clipboard.writeText(link);
+      $('btnCopyLink').textContent = 'Link copiado! Cole no Chrome/Safari';
+    } catch (_) {
+      prompt('Copie o link e abra no Chrome ou Safari:', link);
+    }
+  });
+  // desliga a câmera quando o app vai para segundo plano (economiza bateria e libera a câmera)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopScanner();
+  });
+  $('btnToggleManual').addEventListener('click', () => {
+    $('manualBox').classList.toggle('hidden');
+    if (!$('manualBox').classList.contains('hidden')) $('manualUrl').focus();
+  });
+  $('btnManual').addEventListener('click', () => {
+    const url = $('manualUrl').value.trim();
+    if (url) processUrl(url);
+  });
+  $('manualUrl').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('btnManual').click();
+  });
+  $('btnPasteMode').addEventListener('click', () => {
+    setStatus('');
+    showPasteBox($('manualUrl').value.trim());
+    openResultCard();
+  });
+  $('btnClose').addEventListener('click', () => resultCard.classList.add('hidden'));
+  $('btnSeeAll').addEventListener('click', () => {
+    showAllHistory = !showAllHistory;
+    renderHistory();
+  });
+
+  // ---------- Contas: eventos e inicialização ----------
+  $('authSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-auth]');
+    if (b) setAuthTab(b.dataset.auth);
+  });
+  $('loginForm').addEventListener('submit', onLogin);
+  $('signupForm').addEventListener('submit', onSignup);
+  $('btnForgot').addEventListener('click', onForgot);
+  $('modeCards').addEventListener('change', () => {
+    const mode = document.querySelector('input[name="suMode"]:checked').value;
+    $('modeCards').querySelectorAll('.mode-card').forEach(c => c.classList.toggle('selected', c.querySelector('input').checked));
+    $('suGroupBox').classList.toggle('hidden', mode !== 'group');
+  });
+  $('suGroupSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ga]');
+    if (b) setSignupGroupAction(b.dataset.ga);
+  });
+  $('accountContent').addEventListener('click', onAccountAction);
+  $('btnModalCopy').addEventListener('click', () => copyText($('codeModal').dataset.code, 'Código copiado!'));
+  $('btnModalShare').addEventListener('click', () => shareCode($('codeModal').dataset.code, $('codeModal').dataset.name));
+  $('btnModalClose').addEventListener('click', () => $('codeModal').classList.add('hidden'));
+  // ícone de usuário: abre a tela da conta (toque de novo para voltar ao scan)
+  $('btnHeaderUser').addEventListener('click', () => {
+    if (CLOUD && !me) return; // ainda na tela de login
+    showTab($('tabAccount').classList.contains('hidden') ? 'account' : 'scan');
+  });
+  $('headerSpace').addEventListener('click', () => { if (CLOUD && me) showTab('account'); });
+
+  if (CLOUD) {
+    // espera o Firebase dizer se há alguém logado
+    $('tabScan').classList.add('hidden');
+    document.querySelector('.tabbar').classList.add('hidden');
+    $('authView').classList.remove('hidden');
+    initCloud();
+  } else {
+    renderHistory();
+  }
 </script>
 </body>
 </html>
