@@ -274,6 +274,44 @@
   .s-detail span:last-child { white-space: nowrap; color: var(--text); }
   .stock-note { font-size: .75rem; color: var(--muted); margin: 14px 0 0; }
 
+  /* ---------- Categorias ---------- */
+  .cat-select {
+    font: 500 .85rem "Inter", sans-serif; color: var(--text); cursor: pointer;
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 30px 7px 12px;
+    -webkit-appearance: none; appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235f6b64' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 11px center;
+  }
+  .cat-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin: 0 0 12px; padding: 10px 12px; background: #f6f8f6; border-radius: 10px;
+    font-size: .9rem; font-weight: 600;
+  }
+  .sub-pill {
+    margin-top: 6px; border: 0; border-radius: 999px; cursor: pointer;
+    font: 600 .72rem "Inter", sans-serif; padding: 3px 22px 3px 9px;
+    -webkit-appearance: none; appearance: none; color: var(--green-text);
+    background: var(--green-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='none' stroke='%2315803d' stroke-width='2'%3E%3Cpath d='M2 3.5l3 3 3-3'/%3E%3C/svg%3E") no-repeat right 7px center;
+  }
+  .sub-summary { margin: 12px 0; font-size: .85rem; }
+  .sub-summary div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; color: var(--muted); }
+  .sub-summary b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .breakdown { margin: 0 0 12px; }
+  .bd-title { font-size: .75rem; font-weight: 700; color: var(--muted); margin: 0 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .bd-row { padding: 6px 4px; border-radius: 8px; cursor: pointer; }
+  .bd-row.active { background: #f1f4f2; }
+  .bd-top { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; }
+  .bd-top span:first-child { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .bd-top span:last-child { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bd-top svg { width: 16px; height: 16px; stroke: currentColor; flex: 0 0 auto; }
+  .bd-bar { height: 8px; background: #eef1ee; border-radius: 4px; margin-top: 4px; overflow: hidden; }
+  .bd-bar i { display: block; height: 100%; border-radius: 4px; }
+  .chip.sub { font-size: .78rem; padding: 5px 11px; }
+  .chip.sub.active { background: var(--green-dark); border-color: var(--green-dark); }
+  .search-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .search-row .filter { flex: 1; margin-bottom: 0; min-width: 0; }
+  .s-tag { display: inline-block; font-size: .7rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-right: 6px; }
+  .s-sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-weight: 600; color: var(--text); }
+
   .hidden { display: none !important; }
 
   @media (max-width: 360px) {
@@ -416,16 +454,21 @@
         <div class="stat"><b id="statCupons">0</b><span>cupons</span></div>
         <div class="stat"><b id="statSpent">R$ 0,00</b><span>total gasto</span></div>
       </div>
-      <input type="search" class="filter" id="stockFilter" placeholder="Buscar produto...">
-      <div class="chips" id="stockSort">
-        <button class="chip active" data-sort="qty">Mais comprados</button>
-        <button class="chip" data-sort="spent">Maior gasto</button>
-        <button class="chip" data-sort="recent">Recentes</button>
-        <button class="chip" data-sort="name">A–Z</button>
+      <div class="breakdown" id="stockBreakdown"></div>
+      <div class="chips" id="catChips"></div>
+      <div class="chips" id="subChips"></div>
+      <div class="search-row">
+        <input type="search" class="filter" id="stockFilter" placeholder="Buscar produto...">
+        <select class="cat-select" id="stockSort" aria-label="Ordenar">
+          <option value="qty">Mais comprados</option>
+          <option value="spent">Maior gasto</option>
+          <option value="recent">Recentes</option>
+          <option value="name">A–Z</option>
+        </select>
       </div>
       <ul class="stock-list" id="stockList"></ul>
       <p class="empty hidden" id="stockEmpty"></p>
-      <p class="stock-note">Toque num produto para ver em quais cupons ele aparece. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
+      <p class="stock-note">Toque num produto para ver em quais cupons ele aparece e para trocar a subcategoria. A categoria vem da loja: troque no detalhe do cupom. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
     </section>
   </div>
 
@@ -539,6 +582,144 @@
   const ICON_STORE = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg>';
   const ICON_PHARMA = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>';
   const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const svgIcon = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  const ICON_MEAT = svgIcon('<path d="M14.5 13.5c2.5 0 6-1.5 6-5.5a4.5 4.5 0 0 0-9 0c0 1 .1 1.6.5 2.5L8 14.5"/><circle cx="6.5" cy="17.5" r="2.5"/>');
+  const ICON_BREAD = svgIcon('<path d="M5 11a3 3 0 0 1 0-6h14a3 3 0 0 1 0 6v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/>');
+  const ICON_FOOD = svgIcon('<path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v6M9 3v6M17 21V3c-2 1-3 4-3 7h3"/>');
+  const ICON_FUEL = svgIcon('<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10"/><path d="M14 8h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>');
+  const ICON_BAG = svgIcon('<path d="M6 7h12l1 14H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>');
+
+  // ---------- Categorias (loja) e subcategorias (produto) ----------
+  // Palavras-chave comparadas com o nome normalizado (sem acento, maiúsculo).
+  // "X" = palavra que começa com X · "X$" = palavra exatamente X · "X Y" = trecho que começa com "X Y"
+  const kw = (s) => s.split(',').map(k => k.trim()).filter(Boolean);
+  const KW = {
+    limpeza: kw('DETERG,SABAO,AMACIANTE,AMAC$,DESINF,AGUA SANIT,ALVEJ,LIMPA,LIMP$,ESPONJA,BOMBRIL,LA DE ACO,PALHA DE ACO,VASSOUR,RODO,PANO$,PANO DE,PANO MULTI,SACO LIXO,SC LIXO,SACO P LIXO,CANDIDA,MULTIUSO,LUSTRA,INSETIC,ODORIZ,PAPEL TOALHA,PAP TOALHA,GUARDANAPO,PAPEL ALUM,FILME PVC,LUVA,CLORO,VEJA$,YPE$,OMO$,DESENGORD,TIRA MANCHA,PEDRA SANIT,BOM AR'),
+    higiene: kw('SHAMPOO,SHAMP,CONDICIONADOR,CONDIC,SABONETE,SABONET,SAB LIQ,SAB BARRA,CREME DENT,CR DENT,ESCOVA DENT,ESC DENT,FIO DENT,DESOD,ANTITRANSP,PAPEL HIG,PAP HIG,P HIG,ABSORV,COTONETE,HASTES,ALGODAO,BARBEAD,APAR BARB,LAMINA,ENXAG,LISTERINE,COLGATE,ORAL B,REXONA,LENCO UMED,LENCOS UMED,CREME CORP'),
+    beleza: kw('BATOM,ESMALTE,MAQUI,RIMEL,MASCARA CILIOS,PERFUME,COLONIA,HIDRAT,PROTETOR,BRONZ,TINTURA,COLORACAO,ACETONA,REMOVEDOR,CREME FACIAL,SERUM,BASE LIQ,PO COMPACTO,DEPIL,CERA DEP,GEL CAB,POMADA MODEL,CREME P PENT,CREME PENT'),
+    pet: kw('RACAO,PET$,WHISKAS,PEDIGREE,GOLDEN,AREIA GATO,AREIA HIG,PETISCO,FRISKIES,DOG CHOW,CAT CHOW,PREMIER'),
+    bebidas: kw('REFR,REFRIG,COCA$,COCA COLA,COCA ZERO,GUARANA,FANTA,SPRITE,PEPSI,SODA,SUCO,NECTAR,AGUA,CERV,CHOPP,VHO,VINHO,ESPUM,WHISK,VODKA,CACHACA,GIN$,RUM$,LICOR,ENERG,ISOT,GATORADE,POWERADE,CHA$,CHA GELADO,MATE$,MATE LEAO,KOMBUCHA,BEBIDA,H2OH,SKOL,BRAHMA,HEINEKEN,AMSTEL,BUDWEISER,ITAIPAVA,ANTARCTICA,STELLA,CORONA,SPATEN,RED BULL,MONSTER,TONICA,AGUARDENTE'),
+    frios: kw('LEITE,IOG,IOGURTE,QUEIJO,QJO,QJ$,MUSSARELA,MUCARELA,MUSS,PRESUNTO,PRES$,APRESUNT,MORTADELA,MORT$,SALAME,PEITO PERU,PEITO DE PERU,REQUEIJ,REQ$,MANTEIGA,MANT$,MARGARINA,MARG$,CREME LEITE,CR LEITE,CREME DE LEITE,NATA,COALHADA,PETIT,BEB LACTEA,KEFIR,RICOTA,PARMES,PROVOLONE,CHEDDAR,COTTAGE,BRIE,GORGONZ,LEITE COND,DANONINHO,YAKULT'),
+    carnes: kw('CARNE,BOV,PATINHO,ACEM,ALCATRA,PICANHA,CONTRA FILE,CONTRAFILE,COXAO,MAMINHA,FRALDINHA,COSTELA,MUSCULO,PALETA,CUPIM,MOIDA,FGO,FRANGO,PEITO,COXA,SOBRECOXA,ASA$,ASINHA,FILE,SUINO,SUIN,LOMBO,PERNIL,BISTECA,LINGUICA,LING$,BACON,SALSICHA,TOUCINHO,PEIXE,TILAPIA,SALMAO,MERLUZA,CAMARAO,BACALHAU,HAMBURG,ALMONDEGA,KAFTA,CHARQUE,CALABRESA,CHESTER,PERU$,MIUDOS,FIGADO'),
+    paes: kw('PAO,PAES,BISNAG,BAGUETE,CROISSANT,BROA,TORRADA,FRANCES,CIABATTA,SOVADO,PAO DE FORMA,PULLMAN,WICKBOLD,SEVEN BOYS'),
+    doces: kw('BOLO,ROSCA,SONHO,CUCA,TORTA DOCE,BRIGADEIRO,BOMBA,CAROLINA,PUDIM,SAGU,DOCE,BOMBOM,CHOC,BEIJINHO,QUINDIM,PAVE,MOUSSE,TORTA'),
+    salgados: kw('SALGADO,COXINHA,PASTEL,ESFIHA,ESFIRRA,EMPADA,EMPADINHA,PAO DE QUEIJO,ENROLADO,ENROLADINHO,CROQUETE,QUIBE,KIBE,TORTA SALG,MINI PIZZA,PIZZA,SANDUICHE,LANCHE,MISTO,X SALADA,HOT DOG'),
+    comida: kw('ARROZ,FEIJAO,FEIJ$,MACARRAO,MAC$,MASSA,ESPAGUETE,PENNE,NHOQUE,LASANHA,MOLHO,MOL$,EXTRATO,ATOMATADO,OLEO,AZEITE,ACUCAR,ACUC$,SAL$,SAL REFIN,SAL GROSSO,FARINHA,FAR$,FUBA,AVEIA,CAFE,ACHOC,NESCAU,TODDY,BISC,BISCOITO,BOLACHA,BOL$,WAFER,ROSQ,CHOC,CHOCOLATE,BOMBOM,BALA,GOMA,CHICLE,DOCE,GELEIA,MEL$,CEREAL,GRANOLA,MILHO,ERVILHA,SELETA,AZEITONA,PALMITO,CONSERVA,MAIONESE,MAION,KETCHUP,KETCH,MOSTARDA,TEMPERO,CALDO,SAZON,MIOJO,LAMEN,SOPA,PIPOCA,AMENDOIM,CASTANHA,SALGADINHO,BATATA PALHA,CHIPS,DORITOS,RUFFLES,PRINGLES,CHEETOS,GELATINA,PUDIM,SORVETE,PIZZA,CONGEL,EMPANADO,NUGGET,FERMENTO,AMIDO,MAISENA,POLPA,TAPIOCA,GRAO,LENTILHA,QUINOA,SOJA,MIX$,PACOCA,CREME DE AVELA,NUTELLA,LEITE EM PO,LEITE PO,ATUM,SARDINHA,VINAGRE,SHOYU,CATCHUP,BARRA CEREAL,BARRINHA,COOKIE,TRAKINAS,OREO,PASSATEMPO,NEGRESCO,CREAM CRACKER,TORTILHA,GRANULADO,LEITE DE COCO,COCO RALADO,LEITE CONDENSADO,DOCE DE LEITE,PANETONE,CHOCOTONE,COCADA,PE DE MOLEQUE,BOLO PRONTO,MISTURA BOLO'),
+    horti: kw('ALFACE,TOMATE,BATATA,CEBOLA,ALHO,BANANA,MACA,LARANJA,LIMAO,FRUTA,VERDURA,LEGUME,CENOURA,BROCOLIS,COUVE,REPOLHO,ABOBRINHA,ABOBORA,PEPINO,PIMENTAO,MAMAO,MELANCIA,MELAO,UVA,ABACAXI,MANGA,MORANGO,CHEIRO VERDE,SALSINHA,CEBOLINHA,RUCULA,AGRIAO,ESPINAFRE,HORT,FLV$,KIWI,PERA,PESSEGO,AMEIXA,ABACATE,MARACUJA,MANDIOCA,AIPIM,INHAME,BETERRABA,CHUCHU,BERINJELA,QUIABO,VAGEM,GENGIBRE,TANGERINA,MEXERICA,PONKAN,COENTRO,MANJERICAO,HORTELA,OVO,OVOS'),
+    suplementos: kw('VITAM,VIT$,WHEY,CREATINA,OMEGA,COLAGENO,SUPLEM,POLIVIT,CENTRUM,MAGNESIO,ZINCO,CALCIO,BCAA,PROTEINA'),
+    bebe: kw('FRALDA,LENCO UMED,LENCOS UMED,MAMADEIRA,CHUPETA,POMADA ASSAD,BEBE,INFANT,NAN$,APTAMIL,MILNUTRI,HUGGIES,PAMPERS,TURMA DA MONICA'),
+    medicamentos: kw('CPR,COMP$,CAPS,GTS,XPE,XAROPE,POMADA,DIPIRONA,PARACET,IBUPROF,AMOXI,LOSART,OMEPRAZ,NOVALGINA,DORFLEX,NEOSALDINA,BENEGRIPE,GENERICO,CURATIVO,BAND AID,GAZE,ESPARADRAPO,SORO,TERMOMETRO,TESTE,ANTIAC,ANTIALERG,LORATAD,SIMETICONA,LUFTAL,ENGOV,EPOCLER,COLIRIO,SPRAY NASAL,NASAL'),
+    bovina: kw('BOV,CARNE,PATINHO,ACEM,ALCATRA,PICANHA,CONTRA FILE,CONTRAFILE,COXAO,MAMINHA,FRALDINHA,COSTELA,MUSCULO,PALETA,CUPIM,MOIDA,FILE MIGNON,MIGNON,CHARQUE,CARNE SECA,HAMBURG,KAFTA,ALMONDEGA,ENTRECOT,ANCHO,CHORIZO,T BONE,PEITO BOV,LAGARTO,FIGADO,BUCHO,RABADA'),
+    frango: kw('FGO,FRANGO,PEITO,COXA,SOBRECOXA,ASA$,ASINHA,CORACAO,MOELA,GALINHA,CHESTER,PERU$,COXINHA DA ASA,TULIPA,DRUMETE'),
+    suina: kw('SUIN,PORCO,LOMBO,PERNIL,BISTECA,COSTELINHA,PANCETA,TOUCINHO,BACON,LEITAO,PANCETTA,CARRE,COPA LOMBO,ORELHA,PE DE PORCO'),
+    embutidos: kw('LINGUICA,LING$,SALSICHA,SALAME,CALABRESA,PAIO,BLUMENAU,TOSCANA,CHOURICO'),
+    peixes: kw('PEIXE,TILAPIA,SALMAO,MERLUZA,CAMARAO,BACALHAU,PESCADA,SARDINHA,ATUM,LULA,POLVO,MARISCO,PINTADO,TAMBAQUI'),
+    churrasco: kw('CARVAO,ACENDEDOR,SAL GROSSO,ESPETO,GRELHA,FAROFA,VINAGRETE,PAO DE ALHO'),
+    sobremesa: kw('SORVETE,PUDIM,MOUSSE,TORTA,BOLO,PETIT GATEAU,BROWNIE,ACAI,SUNDAE,MILK SHAKE,MILKSHAKE,DOCE,BRIGADEIRO,CHURROS'),
+    combustivel: kw('GASOL,ETANOL,ALCOOL,DIESEL,GNV,ADITIV,COMBUST,S10$,S500$'),
+    lubrificantes: kw('OLEO MOTOR,OLEO LUBR,LUBRIF,ARLA,FLUIDO,ADITIVO RADIADOR,AGUA RADIADOR,LIMPADOR PARABRISA,PALHETA,FILTRO')
+  };
+
+  // subs: [nome, palavras-chave] na ordem de prioridade · def: subcategoria quando nada bate
+  const CATEGORIES = [
+    { id: 'mercado', name: 'Mercado', color: '#15803d', soft: '#dcf2e3', icon: ICON_STORE, def: 'Outros',
+      subs: [['Limpeza', KW.limpeza], ['Higiene', KW.higiene], ['Pet', KW.pet], ['Bebidas', KW.bebidas], ['Frios e Laticínios', KW.frios],
+             ['Carnes', KW.carnes], ['Padaria', KW.paes], ['Comida', KW.comida], ['Hortifruti', KW.horti]] },
+    { id: 'farmacia', name: 'Farmácia', color: '#b45309', soft: '#fde7c2', icon: ICON_PHARMA, def: 'Medicamentos',
+      subs: [['Bebê', KW.bebe], ['Higiene', KW.higiene], ['Beleza', KW.beleza], ['Suplementos', KW.suplementos], ['Medicamentos', KW.medicamentos]] },
+    { id: 'acougue', name: 'Açougue', color: '#b91c1c', soft: '#fde2e2', icon: ICON_MEAT, def: 'Outros',
+      // Suína antes de Bovina (COSTELINHA x COSTELA) e Bovina antes de Frango (COXAO x COXA, PEITO BOV x PEITO)
+      subs: [['Embutidos', KW.embutidos], ['Suína', KW.suina], ['Peixes', KW.peixes], ['Bovina', KW.bovina], ['Frango', KW.frango],
+             ['Churrasco', KW.churrasco], ['Bebidas', KW.bebidas]] },
+    { id: 'padaria', name: 'Padaria', color: '#92400e', soft: '#fbe8d3', icon: ICON_BREAD, def: 'Outros',
+      subs: [['Bebidas', KW.bebidas], ['Frios e Laticínios', KW.frios], ['Salgados', KW.salgados], ['Doces e Bolos', KW.doces], ['Pães', KW.paes]] },
+    { id: 'restaurante', name: 'Restaurante', color: '#7c3aed', soft: '#ede9fe', icon: ICON_FOOD, def: 'Refeição',
+      subs: [['Bebidas', KW.bebidas], ['Sobremesa', KW.sobremesa]] },
+    { id: 'posto', name: 'Posto', color: '#1d4ed8', soft: '#dbeafe', icon: ICON_FUEL, def: 'Conveniência',
+      subs: [['Combustível', KW.combustivel], ['Lubrificantes', KW.lubrificantes]] },
+    { id: 'outros', name: 'Outros', color: '#4b5563', soft: '#e5e7eb', icon: ICON_BAG, def: 'Geral', subs: [] }
+  ];
+
+  // Tipo de loja pelo nome do estabelecimento; o que não bater fica como Mercado
+  const STORE_RULES = [
+    ['farmacia', /FARMA|DROG|PHARMA|RAIA|PANVEL|PAGUE MENOS|NISSEI/],
+    ['acougue', /ACOUGUE|CASA D[AEO]S? CARNES?|\bCARNES\b|FRIGORIF|BOUTIQUE D[AEO] CARNE/],
+    ['padaria', /PADARIA|PANIFIC|CONFEIT|DOCERIA/],
+    ['posto', /POSTO|COMBUST|PETROBRAS|SHELL|IPIRANGA|PETROLEO/],
+    ['restaurante', /RESTAUR|LANCHON|PIZZAR|BURGER|HAMBURGUER|CHURRASCARIA|SUSHI|CAFETERIA|MC ?DONALD|SUBWAY|\bBAR\b|BISTRO|GASTRONOMIA/]
+  ];
+
+  const CAT_KEY = 'cupons_categorias';
+  function loadCatOv() {
+    try {
+      const o = JSON.parse(localStorage.getItem(CAT_KEY)) || {};
+      return { stores: o.stores || {}, products: o.products || {} };
+    } catch (_) { return { stores: {}, products: {} }; }
+  }
+  let catOv = loadCatOv(); // escolhas manuais: stores[url] = idCategoria · products["cat|NOME"] = subcategoria
+  const subCache = new Map();
+
+  function saveCatOv() {
+    try { localStorage.setItem(CAT_KEY, JSON.stringify(catOv)); } catch (_) {}
+  }
+
+  const catById = (id) => CATEGORIES.find(c => c.id === id) || CATEGORIES[CATEGORIES.length - 1];
+
+  function detectStoreCat(store) {
+    const n = normName(store);
+    const rule = STORE_RULES.find(([, re]) => re.test(n));
+    return rule ? rule[0] : 'mercado';
+  }
+
+  function cupomCat(h) {
+    return catById(catOv.stores[h.url] || detectStoreCat(h.store));
+  }
+
+  function kwMatchAt(tokens, i, k) {
+    if (k.endsWith('$')) return tokens[i] === k.slice(0, -1);
+    if (k.includes(' ')) return tokens.slice(i).join(' ').startsWith(k);
+    return tokens[i].startsWith(k);
+  }
+
+  // A palavra mais à esquerda que bater decide ("NHOQUE BATATA" = Comida, não Hortifruti)
+  function detectSub(cat, name) {
+    const tokens = normName(name).split(' ').filter(Boolean);
+    for (let i = 0; i < tokens.length; i++) {
+      for (const [sub, kws] of cat.subs) {
+        if (kws.some(k => kwMatchAt(tokens, i, k))) return sub;
+      }
+    }
+    return cat.def;
+  }
+
+  function itemSub(cat, name) {
+    const key = cat.id + '|' + normName(name);
+    if (catOv.products[key]) return catOv.products[key];
+    if (!subCache.has(key)) subCache.set(key, detectSub(cat, name));
+    return subCache.get(key);
+  }
+
+  function subNames(cat) {
+    return [...new Set([...cat.subs.map(s => s[0]), cat.def])];
+  }
+
+  function setCupomCat(url, id) {
+    catOv.stores[url] = id;
+    saveCatOv();
+  }
+
+  function setItemSub(cat, name, sub) {
+    catOv.products[cat.id + '|' + normName(name)] = sub;
+    saveCatOv();
+  }
+
+  function catOptions(selectedId) {
+    return CATEGORIES.map(c => '<option value="' + c.id + '"' + (c.id === selectedId ? ' selected' : '') + '>' + c.name + '</option>').join('');
+  }
+
+  function subOptions(cat, selected) {
+    return subNames(cat).map(s => '<option' + (s === selected ? ' selected' : '') + '>' + escapeHtml(s) + '</option>').join('');
+  }
 
   function renderHistory() {
     const list = loadHistory();
@@ -550,11 +731,11 @@
 
     const visible = showAllHistory ? list : list.slice(0, HISTORY_PREVIEW);
     ul.innerHTML = visible.map((h, idx) => {
-      const isPharma = /farm|drog|pharma/i.test(h.store || '');
+      const cat = cupomCat(h);
       return '<li data-idx="' + idx + '">' +
-        '<div class="h-icon' + (isPharma ? ' pharma' : '') + '">' + (isPharma ? ICON_PHARMA : ICON_STORE) + '</div>' +
+        '<div class="h-icon" style="background:' + cat.soft + ';color:' + cat.color + '">' + cat.icon + '</div>' +
         '<div class="h-info"><div class="h-name">' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</div>' +
-        '<div class="h-date">' + fmtDate(h.scannedAt) + '</div></div>' +
+        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) + '</div></div>' +
         '<div class="h-right"><div class="h-total">' + brl(h.total || 0) + '</div>' +
         '<span class="badge">' + ICON_CHECK + 'Validado</span></div></li>';
     }).join('');
@@ -571,6 +752,8 @@
 
   // ---------- Estoque: junta os itens de todos os cupons ----------
   let stockSort = 'qty';
+  let stockCat = '';   // filtro de categoria ('' = todas)
+  let stockSub = '';   // filtro de subcategoria ('' = todas)
   let openStockKey = null;
 
   // "BISC.BAUD.CHAM" e "Bisc Baud Cham" viram a mesma chave
@@ -582,15 +765,16 @@
     const nn = (v) => (v === null || v === undefined) ? NaN : v; // NaN vira null no JSON
     const groups = new Map();
     history.forEach(h => {
+      const cat = cupomCat(h);
       (h.items || []).forEach(i => {
         const unit = (i.un || 'un').toLowerCase().trim();
-        const key = normName(i.name) + '|' + unit;
+        const key = cat.id + '|' + normName(i.name) + '|' + unit;
         let qtd = nn(i.qtd);
         if (isNaN(qtd)) qtd = 1;
         let total = nn(i.total);
         if (isNaN(total)) total = isNaN(nn(i.unit)) ? 0 : qtd * nn(i.unit);
 
-        if (!groups.has(key)) groups.set(key, { key, name: i.name, unit, qty: 0, spent: 0, cupons: new Set(), purchases: [], last: 0 });
+        if (!groups.has(key)) groups.set(key, { key, name: i.name, unit, cat, sub: itemSub(cat, i.name), qty: 0, spent: 0, cupons: new Set(), purchases: [], last: 0 });
         const g = groups.get(key);
         g.qty += qtd;
         g.spent += total;
@@ -607,9 +791,20 @@
     const all = buildStock(history);
     const q = normName($('stockFilter').value);
 
-    $('statProducts').textContent = all.length;
-    $('statCupons').textContent = history.length;
-    $('statSpent').textContent = brl(history.reduce((s, h) => s + (h.total || 0), 0));
+    // filtros de categoria/subcategoria (descarta filtro que não existe mais)
+    if (stockCat && !all.some(g => g.cat.id === stockCat)) { stockCat = ''; stockSub = ''; }
+    const inCat = all.filter(g => !stockCat || g.cat.id === stockCat);
+    if (stockSub && !inCat.some(g => g.sub === stockSub)) stockSub = '';
+    const filtered = inCat.filter(g => !stockSub || g.sub === stockSub);
+
+    const filteredCupons = new Set(filtered.flatMap(g => [...g.cupons]));
+    $('statProducts').textContent = filtered.length;
+    $('statCupons').textContent = filteredCupons.size;
+    $('statSpent').textContent = brl(stockCat
+      ? filtered.reduce((s, g) => s + g.spent, 0)
+      : history.reduce((s, h) => s + (h.total || 0), 0));
+
+    renderStockFilters(all, inCat);
 
     const sorters = {
       qty: (a, b) => b.qty - a.qty || b.spent - a.spent,
@@ -617,7 +812,7 @@
       recent: (a, b) => b.last - a.last,
       name: (a, b) => a.name.localeCompare(b.name, 'pt-BR')
     };
-    const list = all.filter(g => !q || g.key.includes(q)).sort(sorters[stockSort]);
+    const list = filtered.filter(g => !q || normName(g.name).includes(q)).sort(sorters[stockSort]);
 
     const empty = $('stockEmpty');
     empty.textContent = !history.length ? 'Nenhum cupom escaneado ainda. Escaneie cupons na aba Escanear.' : 'Nenhum produto encontrado.';
@@ -628,16 +823,69 @@
       let html = '<li data-key="' + escapeHtml(g.key) + '">' +
         '<div class="s-row"><span class="s-name">' + escapeHtml(g.name) + '</span>' +
         '<span class="s-qty">' + fmtQtd(g.qty) + ' <small>' + escapeHtml(g.unit) + '</small></span></div>' +
-        '<div class="s-meta">' + n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
+        '<div class="s-meta"><span class="s-tag" style="background:' + g.cat.soft + ';color:' + g.cat.color + '">' +
+        escapeHtml(g.cat.name) + ' › ' + escapeHtml(g.sub) + '</span>' +
+        n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
         (g.qty > 0 ? ' · Média ' + brl(g.spent / g.qty) + '/' + escapeHtml(g.unit) : '') + '</div>';
       if (openStockKey === g.key) {
-        html += '<div class="s-detail">' + g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
+        html += '<div class="s-detail">' +
+          '<label class="s-sub">Subcategoria <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
+          subOptions(g.cat, g.sub) + '</select></label>' +
+          g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
           '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') + '</span>' +
           '<span>' + fmtQtd(p.qty) + ' ' + escapeHtml(g.unit) + ' · ' + brl(p.total) + '</span></div>'
         ).join('') + '</div>';
       }
       return html + '</li>';
     }).join('');
+  }
+
+  // Barras de gasto (por categoria, ou por subcategoria quando uma categoria está filtrada) + chips de filtro
+  function renderStockFilters(all, inCat) {
+    const cat = stockCat ? catById(stockCat) : null;
+    const totals = new Map();
+    (cat ? inCat : all).forEach(g => {
+      const k = cat ? g.sub : g.cat.id;
+      totals.set(k, (totals.get(k) || 0) + g.spent);
+    });
+    const rows = [...totals].sort((a, b) => b[1] - a[1]);
+    const max = Math.max(...rows.map(r => r[1]), 0.01);
+    const sum = rows.reduce((s, r) => s + r[1], 0) || 1;
+
+    $('stockBreakdown').innerHTML = !rows.length ? '' :
+      '<p class="bd-title">' + (cat ? 'Gastos em ' + escapeHtml(cat.name) + ' por subcategoria' : 'Gastos por categoria') + '</p>' +
+      rows.map(([k, v]) => {
+        const c = cat || catById(k);
+        const label = cat ? k : c.name;
+        const active = cat ? stockSub === k : false;
+        return '<div class="bd-row' + (active ? ' active' : '') + '" data-' + (cat ? 'sub' : 'cat') + '="' + escapeHtml(k) + '">' +
+          '<div class="bd-top"><span style="color:' + c.color + '">' + c.icon + escapeHtml(label) + '</span>' +
+          '<span>' + brl(v) + ' · ' + Math.round(v / sum * 100) + '%</span></div>' +
+          '<div class="bd-bar"><i style="width:' + (v / max * 100) + '%;background:' + c.color + '"></i></div></div>';
+      }).join('');
+
+    const catIds = [...new Set(all.map(g => g.cat.id))];
+    $('catChips').innerHTML = catIds.length < 1 ? '' :
+      '<button class="chip' + (!stockCat ? ' active' : '') + '" data-cat="">Todas</button>' +
+      CATEGORIES.filter(c => catIds.includes(c.id)).map(c =>
+        '<button class="chip' + (stockCat === c.id ? ' active' : '') + '" data-cat="' + c.id + '">' + c.name + '</button>').join('');
+
+    const subs = cat ? [...new Set(inCat.map(g => g.sub))].sort((a, b) => a.localeCompare(b, 'pt-BR')) : [];
+    $('subChips').classList.toggle('hidden', !cat);
+    $('subChips').innerHTML = !cat ? '' :
+      '<button class="chip sub' + (!stockSub ? ' active' : '') + '" data-sub="">Todas de ' + escapeHtml(cat.name) + '</button>' +
+      subs.map(s => '<button class="chip sub' + (stockSub === s ? ' active' : '') + '" data-sub="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>').join('');
+  }
+
+  function setStockFilter(el) {
+    if (el.dataset.cat !== undefined) {
+      stockCat = stockCat === el.dataset.cat && el.classList.contains('bd-row') ? '' : el.dataset.cat;
+      stockSub = '';
+    } else if (el.dataset.sub !== undefined) {
+      stockSub = stockSub === el.dataset.sub && el.classList.contains('bd-row') ? '' : el.dataset.sub;
+    }
+    openStockKey = null;
+    renderStock();
   }
 
   function showTab(tab) {
@@ -655,7 +903,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31';
+  const APP_VERSION = '2026-10-31.2';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -1102,9 +1350,15 @@
     if (data.scannedAt) html += '<p class="store-info">Escaneado em ' + fmtDate(data.scannedAt) + '</p>';
     html += '</div>';
 
+    const cat = cupomCat({ url, store: data.store });
+    html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
+
     html += '<input type="search" class="filter" id="filterItems" placeholder="Filtrar itens...">';
     html += '<ul class="items" id="itemList">';
+    const bySub = new Map();
     items.forEach(i => {
+      const sub = itemSub(cat, i.name);
+      bySub.set(sub, (bySub.get(sub) || 0) + (isNaN(i.total) ? 0 : i.total));
       const meta = [];
       if (!isNaN(i.qtd)) meta.push('<span><b>Qtde.:</b> ' + fmtQtd(i.qtd) + '</span>');
       if (i.un) meta.push('<span><b>UN:</b> ' + escapeHtml(i.un) + '</span>');
@@ -1115,9 +1369,13 @@
         (i.code ? ' <span class="item-code">(Código: ' + escapeHtml(i.code) + ')</span>' : '') + '</div>' +
         '<span class="label-total">Total Vl.</span></div>' +
         '<div class="row"><div class="item-meta">' + meta.join('') + '</div>' +
-        '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div></li>';
+        '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div>' +
+        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select></li>';
     });
     html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
+
+    html += '<div class="sub-summary">' + [...bySub].sort((a, b) => b[1] - a[1]).map(([sub, v]) =>
+      '<div><span>' + escapeHtml(cat.name) + ' › ' + escapeHtml(sub) + '</span><b>' + brl(v) + '</b></div>').join('') + '</div>';
 
     html += '<div class="summary"><div>Total<small>' + items.length + ' ' +
       (items.length === 1 ? 'item' : 'itens') +
@@ -1141,6 +1399,17 @@
       $('noItems').classList.toggle('hidden', visible > 0);
     });
 
+    $('cupomCat').addEventListener('change', (e) => {
+      setCupomCat(url, e.target.value);
+      renderHistory();
+      renderNota(data, url);
+    });
+    $('itemList').addEventListener('change', (e) => {
+      if (!e.target.classList.contains('sub-pill')) return;
+      setItemSub(cat, e.target.dataset.name, e.target.value);
+      renderNota(data, url);
+    });
+
     $('btnRemove').addEventListener('click', () => {
       if (!confirm('Remover este cupom do histórico?')) return;
       removeFromHistory(url);
@@ -1157,17 +1426,27 @@
   $('btnCamSwitch').addEventListener('click', switchCamera);
   document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
   $('stockFilter').addEventListener('input', renderStock);
-  $('stockSort').addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    stockSort = chip.dataset.sort;
-    $('stockSort').querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+  $('stockSort').addEventListener('change', (e) => {
+    stockSort = e.target.value;
     renderStock();
   });
+  ['catChips', 'subChips', 'stockBreakdown'].forEach(id => $(id).addEventListener('click', (e) => {
+    const el = e.target.closest('[data-cat],[data-sub]');
+    if (el) setStockFilter(el);
+  }));
   $('stockList').addEventListener('click', (e) => {
+    if (e.target.closest('select, label')) return; // mexer na subcategoria não fecha o item
     const li = e.target.closest('li');
     if (!li) return;
     openStockKey = openStockKey === li.dataset.key ? null : li.dataset.key;
+    renderStock();
+  });
+  $('stockList').addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-cat]');
+    if (!sel) return;
+    const cat = catById(sel.dataset.cat);
+    setItemSub(cat, sel.dataset.name, sel.value);
+    // a chave do grupo não muda (categoria|nome|unidade), então o item continua aberto
     renderStock();
   });
   $('photoInput').addEventListener('change', (e) => {
