@@ -341,6 +341,15 @@
   .pick input:disabled + span { cursor: default; }
   .pick input:focus-visible + span { outline: 2px solid var(--green-dark); outline-offset: 1px; }
   .tabbar button.dim:not(.active) { opacity: .55; }
+  .hide-btn {
+    display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 0 6px; cursor: pointer;
+    border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 3px 9px;
+    font: 600 .72rem "Inter", sans-serif; color: var(--muted);
+  }
+  .hide-btn svg { width: 13px; height: 13px; stroke: currentColor; }
+  .hide-btn.on { background: #fdecec; border-color: #f5c2c2; color: var(--danger); }
+  ul.items li.item-hidden .item-name, ul.items li.item-hidden .item-total { opacity: .5; text-decoration: line-through; }
+  .hide-chip { background: #fdecec; border-color: #f5c2c2; color: var(--danger); }
   .tabbar button { font-size: .72rem; padding-left: 2px; padding-right: 2px; text-align: center; line-height: 1.15; }
   .account-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
   .account-card .account-head { margin: 14px 0 4px; padding: 14px; background: #f6f8f6; border-radius: 12px; }
@@ -803,17 +812,85 @@
   }
 
   const inGroup = () => CLOUD && me && me.groupId && group;
-  // Grupos antigos (sem filtro escolhido) compartilham todas as categorias
-  const groupShares = (catId) => !group.sharedCats || group.sharedCats.includes(catId);
   const groupDoc = (url) => groupCupons.find(c => c.url === url);
+
+  // ---------- O que cada pessoa mostra para o grupo ----------
+  // Fica no documento da própria pessoa (users/{uid}):
+  //   shareCats   = categorias das notas dela que vão para o grupo (sem escolha: padrão do grupo)
+  //   hiddenItems = trechos de nome de produto que nunca aparecem para o grupo
+  //   shareOv     = exceções por nota: { idDaNota: true (enviar) | false (não enviar) }
+  const myShareCats = () => me.shareCats || group?.sharedCats || CATEGORIES.map(c => c.id);
+  const hiddenTerms = () => me.hiddenItems || [];
+  const isHiddenItem = (name) => { const n = normName(name); return hiddenTerms().some(t => n.includes(t)); };
+
+  function wantsShare(h, id) {
+    const ov = (me.shareOv || {})[id];
+    return ov !== undefined ? ov : myShareCats().includes(cupomCat(h).id);
+  }
+
+  // Versão da nota que o grupo vê: sem os produtos escondidos (e o total sem eles)
+  function groupVersion(h) {
+    const all = h.items || [];
+    const items = all.filter(i => !isHiddenItem(i.name));
+    const hiddenSum = all.filter(i => isHiddenItem(i.name)).reduce((s, i) => s + (Number.isFinite(i.total) ? i.total : 0), 0);
+    return cleanDoc({
+      ...notaData(h), items, total: Math.max(0, (h.total || 0) - hiddenSum), hiddenCount: all.length - items.length,
+      url: h.url, scannedAt: h.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+    });
+  }
+  const sig = (d) => JSON.stringify([d.items, d.total, d.addedByName, d.store]);
+
+  // Deixa o grupo igual ao que a pessoa escolheu: envia, atualiza ou tira as notas dela
+  async function syncToGroup(list = cloudCupons) {
+    if (!inGroup()) return 0;
+    const gid = me.groupId;
+    let batch = fb.writeBatch(db), pending = 0, changed = 0;
+    for (const h of list) {
+      const id = await hashId(h.url);
+      const ref = fb.doc(db, 'groups', gid, 'cupons', id);
+      const cur = groupDoc(h.url);
+      if (cur && cur.addedBy && cur.addedBy !== me.uid) continue; // nota de outra pessoa
+      if (wantsShare(h, id)) {
+        const doc = groupVersion(h);
+        if (cur && sig(cur) === sig(doc)) continue;
+        batch.set(ref, doc);
+      } else if (cur) {
+        batch.delete(ref);
+      } else continue;
+      changed++;
+      if (++pending === 400) { await batch.commit(); batch = fb.writeBatch(db); pending = 0; }
+    }
+    if (pending) await batch.commit();
+    return changed;
+  }
+
+  async function saveMyPrefs(partial) {
+    Object.assign(me, partial);
+    await fb.setDoc(fb.doc(db, 'users', me.uid), partial, { merge: true });
+  }
+
+  // Enviar / não enviar uma nota específica (vale mais que a regra da categoria)
+  async function setShareOv(h, value) {
+    const id = await hashId(h.url);
+    me.shareOv = { ...(me.shareOv || {}), [id]: value };
+    await fb.setDoc(fb.doc(db, 'users', me.uid), { shareOv: { [id]: value } }, { merge: true });
+    return syncToGroup([h]);
+  }
 
   function addToHistory(url, data) {
     if (CLOUD) {
-      cloudSaveCupom(url, data).catch(cloudError); // o onSnapshot redesenha a lista
-      const cat = cupomCat({ url, store: data.store });
-      if (inGroup() && groupShares(cat.id)) {
-        shareToGroup(url, data).then(ok => { if (ok) toast('Nota de ' + cat.name + ' enviada para o grupo ' + group.name + '.', 3500); }).catch(cloudError);
-      }
+      cloudSaveCupom(url, data).then(async (saved) => {
+        if (!inGroup()) return;
+        const other = groupDoc(url);
+        if (other && other.addedBy !== me.uid) {
+          toast('Essa nota já está no grupo: foi escaneada por ' + firstName(other.addedByName) + '.', 4000);
+          return;
+        }
+        const wasThere = !!other;
+        if (await syncToGroup([saved]) && !wasThere) {
+          toast('Nota de ' + cupomCat(saved).name + ' enviada para o grupo ' + group.name + '.', 3500);
+        }
+      }).catch(cloudError);
       return;
     }
     const list = localHistory().filter(h => h.url !== url);
@@ -944,8 +1021,11 @@
       const d = snap.data() || {};
       if (d.name) me.name = d.name;
       me.groupId = d.groupId || null;
+      me.shareCats = d.shareCats || null;
+      me.hiddenItems = d.hiddenItems || [];
+      me.shareOv = d.shareOv || {};
       subscribeSpace();
-      renderAccount();
+      refreshViews();
       renderHeaderSpace();
     }, cloudError);
   }
@@ -1025,23 +1105,11 @@
       ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
     });
     await fb.setDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)), docData);
+    return docData;
   }
 
   async function cloudDeleteCupom(url) {
     await fb.deleteDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)));
-  }
-
-  // Coloca a nota no grupo. Se outra pessoa já tinha mandado, mantém quem escaneou primeiro.
-  async function shareToGroup(url, data) {
-    const prev = groupDoc(url);
-    if (prev && prev.addedBy && prev.addedBy !== me.uid) {
-      toast('Essa nota já está no grupo: foi escaneada por ' + firstName(prev.addedByName) + '.', 4000);
-      return false;
-    }
-    await fb.setDoc(fb.doc(db, 'groups', me.groupId, 'cupons', await hashId(url)), cleanDoc({
-      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
-    }));
-    return true;
   }
 
   async function unshareFromGroup(url) {
@@ -1094,24 +1162,21 @@
     return gid;
   }
 
-  // Manda para o grupo as notas que a pessoa já tinha, só das categorias que o grupo compartilha
-  async function copyPersonalToGroup(gid) {
-    const uid = me.uid;
-    const [gSnap, mine, theirs] = await Promise.all([
+  // Ao criar/entrar num grupo: manda as notas que a pessoa já tinha (seguindo as escolhas dela),
+  // ou marca todas como "não enviar" para só as próximas irem para o grupo
+  async function afterJoin(gid, bring) {
+    const [gSnap, theirs] = await Promise.all([
       fb.getDoc(fb.doc(db, 'groups', gid)),
-      fb.getDocs(fb.collection(db, 'users', uid, 'cupons')),
       fb.getDocs(fb.collection(db, 'groups', gid, 'cupons'))
     ]);
-    const cats = gSnap.data()?.sharedCats;
-    const taken = new Set(theirs.docs.map(d => d.id));
-    const docs = mine.docs.filter(d => !taken.has(d.id) && (!cats || cats.includes(cupomCat(d.data()).id)));
-    for (let i = 0; i < docs.length; i += 450) {
-      const batch = fb.writeBatch(db);
-      docs.slice(i, i + 450).forEach(d => batch.set(fb.doc(db, 'groups', gid, 'cupons', d.id),
-        cleanDoc({ ...d.data(), addedBy: uid, addedByName: me.name })));
-      await batch.commit();
-    }
-    return docs.length;
+    me.groupId = gid;
+    group = { id: gid, ...gSnap.data() };
+    groupCupons = theirs.docs.map(d => d.data());
+    if (bring) return syncToGroup(cloudCupons);
+    const ov = {};
+    for (const h of cloudCupons) ov[await hashId(h.url)] = false;
+    if (Object.keys(ov).length) await saveMyPrefs({ shareOv: { ...(me.shareOv || {}), ...ov } });
+    return 0;
   }
 
   async function leaveGroup() {
@@ -1306,7 +1371,25 @@
       (disabled ? ' disabled' : '') + '><span>' + c.name + '</span></label>').join('') + '</div>';
   }
   const pickedCats = (id) => [...document.querySelectorAll('#' + id + ' input:checked')].map(i => i.value);
-  const sharedNames = () => group.sharedCats ? group.sharedCats.map(id => catById(id).name).join(', ') : 'todas as categorias';
+  const catNames = (ids) => ids.length === CATEGORIES.length ? 'todas as categorias' : ids.map(id => catById(id).name).join(', ');
+
+  // Card "O que eu mostro para o grupo": categorias + produtos escondidos
+  function myShareCard() {
+    const terms = hiddenTerms();
+    return '<section class="card account-card"><h3 class="card-title">O que eu mostro para o grupo</h3>' +
+      '<p class="muted">Vale só para as notas que <b>você</b> escaneia. Cada pessoa do grupo escolhe as dela.</p>' +
+      '<p class="field-label">Minhas notas que vão para o grupo</p>' +
+      catPicker('myCats', myShareCats()) +
+      '<p class="field-label">Produtos que o grupo não vê</p>' +
+      '<p class="muted" style="margin-bottom:8px">A nota aparece no grupo, mas sem estes produtos (e o total fica sem eles). ' +
+      'Dica: dá para esconder direto na nota, tocando em "Ocultar do grupo" no produto.</p>' +
+      (terms.length ? '<div class="cat-picker">' + terms.map(t =>
+        '<button class="chip hide-chip" data-unhide="' + escapeHtml(t) + '">' + escapeHtml(t) + ' ✕</button>').join('') + '</div>' : '') +
+      '<div class="inline-form"><input id="accHideTerm" placeholder="Ex.: DIPIRONA" autocomplete="off">' +
+      '<button class="btn small" data-action="hide-term">Esconder</button></div>' +
+      '<p class="muted" style="margin:0">Para uma nota específica, abra a nota e use <b>Enviar ao grupo</b> ou <b>Tirar do grupo</b>.</p>' +
+      '</section>';
+  }
 
   function renderAccount() {
     if ($('tabAccount').classList.contains('hidden')) return;
@@ -1314,7 +1397,7 @@
     if (!me) return;
     // guarda o que a pessoa estava digitando (a tela é redesenhada a cada sincronização)
     const keep = {};
-    ['accGroupName', 'accCode'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
+    ['accGroupName', 'accCode', 'accHideTerm'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
     const keepBring = $('accBring') ? $('accBring').checked : true;
     const keepCats = $('accCats') ? pickedCats('accCats') : DEFAULT_SHARED;
 
@@ -1325,16 +1408,12 @@
     html += '<hr class="divider">';
     if (me.groupId && group) {
       const members = group.members || [];
-      const owner = group.ownerUid === me.uid;
       html += '<h3 class="card-title">Cadastro coletivo</h3>' +
-        '<p class="muted">Você está no grupo <b>' + escapeHtml(group.name) + '</b>. As notas de <b>' + escapeHtml(sharedNames()) +
-        '</b> que qualquer pessoa escanear aparecem em <b>Itens do grupo</b>. As outras ficam só em <b>Minhas notas</b>.</p>' +
+        '<p class="muted">Você está no grupo <b>' + escapeHtml(group.name) + '</b>. Suas notas de <b>' + escapeHtml(catNames(myShareCats())) +
+        '</b> aparecem em <b>Itens do grupo</b>. As outras ficam só em <b>Minhas notas</b>.</p>' +
         '<p class="field-label">Código do grupo</p><div class="group-code">' + escapeHtml(group.code) + '</div>' +
         '<div class="btn-row"><button class="btn small ghost" data-action="copy-code">Copiar código</button>' +
         '<button class="btn small ghost" data-action="share-code">Convidar</button></div>' +
-        '<p class="field-label">Notas que vão para o grupo</p>' +
-        catPicker('grpCats', group.sharedCats || CATEGORIES.map(c => c.id), !owner) +
-        (owner ? '' : '<p class="muted" style="margin-top:-6px">Só quem criou o grupo pode mudar.</p>') +
         '<p class="field-label">Participantes (' + members.length + ')</p><ul class="members">' +
         members.map(uid => {
           const n = (group.memberNames || {})[uid] || 'Participante';
@@ -1349,7 +1428,7 @@
         '<p class="muted">Só você vê suas notas. Crie um grupo para juntar as notas de todos, ou entre em um com o código.</p>' +
         '<p class="field-label">Criar um grupo</p>' +
         '<div class="inline-form"><input id="accGroupName" placeholder="Ex.: Família Silva"><button class="btn small" data-action="create-group">Criar</button></div>' +
-        '<p class="muted" style="margin-bottom:8px">Notas que vão para o grupo quando alguém escanear:</p>' +
+        '<p class="muted" style="margin-bottom:8px">Categorias que vão para o grupo (padrão; depois cada pessoa pode mudar as dela):</p>' +
         catPicker('accCats', keepCats) +
         '<p class="field-label">Entrar em um grupo</p>' +
         '<div class="inline-form"><input id="accCode" class="code-input" maxlength="6" placeholder="CÓDIGO" autocomplete="off"><button class="btn small" data-action="join-group">Entrar</button></div>' +
@@ -1357,6 +1436,7 @@
         '<span>Mandar para o grupo as notas que eu já tenho das categorias do grupo. Elas continuam também em Minhas notas.</span></label>';
     }
     html += '<p class="form-error hidden" id="accError"></p></section>';
+    if (inGroup()) html += myShareCard();
 
     const local = localHistory().length;
     if (local) {
@@ -1370,26 +1450,42 @@
     Object.entries(keep).forEach(([id, v]) => { if ($(id)) $(id).value = v; });
   }
 
-  // Quem criou o grupo muda as categorias que vão para o grupo
-  async function onAccountChange(e) {
-    if (!e.target.closest('#grpCats') || !inGroup() || group.ownerUid !== me.uid) return;
-    const cats = pickedCats('grpCats');
-    if (!cats.length) { e.target.checked = true; toast('O grupo precisa de pelo menos uma categoria.'); return; }
+  // Aplica uma mudança nas escolhas da pessoa e atualiza as notas dela no grupo
+  async function applyMyPrefs(partial, okMsg) {
     try {
-      await fb.updateDoc(fb.doc(db, 'groups', group.id), { sharedCats: cats });
-      toast('Categorias do grupo atualizadas.');
+      await saveMyPrefs(partial);
+      const n = await syncToGroup();
+      toast(okMsg + (n ? ' ' + n + (n === 1 ? ' nota atualizada' : ' notas atualizadas') + ' no grupo.' : ''));
     } catch (err) {
       cloudError(err);
-      renderAccount();
     }
+    refreshViews();
   }
 
+  // Cada pessoa escolhe as categorias das notas dela que vão para o grupo
+  function onAccountChange(e) {
+    if (!e.target.closest('#myCats') || !inGroup()) return;
+    applyMyPrefs({ shareCats: pickedCats('myCats') }, 'Escolha salva.');
+  }
+
+  // Esconde (ou volta a mostrar) um produto para o grupo
+  const hideTerm = (term) => applyMyPrefs({ hiddenItems: [...new Set([...hiddenTerms(), term])] }, '"' + term + '" não aparece mais para o grupo.');
+  const unhideTerm = (term) => applyMyPrefs({ hiddenItems: hiddenTerms().filter(t => t !== term) }, '"' + term + '" voltou a aparecer para o grupo.');
+
   async function onAccountAction(e) {
+    const unhide = e.target.closest('[data-unhide]');
+    if (unhide) return unhideTerm(unhide.dataset.unhide);
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
     formMsg('accError', '');
     try {
+      if (action === 'hide-term') {
+        const term = normName($('accHideTerm').value);
+        if (!term) { toast('Digite o nome (ou parte do nome) do produto.'); return; }
+        $('accHideTerm').value = '';
+        return hideTerm(term);
+      }
       if (action === 'copy-code') return copyText(group.code, 'Código copiado!');
       if (action === 'share-code') return shareCode(group.code, group.name);
       if (action === 'logout') {
@@ -1412,7 +1508,7 @@
           if (!cats.length) throw new Error('Escolha pelo menos uma categoria para o grupo.');
           await withBusy(btn, async () => {
             const { code, gid } = await createGroup(name, me.name, cats);
-            if (bring) moved = await copyPersonalToGroup(gid);
+            moved = await afterJoin(gid, bring);
             showCodeModal(code, name);
           });
         } else {
@@ -1420,7 +1516,7 @@
           if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
           await withBusy(btn, async () => {
             const gid = await joinGroup(code, me.name);
-            if (bring) moved = await copyPersonalToGroup(gid);
+            moved = await afterJoin(gid, bring);
           });
           toast('Você entrou no grupo!');
         }
@@ -1448,6 +1544,8 @@
   const ICON_FUEL = svgIcon('<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10"/><path d="M14 8h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/>');
   const ICON_BAG = svgIcon('<path d="M6 7h12l1 14H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>');
   const ICON_USER = svgIcon('<circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/>');
+  const ICON_EYE = svgIcon('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>');
+  const ICON_EYE_OFF = svgIcon('<path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.2M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M14.1 14.1a3 3 0 0 1-4.2-4.2M2 2l20 20"/>');
   const ICON_GROUP = svgIcon('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/>');
 
   // ---------- Categorias (loja) e subcategorias (produto) ----------
@@ -1679,7 +1777,7 @@
 
     head.innerHTML = '<h2>Itens do grupo</h2>' +
       '<p class="lead"><b>' + escapeHtml(group.name) + '</b> · ' + n + (n === 1 ? ' pessoa' : ' pessoas') +
-      '. Notas de ' + escapeHtml(sharedNames()) + ' escaneadas por todos.</p>' +
+      '. Notas que cada pessoa escolheu mostrar para o grupo.</p>' +
       '<div class="stock-stats two"><div class="stat"><b>' + list.length + '</b><span>notas</span></div>' +
       '<div class="stat"><b>' + brl(list.reduce((s, h) => s + (h.total || 0), 0)) + '</b><span>total gasto</span></div></div>' +
       (people.length > 1 ? '<div class="chips">' +
@@ -1689,7 +1787,7 @@
       '<div class="chips">' + listChips(all, groupCat, 'data-gcat') + '</div>';
 
     $('groupEmpty').textContent = all.length ? 'Nenhuma nota encontrada.' :
-      'Nenhuma nota no grupo ainda. Notas de ' + sharedNames() + ' escaneadas por qualquer pessoa do grupo aparecem aqui.';
+      'Nenhuma nota no grupo ainda. As notas que cada pessoa escolher mostrar para o grupo aparecem aqui.';
     $('groupEmpty').classList.toggle('hidden', list.length > 0);
     renderCupomList($('groupList'), list, 'group');
   }
@@ -1863,7 +1961,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.7';
+  const APP_VERSION = '2026-10-31.8';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -2313,6 +2411,13 @@
     const cat = cupomCat({ url, store: data.store });
     html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
 
+    // nas notas da própria pessoa, dentro de um grupo: cada produto pode ser escondido do grupo
+    const canHide = inGroup() && ctx !== 'group';
+    if (ctx === 'group' && data.hiddenCount > 0) {
+      html += '<p class="notice">' + escapeHtml(data.addedBy === me?.uid ? 'Você escondeu ' : firstName(data.addedByName) + ' escondeu ') +
+        data.hiddenCount + (data.hiddenCount === 1 ? ' produto' : ' produtos') + ' desta nota do grupo.</p>';
+    }
+
     html += '<input type="search" class="filter" id="filterItems" placeholder="Filtrar itens...">';
     html += '<ul class="items" id="itemList">';
     const bySub = new Map();
@@ -2324,13 +2429,16 @@
       if (i.un) meta.push('<span><b>UN:</b> ' + escapeHtml(i.un) + '</span>');
       if (!isNaN(i.unit)) meta.push('<span><b>Unidade Vl.:</b> ' + fmtNum(i.unit) + '</span>');
       const search = (i.name + ' ' + (i.code || '')).toLowerCase();
-      html += '<li data-search="' + escapeHtml(search) + '">' +
+      const hidden = canHide && isHiddenItem(i.name);
+      html += '<li data-search="' + escapeHtml(search) + '"' + (hidden ? ' class="item-hidden"' : '') + '>' +
         '<div class="row"><div><span class="item-name">' + escapeHtml(i.name) + '</span>' +
         (i.code ? ' <span class="item-code">(Código: ' + escapeHtml(i.code) + ')</span>' : '') + '</div>' +
         '<span class="label-total">Total Vl.</span></div>' +
         '<div class="row"><div class="item-meta">' + meta.join('') + '</div>' +
         '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div>' +
-        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select></li>';
+        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select>' +
+        (canHide ? '<button class="hide-btn' + (hidden ? ' on' : '') + '" data-hide="' + escapeHtml(i.name) + '">' +
+          (hidden ? ICON_EYE_OFF + 'Oculto do grupo · mostrar' : ICON_EYE + 'Ocultar do grupo') + '</button>' : '') + '</li>';
     });
     html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
 
@@ -2377,18 +2485,34 @@
       renderNota(data, url, ctx);
     });
 
+    // esconder/mostrar um produto para o grupo (vale para todas as notas da pessoa)
+    $('itemList').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-hide]');
+      if (!b) return;
+      const name = b.dataset.hide;
+      if (isHiddenItem(name)) {
+        const n = normName(name);
+        await applyMyPrefs({ hiddenItems: hiddenTerms().filter(t => !n.includes(t)) }, '"' + name + '" voltou a aparecer para o grupo.');
+      } else {
+        await hideTerm(normName(name));
+      }
+      renderNota(data, url, ctx);
+    });
+
+    // a nota completa da pessoa (para mandar ao grupo com os produtos escondidos já tirados)
+    const mineDoc = () => cloudCupons.find(c => c.url === url) || { ...data, url };
     $('btnShare')?.addEventListener('click', async (e) => {
       try {
-        let ok = false;
-        await withBusy(e.currentTarget, async () => { ok = await shareToGroup(url, data); });
-        if (ok) toast('Nota enviada para o grupo ' + group.name + '.');
+        await withBusy(e.currentTarget, () => setShareOv(mineDoc(), true));
+        toast('Nota enviada para o grupo ' + group.name + '.');
       } catch (err) { cloudError(err); }
       renderNota(data, url, ctx);
     });
     $('btnUnshare')?.addEventListener('click', async (e) => {
       if (!confirm('Tirar esta nota de Itens do grupo? Ela continua nas notas de quem escaneou.')) return;
       try {
-        await withBusy(e.currentTarget, () => unshareFromGroup(url));
+        // a própria nota: guarda a escolha, para não voltar ao grupo; nota de outra pessoa (criador do grupo): só tira
+        await withBusy(e.currentTarget, () => gd.addedBy === me.uid ? setShareOv(mineDoc(), false) : unshareFromGroup(url));
         toast('Nota tirada do grupo.');
       } catch (err) { cloudError(err); }
       if (ctx === 'group') resultCard.classList.add('hidden');
