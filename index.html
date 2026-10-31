@@ -316,6 +316,32 @@
   .header-icons button { background: none; border: 0; padding: 0; cursor: pointer; color: #fff; display: flex; border-radius: 50%; }
   .header-icons button.active { box-shadow: 0 0 0 3px rgba(255, 255, 255, .35); }
   .avatar svg { width: 26px; height: 26px; stroke: currentColor; }
+  .by { display: inline-flex; align-items: center; gap: 6px; margin-top: 5px; font-size: .78rem; font-weight: 600; color: var(--green-text); }
+  .by-av {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--orange-soft); color: var(--orange);
+    display: inline-flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700;
+  }
+  .by-av.me { background: var(--green-soft); color: var(--green-text); }
+  .nota-head .by { margin-top: 8px; }
+  .list-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+  .list-card .lead { margin: 0 0 8px; color: var(--muted); font-size: .9rem; }
+  .list-card .filter { margin: 4px 0 0; }
+  .list-card { margin-bottom: 18px; }
+  .stock-stats.two { grid-template-columns: 1fr 1fr; }
+  .shared-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; margin-left: 6px; font-size: .72rem; font-weight: 600; color: var(--muted); }
+  .shared-badge svg { width: 13px; height: 13px; stroke: currentColor; }
+  .cat-picker { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .pick { position: relative; cursor: pointer; }
+  .pick input { position: absolute; opacity: 0; pointer-events: none; }
+  .pick span {
+    display: inline-block; border: 1px solid var(--border); background: #fff; border-radius: 999px;
+    padding: 6px 12px; font: 500 .82rem "Inter", sans-serif; color: var(--muted);
+  }
+  .pick input:checked + span { background: var(--green-btn); border-color: var(--green-btn); color: #fff; }
+  .pick input:disabled + span { cursor: default; }
+  .pick input:focus-visible + span { outline: 2px solid var(--green-dark); outline-offset: 1px; }
+  .tabbar button.dim:not(.active) { opacity: .55; }
+  .tabbar button { font-size: .72rem; padding-left: 2px; padding-right: 2px; text-align: center; line-height: 1.15; }
   .account-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
   .account-card .account-head { margin: 14px 0 4px; padding: 14px; background: #f6f8f6; border-radius: 12px; }
   .check-row { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 14px; font-size: .88rem; color: var(--muted); cursor: pointer; }
@@ -463,6 +489,11 @@
               <button type="button" data-ga="join">Tenho um código</button>
             </div>
             <label class="field" id="suGroupNameField"><span>Nome do grupo</span><input id="suGroupName" placeholder="Ex.: Família Silva"></label>
+            <div id="suCatsField">
+              <p class="field-label">Notas que vão para o grupo</p>
+              <p class="muted" style="margin-bottom:8px">Quando alguém escanear uma nota destas categorias, ela aparece para todo o grupo. As outras ficam só com quem escaneou.</p>
+              <div class="cat-picker" id="suCats"></div>
+            </div>
             <label class="field hidden" id="suCodeField"><span>Código do grupo</span><input id="suCode" class="code-input" maxlength="6" placeholder="K7P2QX" autocapitalize="characters" autocomplete="off"></label>
           </div>
           <p class="form-error hidden" id="signupError"></p>
@@ -561,7 +592,7 @@
     <!-- Histórico -->
     <section>
       <div class="section-head">
-        <h3>Últimos Cupons Escaneados</h3>
+        <h3>Meus Últimos Cupons</h3>
         <button id="btnSeeAll" class="hidden">Ver todos</button>
       </div>
       <ul class="history" id="historyList"></ul>
@@ -573,7 +604,11 @@
   <div id="tabStock" class="hidden">
     <section class="card stock-card">
       <h2>Estoque</h2>
-      <p class="lead">Todos os produtos dos cupons escaneados, somados.</p>
+      <p class="lead" id="stockLead">Todos os produtos dos cupons escaneados, somados.</p>
+      <div class="seg small hidden" id="stockSeg" style="margin-top:12px">
+        <button class="active" data-src="mine">Minhas compras</button>
+        <button data-src="group">Do grupo</button>
+      </div>
       <div class="stock-stats">
         <div class="stat"><b id="statProducts">0</b><span>produtos</span></div>
         <div class="stat"><b id="statCupons">0</b><span>cupons</span></div>
@@ -595,6 +630,31 @@
       <p class="empty hidden" id="stockEmpty"></p>
       <p class="stock-note">Toque num produto para ver em quais cupons ele aparece e para trocar a subcategoria. A categoria vem da loja: troque no detalhe do cupom. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
     </section>
+  </div>
+
+  <!-- Aba Minhas notas: tudo que a pessoa escaneou -->
+  <div id="tabMine" class="hidden">
+    <section class="card list-card">
+      <h2>Minhas notas</h2>
+      <p class="lead">Todas as notas que você escaneou.</p>
+      <div class="stock-stats two">
+        <div class="stat"><b id="mineCount">0</b><span>notas</span></div>
+        <div class="stat"><b id="mineSpent">R$ 0,00</b><span>total gasto</span></div>
+      </div>
+      <div class="chips" id="mineChips"></div>
+      <input type="search" class="filter" id="mineFilter" placeholder="Buscar loja...">
+    </section>
+    <ul class="history" id="mineList"></ul>
+    <p class="empty-history hidden" id="mineEmpty"></p>
+  </div>
+
+  <!-- Aba Itens do grupo: notas compartilhadas por todos -->
+  <div id="tabGroup" class="hidden">
+    <section class="card list-card" id="groupHead"></section>
+    <div id="groupBody">
+      <ul class="history" id="groupList"></ul>
+      <p class="empty-history hidden" id="groupEmpty"></p>
+    </div>
   </div>
 
   <!-- Aba Conta: dados do usuário e do grupo -->
@@ -621,6 +681,14 @@
     <button class="active" data-tab="scan">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v4M7 13v4h4"/></svg>
       Escanear
+    </button>
+    <button data-tab="mine">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+      Minhas notas
+    </button>
+    <button data-tab="group" id="tabBtnGroup">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>
+      Itens do grupo
     </button>
     <button data-tab="stock">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
@@ -666,7 +734,6 @@
 
   let scanner = null;
   let busy = false;
-  let showAllHistory = false;
 
   // ---------- Helpers ----------
   const brl = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -707,28 +774,46 @@
     statusEl.innerHTML = (loading ? '<span class="spinner"></span>' : '') + msg;
   }
 
+  // O card de detalhe vai para a aba aberta: abaixo do scan, ou no topo de Minhas notas / Itens do grupo
   function openResultCard() {
+    if (currentTab === 'scan') $('scanCard').after(resultCard);
+    else $(TAB_IDS[currentTab]).prepend(resultCard);
     resultCard.classList.remove('hidden');
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ---------- Histórico ----------
-  // Sem Firebase: salvo só no aparelho (localStorage). Com Firebase: na conta ou no grupo, sincronizado em tempo real.
+  // Sem Firebase: salvo só no aparelho (localStorage).
+  // Com Firebase: toda nota fica na conta da pessoa (users/{uid}); as das categorias que o grupo
+  // compartilha vão também para o grupo (groups/{gid}).
   function localHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (_) { return []; }
   }
 
+  // Notas que a própria pessoa escaneou (inclui as que ela mandou para o grupo antes desta versão)
   function loadHistory() {
-    return CLOUD ? cloudCupons : localHistory();
+    if (!CLOUD) return localHistory();
+    const seen = new Set(cloudCupons.map(c => c.url));
+    const mineInGroup = groupCupons.filter(c => c.addedBy === me?.uid && !seen.has(c.url));
+    return cloudCupons.concat(mineInGroup).sort((a, b) => (b.scannedAt || 0) - (a.scannedAt || 0));
   }
 
   function saveHistory(list) {
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (_) {}
   }
 
+  const inGroup = () => CLOUD && me && me.groupId && group;
+  // Grupos antigos (sem filtro escolhido) compartilham todas as categorias
+  const groupShares = (catId) => !group.sharedCats || group.sharedCats.includes(catId);
+  const groupDoc = (url) => groupCupons.find(c => c.url === url);
+
   function addToHistory(url, data) {
     if (CLOUD) {
       cloudSaveCupom(url, data).catch(cloudError); // o onSnapshot redesenha a lista
+      const cat = cupomCat({ url, store: data.store });
+      if (inGroup() && groupShares(cat.id)) {
+        shareToGroup(url, data).then(ok => { if (ok) toast('Nota de ' + cat.name + ' enviada para o grupo ' + group.name + '.', 3500); }).catch(cloudError);
+      }
       return;
     }
     const list = localHistory().filter(h => h.url !== url);
@@ -737,9 +822,11 @@
     renderHistory();
   }
 
+  // Remove das notas da pessoa; se foi ela quem mandou para o grupo, sai do grupo também
   function removeFromHistory(url) {
     if (CLOUD) {
       cloudDeleteCupom(url).catch(cloudError);
+      if (inGroup() && groupDoc(url)?.addedBy === me.uid) unshareFromGroup(url).catch(cloudError);
       return;
     }
     saveHistory(localHistory().filter(h => h.url !== url));
@@ -750,18 +837,19 @@
   const FB_VER = '10.12.2';
   let fb = null, auth = null, db = null;
   let me = null;          // { uid, email, name, groupId }
-  let group = null;       // grupo atual { id, name, code, ownerUid, members, memberNames }
-  let cloudCupons = [];
-  let spaceKey = null;    // espaço com listeners ativos: 'users/uid' ou 'groups/gid'
+  let group = null;       // grupo atual { id, name, code, ownerUid, members, memberNames, sharedCats }
+  let cloudCupons = [];   // notas da pessoa
+  let groupCupons = [];   // notas compartilhadas no grupo
+  let spaceKey;           // grupo com listeners ativos (null = sem grupo; undefined = nada assinado)
   const unsubs = {};
 
   function unsub(...names) {
     names.forEach(n => { if (unsubs[n]) { unsubs[n](); delete unsubs[n]; } });
   }
 
-  // Cupons e categorias ficam em users/{uid}/... (individual) ou groups/{gid}/... (coletivo)
+  // As notas da pessoa e as categorias escolhidas por ela ficam em users/{uid}
   function spacePath() {
-    return me.groupId ? ['groups', me.groupId] : ['users', me.uid];
+    return ['users', me.uid];
   }
   const metaRef = () => fb.doc(db, ...spacePath(), 'meta', 'categorias');
 
@@ -839,10 +927,11 @@
   let authResolved = false;
   function onUser(user) {
     authResolved = true;
-    unsub('user', 'group', 'cupons', 'meta');
-    spaceKey = null;
+    unsub('user', 'group', 'groupCupons', 'cupons', 'meta');
+    spaceKey = undefined;
     group = null;
     cloudCupons = [];
+    groupCupons = [];
     catOv = { stores: {}, products: {} };
     if (!user) {
       me = null;
@@ -861,37 +950,55 @@
     }, cloudError);
   }
 
+  const cuponsQuery = (...path) => fb.query(fb.collection(db, ...path, 'cupons'), fb.orderBy('scannedAt', 'desc'), fb.limit(500));
+
   function subscribeSpace() {
-    const key = spacePath().join('/');
-    if (key === spaceKey) return;
-    spaceKey = key;
-    unsub('group', 'cupons', 'meta');
-    cloudCupons = [];
-    group = null;
-    catOv = { stores: {}, products: {} };
-    refreshViews();
-
-    const q = fb.query(fb.collection(db, ...spacePath(), 'cupons'), fb.orderBy('scannedAt', 'desc'), fb.limit(500));
-    unsubs.cupons = fb.onSnapshot(q, snap => {
-      cloudCupons = snap.docs.map(d => d.data());
-      refreshViews();
-    }, cloudError);
-
-    unsubs.meta = fb.onSnapshot(metaRef(), snap => {
-      const o = snap.data() || {};
-      catOv = { stores: o.stores || {}, products: o.products || {} };
-      refreshViews();
-    }, cloudError);
-
-    if (me.groupId) {
-      unsubs.group = fb.onSnapshot(fb.doc(db, 'groups', me.groupId), snap => {
-        group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
-        // saiu do grupo ou o grupo sumiu: volta para o modo individual
-        if (!group || !(group.members || []).includes(me.uid)) { detachGroup(); return; }
-        renderAccount();
-        renderHeaderSpace();
-      }, err => { if (err.code === 'permission-denied') detachGroup(); else cloudError(err); });
+    // notas da pessoa: assina uma vez por login
+    if (!unsubs.cupons) {
+      unsubs.cupons = fb.onSnapshot(cuponsQuery('users', me.uid), snap => {
+        cloudCupons = snap.docs.map(d => d.data());
+        refreshViews();
+      }, cloudError);
+      unsubs.meta = fb.onSnapshot(metaRef(), snap => {
+        const o = snap.data() || {};
+        catOv = { stores: o.stores || {}, products: o.products || {} };
+        refreshViews();
+      }, cloudError);
     }
+
+    // grupo: troca de assinatura quando a pessoa entra/sai de um grupo
+    const gid = me.groupId || null;
+    if (gid === spaceKey) return;
+    spaceKey = gid;
+    unsub('group', 'groupCupons');
+    group = null;
+    groupCupons = [];
+    refreshViews();
+    if (!gid) return;
+
+    unsubs.group = fb.onSnapshot(fb.doc(db, 'groups', gid), snap => {
+      group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
+      // saiu do grupo ou o grupo sumiu: volta para o modo individual
+      if (!group || !(group.members || []).includes(me.uid)) { detachGroup(); return; }
+      refreshViews();
+      renderHeaderSpace();
+    }, err => { if (err.code === 'permission-denied') detachGroup(); else cloudError(err); });
+
+    let firstLoad = true;
+    unsubs.groupCupons = fb.onSnapshot(cuponsQuery('groups', gid), snap => {
+      groupCupons = snap.docs.map(d => d.data());
+      refreshViews();
+      // avisa quando outra pessoa do grupo escaneia uma nota (não na carga inicial)
+      if (!firstLoad) {
+        snap.docChanges().forEach(ch => {
+          const c = ch.doc.data();
+          if (ch.type === 'added' && c.addedBy && c.addedBy !== me.uid) {
+            toast(firstName(c.addedByName) + ' escaneou uma nota: ' + titleCase(c.store || 'Loja') + ' · ' + brl(c.total || 0), 5000);
+          }
+        });
+      }
+      firstLoad = false;
+    }, err => { if (err.code !== 'permission-denied') cloudError(err); });
   }
 
   function detachGroup() {
@@ -900,20 +1007,45 @@
 
   function refreshViews() {
     renderHistory();
-    if (!$('tabStock').classList.contains('hidden')) renderStock();
+    if (currentTab === 'stock') renderStock();
+    if (currentTab === 'mine') renderMine();
+    if (currentTab === 'group') renderGroupTab();
     renderAccount();
+    $('tabBtnGroup').classList.toggle('dim', !inGroup());
   }
 
+  // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
+  const cleanDoc = (o) => JSON.parse(JSON.stringify(o));
+  // só os dados da nota (sem campos de quem escaneou)
+  const notaData = ({ addedBy, addedByName, ...d }) => d;
+
   async function cloudSaveCupom(url, data) {
-    // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
-    const docData = JSON.parse(JSON.stringify({
-      ...data, url, scannedAt: data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
-    }));
+    const prev = cloudCupons.find(c => c.url === url);
+    const docData = cleanDoc({
+      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+    });
     await fb.setDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)), docData);
   }
 
   async function cloudDeleteCupom(url) {
     await fb.deleteDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)));
+  }
+
+  // Coloca a nota no grupo. Se outra pessoa já tinha mandado, mantém quem escaneou primeiro.
+  async function shareToGroup(url, data) {
+    const prev = groupDoc(url);
+    if (prev && prev.addedBy && prev.addedBy !== me.uid) {
+      toast('Essa nota já está no grupo: foi escaneada por ' + firstName(prev.addedByName) + '.', 4000);
+      return false;
+    }
+    await fb.setDoc(fb.doc(db, 'groups', me.groupId, 'cupons', await hashId(url)), cleanDoc({
+      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+    }));
+    return true;
+  }
+
+  async function unshareFromGroup(url) {
+    await fb.deleteDoc(fb.doc(db, 'groups', me.groupId, 'cupons', await hashId(url)));
   }
 
   // Código de 6 caracteres sem os que confundem (0/O, 1/I/L)
@@ -925,7 +1057,7 @@
   }
   const normCode = (s) => (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-  async function createGroup(groupName, userName) {
+  async function createGroup(groupName, userName, sharedCats) {
     const uid = auth.currentUser.uid;
     for (let attempt = 0; attempt < 5; attempt++) {
       const code = genCode();
@@ -935,12 +1067,12 @@
         await fb.runTransaction(db, async (tx) => {
           if ((await tx.get(codeRef)).exists()) throw new Error('code-taken');
           tx.set(groupRef, {
-            name: groupName, code, ownerUid: uid, members: [uid], memberNames: { [uid]: userName }, createdAt: fb.serverTimestamp()
+            name: groupName, code, ownerUid: uid, members: [uid], memberNames: { [uid]: userName }, sharedCats, createdAt: fb.serverTimestamp()
           });
           tx.set(codeRef, { groupId: groupRef.id, ownerUid: uid });
           tx.set(fb.doc(db, 'users', uid), { groupId: groupRef.id }, { merge: true });
         });
-        return code;
+        return { code, gid: groupRef.id };
       } catch (err) {
         if (err.message !== 'code-taken') throw err;
       }
@@ -959,20 +1091,26 @@
     const uid = auth.currentUser.uid;
     await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayUnion(uid), ['memberNames.' + uid]: userName });
     await fb.setDoc(fb.doc(db, 'users', uid), { groupId: gid }, { merge: true });
+    return gid;
   }
 
-  // Leva os cupons e categorias do cadastro individual para o grupo, para somar no estoque de todos
+  // Manda para o grupo as notas que a pessoa já tinha, só das categorias que o grupo compartilha
   async function copyPersonalToGroup(gid) {
     const uid = me.uid;
-    const snap = await fb.getDocs(fb.collection(db, 'users', uid, 'cupons'));
-    const docs = snap.docs;
+    const [gSnap, mine, theirs] = await Promise.all([
+      fb.getDoc(fb.doc(db, 'groups', gid)),
+      fb.getDocs(fb.collection(db, 'users', uid, 'cupons')),
+      fb.getDocs(fb.collection(db, 'groups', gid, 'cupons'))
+    ]);
+    const cats = gSnap.data()?.sharedCats;
+    const taken = new Set(theirs.docs.map(d => d.id));
+    const docs = mine.docs.filter(d => !taken.has(d.id) && (!cats || cats.includes(cupomCat(d.data()).id)));
     for (let i = 0; i < docs.length; i += 450) {
       const batch = fb.writeBatch(db);
-      docs.slice(i, i + 450).forEach(d => batch.set(fb.doc(db, 'groups', gid, 'cupons', d.id), d.data()));
+      docs.slice(i, i + 450).forEach(d => batch.set(fb.doc(db, 'groups', gid, 'cupons', d.id),
+        cleanDoc({ ...d.data(), addedBy: uid, addedByName: me.name })));
       await batch.commit();
     }
-    const meta = await fb.getDoc(fb.doc(db, 'users', uid, 'meta', 'categorias'));
-    if (meta.exists()) await fb.setDoc(fb.doc(db, 'groups', gid, 'meta', 'categorias'), meta.data(), { merge: true });
     return docs.length;
   }
 
@@ -1025,7 +1163,7 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabAccount', 'resultCard', 'headerSpace'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabAccount', 'resultCard', 'headerSpace'].forEach(id => $(id).classList.add('hidden'));
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
     $('authView').classList.remove('hidden');
@@ -1051,6 +1189,7 @@
     signupGroupAction = action;
     $('suGroupSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.ga === action));
     $('suGroupNameField').classList.toggle('hidden', action !== 'create');
+    $('suCatsField').classList.toggle('hidden', action !== 'create');
     $('suCodeField').classList.toggle('hidden', action !== 'join');
   }
 
@@ -1105,6 +1244,8 @@
       try {
         if (!name) throw new Error('Digite seu nome.');
         if (mode === 'group' && signupGroupAction === 'create' && !groupName) throw new Error('Dê um nome para o grupo.');
+        const sharedCats = pickedCats('suCats');
+        if (mode === 'group' && signupGroupAction === 'create' && !sharedCats.length) throw new Error('Escolha pelo menos uma categoria para o grupo.');
         if (mode === 'group' && signupGroupAction === 'join') {
           if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
           await findGroupByCode(code); // confere o código antes de criar a conta
@@ -1114,7 +1255,7 @@
         if (me) me.name = name;
         await fb.setDoc(fb.doc(db, 'users', cred.user.uid), { name, email, createdAt: fb.serverTimestamp() }, { merge: true });
         if (mode === 'group') {
-          if (signupGroupAction === 'create') showCodeModal(await createGroup(groupName, name), groupName);
+          if (signupGroupAction === 'create') showCodeModal((await createGroup(groupName, name, sharedCats)).code, groupName);
           else { await joinGroup(code, name); toast('Você entrou no grupo!'); }
         }
       } catch (err) {
@@ -1157,6 +1298,16 @@
       '<button class="btn small" disabled style="opacity:.5">Criar grupo</button></section>';
   }
 
+  // Categorias que vão para o grupo (escolhidas por quem cria o grupo)
+  const DEFAULT_SHARED = ['mercado'];
+  function catPicker(id, selected, disabled = false) {
+    return '<div class="cat-picker" id="' + id + '">' + CATEGORIES.map(c =>
+      '<label class="pick"><input type="checkbox" value="' + c.id + '"' + (selected.includes(c.id) ? ' checked' : '') +
+      (disabled ? ' disabled' : '') + '><span>' + c.name + '</span></label>').join('') + '</div>';
+  }
+  const pickedCats = (id) => [...document.querySelectorAll('#' + id + ' input:checked')].map(i => i.value);
+  const sharedNames = () => group.sharedCats ? group.sharedCats.map(id => catById(id).name).join(', ') : 'todas as categorias';
+
   function renderAccount() {
     if ($('tabAccount').classList.contains('hidden')) return;
     if (!CLOUD) return renderAccountOffline();
@@ -1165,6 +1316,7 @@
     const keep = {};
     ['accGroupName', 'accCode'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
     const keepBring = $('accBring') ? $('accBring').checked : true;
+    const keepCats = $('accCats') ? pickedCats('accCats') : DEFAULT_SHARED;
 
     let html = '<section class="card account-card"><h2>Minha conta</h2>' +
       '<div class="account-head"><div class="avatar">' + initial(me.name) + '</div>' +
@@ -1173,11 +1325,16 @@
     html += '<hr class="divider">';
     if (me.groupId && group) {
       const members = group.members || [];
+      const owner = group.ownerUid === me.uid;
       html += '<h3 class="card-title">Cadastro coletivo</h3>' +
-        '<p class="muted">Todos do grupo <b>' + escapeHtml(group.name) + '</b> veem e adicionam cupons no mesmo histórico e estoque.</p>' +
+        '<p class="muted">Você está no grupo <b>' + escapeHtml(group.name) + '</b>. As notas de <b>' + escapeHtml(sharedNames()) +
+        '</b> que qualquer pessoa escanear aparecem em <b>Itens do grupo</b>. As outras ficam só em <b>Minhas notas</b>.</p>' +
         '<p class="field-label">Código do grupo</p><div class="group-code">' + escapeHtml(group.code) + '</div>' +
         '<div class="btn-row"><button class="btn small ghost" data-action="copy-code">Copiar código</button>' +
         '<button class="btn small ghost" data-action="share-code">Convidar</button></div>' +
+        '<p class="field-label">Notas que vão para o grupo</p>' +
+        catPicker('grpCats', group.sharedCats || CATEGORIES.map(c => c.id), !owner) +
+        (owner ? '' : '<p class="muted" style="margin-top:-6px">Só quem criou o grupo pode mudar.</p>') +
         '<p class="field-label">Participantes (' + members.length + ')</p><ul class="members">' +
         members.map(uid => {
           const n = (group.memberNames || {})[uid] || 'Participante';
@@ -1189,13 +1346,15 @@
       html += '<p class="auth-loading"><span class="spinner"></span>Carregando grupo...</p>';
     } else {
       html += '<h3 class="card-title">Cadastro individual</h3>' +
-        '<p class="muted">Só você vê seus cupons. Crie um grupo para juntar as notas fiscais de todos no mesmo estoque, ou entre em um com o código.</p>' +
+        '<p class="muted">Só você vê suas notas. Crie um grupo para juntar as notas de todos, ou entre em um com o código.</p>' +
         '<p class="field-label">Criar um grupo</p>' +
         '<div class="inline-form"><input id="accGroupName" placeholder="Ex.: Família Silva"><button class="btn small" data-action="create-group">Criar</button></div>' +
+        '<p class="muted" style="margin-bottom:8px">Notas que vão para o grupo quando alguém escanear:</p>' +
+        catPicker('accCats', keepCats) +
         '<p class="field-label">Entrar em um grupo</p>' +
         '<div class="inline-form"><input id="accCode" class="code-input" maxlength="6" placeholder="CÓDIGO" autocomplete="off"><button class="btn small" data-action="join-group">Entrar</button></div>' +
         '<label class="check-row"><input type="checkbox" id="accBring"' + (keepBring ? ' checked' : '') + '>' +
-        '<span>Levar meus cupons para o grupo (somam no estoque do grupo). Eles também continuam guardados na sua conta individual.</span></label>';
+        '<span>Mandar para o grupo as notas que eu já tenho das categorias do grupo. Elas continuam também em Minhas notas.</span></label>';
     }
     html += '<p class="form-error hidden" id="accError"></p></section>';
 
@@ -1203,12 +1362,26 @@
     if (local) {
       html += '<section class="card"><h3 class="card-title">Cupons deste aparelho</h3>' +
         '<p class="muted">Você tem ' + local + (local === 1 ? ' cupom salvo' : ' cupons salvos') + ' só neste celular, de antes do login.</p>' +
-        '<button class="btn small ghost" data-action="import">Enviar para ' + (me.groupId ? 'o grupo' : 'minha conta') + '</button></section>';
+        '<button class="btn small ghost" data-action="import">Enviar para minha conta</button></section>';
     }
 
     html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
     $('accountContent').innerHTML = html;
     Object.entries(keep).forEach(([id, v]) => { if ($(id)) $(id).value = v; });
+  }
+
+  // Quem criou o grupo muda as categorias que vão para o grupo
+  async function onAccountChange(e) {
+    if (!e.target.closest('#grpCats') || !inGroup() || group.ownerUid !== me.uid) return;
+    const cats = pickedCats('grpCats');
+    if (!cats.length) { e.target.checked = true; toast('O grupo precisa de pelo menos uma categoria.'); return; }
+    try {
+      await fb.updateDoc(fb.doc(db, 'groups', group.id), { sharedCats: cats });
+      toast('Categorias do grupo atualizadas.');
+    } catch (err) {
+      cloudError(err);
+      renderAccount();
+    }
   }
 
   async function onAccountAction(e) {
@@ -1224,7 +1397,7 @@
         return;
       }
       if (action === 'leave') {
-        if (!confirm('Sair do grupo "' + group.name + '"? Os cupons continuam no grupo para os outros participantes.')) return;
+        if (!confirm('Sair do grupo "' + group.name + '"? As notas continuam no grupo para os outros participantes e as suas continuam em Minhas notas.')) return;
         await withBusy(btn, leaveGroup);
         toast('Você saiu do grupo.');
         return;
@@ -1234,22 +1407,24 @@
         let moved = 0;
         if (action === 'create-group') {
           const name = $('accGroupName').value.trim();
+          const cats = pickedCats('accCats');
           if (!name) throw new Error('Dê um nome para o grupo.');
+          if (!cats.length) throw new Error('Escolha pelo menos uma categoria para o grupo.');
           await withBusy(btn, async () => {
-            const code = await createGroup(name, me.name);
-            if (bring) moved = await copyPersonalToGroup((await fb.getDoc(fb.doc(db, 'groupCodes', code))).data().groupId);
+            const { code, gid } = await createGroup(name, me.name, cats);
+            if (bring) moved = await copyPersonalToGroup(gid);
             showCodeModal(code, name);
           });
         } else {
           const code = normCode($('accCode').value);
           if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
           await withBusy(btn, async () => {
-            await joinGroup(code, me.name);
-            if (bring) moved = await copyPersonalToGroup(await findGroupByCode(code));
+            const gid = await joinGroup(code, me.name);
+            if (bring) moved = await copyPersonalToGroup(gid);
           });
           toast('Você entrou no grupo!');
         }
-        if (moved) toast(moved + (moved === 1 ? ' cupom levado' : ' cupons levados') + ' para o grupo.');
+        if (moved) toast(moved + (moved === 1 ? ' nota enviada' : ' notas enviadas') + ' para o grupo.');
         return;
       }
       if (action === 'import') {
@@ -1415,34 +1590,108 @@
     return subNames(cat).map(s => '<option' + (s === selected ? ' selected' : '') + '>' + escapeHtml(s) + '</option>').join('');
   }
 
-  function renderHistory() {
-    const list = loadHistory();
-    const ul = $('historyList');
-    const btnSeeAll = $('btnSeeAll');
-    $('historyEmpty').classList.toggle('hidden', list.length > 0);
-    btnSeeAll.classList.toggle('hidden', list.length <= HISTORY_PREVIEW);
-    btnSeeAll.textContent = showAllHistory ? 'Ver menos' : 'Ver todos';
+  // Quem do grupo escaneou a nota (só nas notas do grupo)
+  function byWho(h) {
+    if (!CLOUD || !me || !h.addedByName) return '';
+    return h.addedBy === me.uid ? 'você' : firstName(h.addedByName);
+  }
+  function scannedBy(h) {
+    const who = byWho(h);
+    if (!who) return '';
+    return '<span class="by"><span class="by-av' + (who === 'você' ? ' me' : '') + '">' + initial(h.addedByName) + '</span>' +
+      'Escaneado por ' + escapeHtml(who) + '</span>';
+  }
+  const sharedBadge = (h) => inGroup() && groupDoc(h.url) ? '<span class="shared-badge">' + ICON_GROUP + 'No grupo</span>' : '';
 
-    const visible = showAllHistory ? list : list.slice(0, HISTORY_PREVIEW);
-    ul.innerHTML = visible.map((h, idx) => {
+  // Lista de notas (histórico, Minhas notas, Itens do grupo). ctx 'group' mostra quem escaneou.
+  function renderCupomList(ul, list, ctx) {
+    ul.innerHTML = list.map((h, idx) => {
       const cat = cupomCat(h);
       return '<li data-idx="' + idx + '">' +
         '<div class="h-icon" style="background:' + cat.soft + ';color:' + cat.color + '">' + cat.icon + '</div>' +
         '<div class="h-info"><div class="h-name">' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</div>' +
-        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) +
-        (CLOUD && group && h.addedByName ? ' · por ' + escapeHtml(firstName(h.addedByName)) : '') + '</div></div>' +
+        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) + '</div>' +
+        (ctx === 'group' ? scannedBy(h) : sharedBadge(h)) + '</div>' +
         '<div class="h-right"><div class="h-total">' + brl(h.total || 0) + '</div>' +
         '<span class="badge">' + ICON_CHECK + 'Validado</span></div></li>';
     }).join('');
+    ul.onclick = (e) => {
+      const li = e.target.closest('li[data-idx]');
+      if (!li) return;
+      const h = list[+li.dataset.idx];
+      setStatus('');
+      renderNota(h, h.url, ctx);
+      openResultCard();
+    };
+  }
 
-    ul.querySelectorAll('li').forEach(li => {
-      li.addEventListener('click', () => {
-        const h = visible[+li.dataset.idx];
-        setStatus('');
-        renderNota(h, h.url);
-        openResultCard();
-      });
-    });
+  // Aba Escanear: só as últimas notas que a própria pessoa escaneou
+  function renderHistory() {
+    const list = loadHistory();
+    $('historyEmpty').classList.toggle('hidden', list.length > 0);
+    $('btnSeeAll').classList.toggle('hidden', list.length <= HISTORY_PREVIEW);
+    renderCupomList($('historyList'), list.slice(0, HISTORY_PREVIEW), 'mine');
+  }
+
+  // Chips de categoria das abas de lista
+  let mineCat = '', groupCat = '', groupWho = '';
+  function listChips(list, active, attr) {
+    const ids = [...new Set(list.map(h => cupomCat(h).id))];
+    if (ids.length < 2) return '';
+    return '<button class="chip' + (!active ? ' active' : '') + '" ' + attr + '="">Todas</button>' +
+      CATEGORIES.filter(c => ids.includes(c.id)).map(c =>
+        '<button class="chip' + (active === c.id ? ' active' : '') + '" ' + attr + '="' + c.id + '">' + c.name + '</button>').join('');
+  }
+
+  // Aba Minhas notas: tudo que a pessoa escaneou
+  function renderMine() {
+    const all = loadHistory();
+    if (mineCat && !all.some(h => cupomCat(h).id === mineCat)) mineCat = '';
+    const q = normName($('mineFilter').value);
+    const list = all.filter(h => (!mineCat || cupomCat(h).id === mineCat) && (!q || normName(h.store).includes(q)));
+    $('mineCount').textContent = list.length;
+    $('mineSpent').textContent = brl(list.reduce((s, h) => s + (h.total || 0), 0));
+    $('mineChips').innerHTML = listChips(all, mineCat, 'data-mcat');
+    $('mineEmpty').textContent = all.length ? 'Nenhuma nota encontrada.' : 'Você ainda não escaneou nenhuma nota.';
+    $('mineEmpty').classList.toggle('hidden', list.length > 0);
+    renderCupomList($('mineList'), list, 'mine');
+  }
+
+  // Aba Itens do grupo: notas que todos do grupo escanearam
+  function renderGroupTab() {
+    const head = $('groupHead');
+    if (!inGroup()) {
+      $('groupBody').classList.add('hidden');
+      head.innerHTML = '<h2>Itens do grupo</h2>' +
+        (CLOUD && me && me.groupId
+          ? '<p class="auth-loading"><span class="spinner"></span>Carregando grupo...</p>'
+          : '<p class="lead">Você ainda não está em um grupo. Crie um grupo ou entre com um código para ver aqui as notas escaneadas por todos.</p>' +
+            '<button class="btn small" data-go="account">Criar ou entrar em um grupo</button>');
+      return;
+    }
+    $('groupBody').classList.remove('hidden');
+    const all = groupCupons;
+    if (groupCat && !all.some(h => cupomCat(h).id === groupCat)) groupCat = '';
+    if (groupWho && !all.some(h => h.addedBy === groupWho)) groupWho = '';
+    const list = all.filter(h => (!groupCat || cupomCat(h).id === groupCat) && (!groupWho || h.addedBy === groupWho));
+    const people = [...new Map(all.filter(h => h.addedBy).map(h => [h.addedBy, h.addedByName])).entries()];
+    const n = (group.members || []).length;
+
+    head.innerHTML = '<h2>Itens do grupo</h2>' +
+      '<p class="lead"><b>' + escapeHtml(group.name) + '</b> · ' + n + (n === 1 ? ' pessoa' : ' pessoas') +
+      '. Notas de ' + escapeHtml(sharedNames()) + ' escaneadas por todos.</p>' +
+      '<div class="stock-stats two"><div class="stat"><b>' + list.length + '</b><span>notas</span></div>' +
+      '<div class="stat"><b>' + brl(list.reduce((s, h) => s + (h.total || 0), 0)) + '</b><span>total gasto</span></div></div>' +
+      (people.length > 1 ? '<div class="chips">' +
+        '<button class="chip' + (!groupWho ? ' active' : '') + '" data-who="">Todos</button>' +
+        people.map(([uid, name]) => '<button class="chip' + (groupWho === uid ? ' active' : '') + '" data-who="' + escapeHtml(uid) + '">' +
+          escapeHtml(uid === me.uid ? 'Eu' : firstName(name)) + '</button>').join('') + '</div>' : '') +
+      '<div class="chips">' + listChips(all, groupCat, 'data-gcat') + '</div>';
+
+    $('groupEmpty').textContent = all.length ? 'Nenhuma nota encontrada.' :
+      'Nenhuma nota no grupo ainda. Notas de ' + sharedNames() + ' escaneadas por qualquer pessoa do grupo aparecem aqui.';
+    $('groupEmpty').classList.toggle('hidden', list.length > 0);
+    renderCupomList($('groupList'), list, 'group');
   }
 
   // ---------- Estoque: junta os itens de todos os cupons ----------
@@ -1475,14 +1724,22 @@
         g.spent += total;
         g.cupons.add(h.url);
         g.last = Math.max(g.last, h.scannedAt || 0);
-        g.purchases.push({ store: h.store, date: h.scannedAt, qty: qtd, total });
+        g.purchases.push({ store: h.store, date: h.scannedAt, qty: qtd, total, who: stockFromGroup() ? byWho(h) : '' });
       });
     });
     return [...groups.values()];
   }
 
+  let stockSrc = 'mine'; // 'mine' = minhas compras · 'group' = do grupo
+  const stockFromGroup = () => stockSrc === 'group' && inGroup();
+
   function renderStock() {
-    const history = loadHistory();
+    $('stockSeg').classList.toggle('hidden', !inGroup());
+    $('stockSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.src === (stockFromGroup() ? 'group' : 'mine')));
+    $('stockLead').textContent = stockFromGroup()
+      ? 'Produtos das notas de todos do grupo ' + group.name + ', somados.'
+      : 'Todos os produtos das notas que você escaneou, somados.';
+    const history = stockFromGroup() ? groupCupons : loadHistory();
     const all = buildStock(history);
     const q = normName($('stockFilter').value);
 
@@ -1527,7 +1784,8 @@
           '<label class="s-sub">Subcategoria <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
           subOptions(g.cat, g.sub) + '</select></label>' +
           g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
-          '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') + '</span>' +
+          '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') +
+          (p.who ? ' · ' + escapeHtml(p.who) : '') + '</span>' +
           '<span>' + fmtQtd(p.qty) + ' ' + escapeHtml(g.unit) + ' · ' + brl(p.total) + '</span></div>'
         ).join('') + '</div>';
       }
@@ -1583,14 +1841,20 @@
     renderStock();
   }
 
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', stock: 'tabStock', account: 'tabAccount' };
+  let currentTab = 'scan';
+
   function showTab(tab) {
+    currentTab = tab;
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    $('tabScan').classList.toggle('hidden', tab !== 'scan');
-    $('tabStock').classList.toggle('hidden', tab !== 'stock');
-    $('tabAccount').classList.toggle('hidden', tab !== 'account');
+    Object.entries(TAB_IDS).forEach(([t, id]) => $(id).classList.toggle('hidden', t !== tab));
     $('btnHeaderUser').classList.toggle('active', tab === 'account');
+    // o detalhe da nota fica na aba onde foi aberto
+    if (!$(TAB_IDS[tab]).contains(resultCard)) resultCard.classList.add('hidden');
     if (tab !== 'scan') stopScanner();
     if (tab === 'stock') renderStock();
+    if (tab === 'mine') renderMine();
+    if (tab === 'group') renderGroupTab();
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
   }
@@ -1599,7 +1863,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.5';
+  const APP_VERSION = '2026-10-31.7';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -2034,7 +2298,7 @@
     return data;
   }
 
-  function renderNota(data, url) {
+  function renderNota(data, url, ctx = 'mine') {
     // NaN vira null no JSON do histórico; normaliza de volta
     const num = (v) => (v === null || v === undefined) ? NaN : v;
     const items = data.items.map(i => ({ ...i, qtd: num(i.qtd), unit: num(i.unit), total: num(i.total) }));
@@ -2044,7 +2308,7 @@
     if (data.store) html += '<p class="store">' + escapeHtml(data.store) + '</p>';
     (data.storeInfo || []).forEach(line => { html += '<p class="store-info">' + escapeHtml(line) + '</p>'; });
     if (data.scannedAt) html += '<p class="store-info">Escaneado em ' + fmtDate(data.scannedAt) + '</p>';
-    html += '</div>';
+    html += (ctx === 'group' ? scannedBy(data) : sharedBadge({ url })) + '</div>';
 
     const cat = cupomCat({ url, store: data.store });
     html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
@@ -2078,9 +2342,16 @@
       (Math.abs(sumItems - data.total) > 0.009 ? ' · soma dos itens ' + brl(sumItems) : '') +
       '</small></div><div>' + brl(data.total) + '</div></div>';
 
+    // Ações: em Minhas notas dá para mandar/tirar do grupo; em Itens do grupo, quem mandou (ou o criador) pode tirar
+    const gd = inGroup() ? groupDoc(url) : null;
+    const canUnshare = gd && (gd.addedBy === me.uid || group.ownerUid === me.uid);
+    let groupBtn = '';
+    if (inGroup() && ctx !== 'group' && !gd) groupBtn = '<button class="btn small" id="btnShare">Enviar ao grupo</button>';
+    if (canUnshare) groupBtn = '<button class="btn small ghost" id="btnUnshare">Tirar do grupo</button>';
     html += '<div class="detail-actions">' +
       (/^https?:\/\//i.test(url) ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener"><span class="btn small ghost">Nota original</span></a>' : '') +
-      '<button class="btn small stop" id="btnRemove">Remover</button></div>';
+      groupBtn +
+      (ctx === 'group' ? '' : '<button class="btn small stop" id="btnRemove">Remover</button>') + '</div>';
 
     resultEl.innerHTML = html;
 
@@ -2097,17 +2368,35 @@
 
     $('cupomCat').addEventListener('change', (e) => {
       setCupomCat(url, e.target.value);
-      renderHistory();
-      renderNota(data, url);
+      refreshViews();
+      renderNota(data, url, ctx);
     });
     $('itemList').addEventListener('change', (e) => {
       if (!e.target.classList.contains('sub-pill')) return;
       setItemSub(cat, e.target.dataset.name, e.target.value);
-      renderNota(data, url);
+      renderNota(data, url, ctx);
     });
 
-    $('btnRemove').addEventListener('click', () => {
-      if (!confirm('Remover este cupom do histórico?')) return;
+    $('btnShare')?.addEventListener('click', async (e) => {
+      try {
+        let ok = false;
+        await withBusy(e.currentTarget, async () => { ok = await shareToGroup(url, data); });
+        if (ok) toast('Nota enviada para o grupo ' + group.name + '.');
+      } catch (err) { cloudError(err); }
+      renderNota(data, url, ctx);
+    });
+    $('btnUnshare')?.addEventListener('click', async (e) => {
+      if (!confirm('Tirar esta nota de Itens do grupo? Ela continua nas notas de quem escaneou.')) return;
+      try {
+        await withBusy(e.currentTarget, () => unshareFromGroup(url));
+        toast('Nota tirada do grupo.');
+      } catch (err) { cloudError(err); }
+      if (ctx === 'group') resultCard.classList.add('hidden');
+      else renderNota(data, url, ctx);
+    });
+    $('btnRemove')?.addEventListener('click', () => {
+      const shared = inGroup() && groupDoc(url)?.addedBy === me.uid;
+      if (!confirm('Remover esta nota das suas notas?' + (shared ? ' Ela também sai de Itens do grupo.' : ''))) return;
       removeFromHistory(url);
       resultCard.classList.add('hidden');
     });
@@ -2181,9 +2470,28 @@
     openResultCard();
   });
   $('btnClose').addEventListener('click', () => resultCard.classList.add('hidden'));
-  $('btnSeeAll').addEventListener('click', () => {
-    showAllHistory = !showAllHistory;
-    renderHistory();
+  $('btnSeeAll').addEventListener('click', () => showTab('mine'));
+  $('mineFilter').addEventListener('input', renderMine);
+  $('mineChips').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mcat]');
+    if (!b) return;
+    mineCat = b.dataset.mcat;
+    renderMine();
+  });
+  $('groupHead').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-who],[data-gcat],[data-go]');
+    if (!b) return;
+    if (b.dataset.go) return showTab(b.dataset.go);
+    if (b.dataset.who !== undefined) groupWho = b.dataset.who;
+    if (b.dataset.gcat !== undefined) groupCat = b.dataset.gcat;
+    renderGroupTab();
+  });
+  $('stockSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-src]');
+    if (!b) return;
+    stockSrc = b.dataset.src;
+    stockCat = ''; stockSub = ''; openStockKey = null;
+    renderStock();
   });
 
   // ---------- Contas: eventos e inicialização ----------
@@ -2204,6 +2512,8 @@
     if (b) setSignupGroupAction(b.dataset.ga);
   });
   $('accountContent').addEventListener('click', onAccountAction);
+  $('accountContent').addEventListener('change', onAccountChange);
+  $('suCats').outerHTML = catPicker('suCats', DEFAULT_SHARED);
   $('btnModalCopy').addEventListener('click', () => copyText($('codeModal').dataset.code, 'Código copiado!'));
   $('btnModalShare').addEventListener('click', () => shareCode($('codeModal').dataset.code, $('codeModal').dataset.name));
   $('btnModalClose').addEventListener('click', () => $('codeModal').classList.add('hidden'));
@@ -2221,6 +2531,7 @@
     $('authView').classList.remove('hidden');
     initCloud();
   } else {
+    $('tabBtnGroup').classList.add('hidden');
     renderHistory();
   }
 </script>
