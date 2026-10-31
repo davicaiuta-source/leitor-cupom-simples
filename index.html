@@ -615,7 +615,7 @@
       <h2>Estoque</h2>
       <p class="lead" id="stockLead">Todos os produtos dos cupons escaneados, somados.</p>
       <div class="seg small hidden" id="stockSeg" style="margin-top:12px">
-        <button class="active" data-src="mine">Minhas compras</button>
+        <button class="active" data-src="mine">Pessoal</button>
         <button data-src="group">Do grupo</button>
       </div>
       <div class="stock-stats">
@@ -645,7 +645,7 @@
   <div id="tabMine" class="hidden">
     <section class="card list-card">
       <h2>Minhas notas</h2>
-      <p class="lead">Todas as notas que você escaneou.</p>
+      <p class="lead" id="mineLead">Todas as notas que você escaneou.</p>
       <div class="stock-stats two">
         <div class="stat"><b id="mineCount">0</b><span>notas</span></div>
         <div class="stat"><b id="mineSpent">R$ 0,00</b><span>total gasto</span></div>
@@ -818,6 +818,13 @@
     const seen = new Set(cloudCupons.map(c => c.url));
     const mineInGroup = groupCupons.filter(c => c.addedBy === me?.uid && !seen.has(c.url));
     return cloudCupons.concat(mineInGroup).sort((a, b) => (b.scannedAt || 0) - (a.scannedAt || 0));
+  }
+
+  // Notas pessoais: as que a pessoa escaneou e NÃO estão no grupo (as do grupo ficam só em Itens do grupo)
+  function personalHistory() {
+    if (!CLOUD || !inGroup()) return loadHistory();
+    const inGrp = new Set(groupCupons.map(c => c.url));
+    return loadHistory().filter(h => !inGrp.has(h.url));
   }
 
   function saveHistory(list) {
@@ -1779,16 +1786,21 @@
         '<button class="chip' + (active === c.id ? ' active' : '') + '" ' + attr + '="' + c.id + '">' + c.name + '</button>').join('');
   }
 
-  // Aba Minhas notas: tudo que a pessoa escaneou
+  // Aba Minhas notas: notas pessoais (as que subiram para o grupo ficam em Itens do grupo)
   function renderMine() {
-    const all = loadHistory();
+    const all = personalHistory();
+    $('mineLead').textContent = inGroup()
+      ? 'Notas que ficaram só com você. As que você subiu para o grupo estão em Itens do grupo.'
+      : 'Todas as notas que você escaneou.';
     if (mineCat && !all.some(h => cupomCat(h).id === mineCat)) mineCat = '';
     const q = normName($('mineFilter').value);
     const list = all.filter(h => (!mineCat || cupomCat(h).id === mineCat) && (!q || normName(h.store).includes(q)));
     $('mineCount').textContent = list.length;
     $('mineSpent').textContent = brl(list.reduce((s, h) => s + (h.total || 0), 0));
     $('mineChips').innerHTML = listChips(all, mineCat, 'data-mcat');
-    $('mineEmpty').textContent = all.length ? 'Nenhuma nota encontrada.' : 'Você ainda não escaneou nenhuma nota.';
+    $('mineEmpty').textContent = all.length ? 'Nenhuma nota encontrada.'
+      : inGroup() && loadHistory().length ? 'Nenhuma nota pessoal: todas as suas notas estão em Itens do grupo.'
+      : 'Você ainda não escaneou nenhuma nota.';
     $('mineEmpty').classList.toggle('hidden', list.length > 0);
     renderCupomList($('mineList'), list, 'mine');
   }
@@ -1874,8 +1886,9 @@
     $('stockSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.src === (stockFromGroup() ? 'group' : 'mine')));
     $('stockLead').textContent = stockFromGroup()
       ? 'Produtos das notas de todos do grupo ' + group.name + ', somados.'
+      : inGroup() ? 'Produtos das suas notas pessoais (sem as que foram para o grupo), somados.'
       : 'Todos os produtos das notas que você escaneou, somados.';
-    const history = stockFromGroup() ? groupCupons : loadHistory();
+    const history = stockFromGroup() ? groupCupons : personalHistory();
     const all = buildStock(history);
     const q = normName($('stockFilter').value);
 
@@ -1999,7 +2012,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.11';
+  const APP_VERSION = '2026-10-31.12';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -2550,7 +2563,12 @@
       if (!confirm('Tirar esta nota de Itens do grupo? Ela continua nas notas de quem escaneou.')) return;
       try {
         // a própria nota: guarda a escolha, para não voltar ao grupo; nota de outra pessoa (criador do grupo): só tira
-        await withBusy(e.currentTarget, () => gd.addedBy === me.uid ? setShareOv(mineDoc(), false) : unshareFromGroup(url));
+        await withBusy(e.currentTarget, async () => {
+          if (gd.addedBy !== me.uid) return unshareFromGroup(url);
+          // notas antigas que só existiam no grupo: guarda nas notas pessoais antes de tirar
+          if (!cloudCupons.some(c => c.url === url)) await cloudSaveCupom(url, data);
+          return setShareOv(mineDoc(), false);
+        });
         toast('Nota tirada do grupo.');
       } catch (err) { cloudError(err); }
       if (ctx === 'group') resultCard.classList.add('hidden');
