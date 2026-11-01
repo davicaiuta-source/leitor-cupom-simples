@@ -341,6 +341,62 @@
   .pick input:disabled + span { cursor: default; }
   .pick input:focus-visible + span { outline: 2px solid var(--green-dark); outline-offset: 1px; }
   .tabbar button.dim:not(.active) { opacity: .55; }
+
+  /* ---------- Gastos (gráficos) ---------- */
+  .spend-card {
+    --chart-1: #2a78d6;       /* série única (gastos no tempo, subcategoria, pessoa, loja) */
+    --chart-1-soft: #86b6ef;  /* períodos não selecionados (passo claro da mesma rampa) */
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --ink-muted: #898781;
+  }
+  .spend-card .seg { margin-bottom: 10px; }
+  .period-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 4px 0 6px; }
+  .period-nav b { font-size: 1rem; text-align: center; flex: 1; }
+  .period-nav .icon-btn { font-size: 1.3rem; line-height: 1; }
+  .period-nav .icon-btn:disabled { opacity: .35; cursor: default; }
+  .hero-fig { text-align: center; margin: 6px 0 16px; }
+  .hero-fig span { display: block; font-size: 2.6rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); line-height: 1.1; }
+  .hero-fig small { display: block; margin-top: 4px; font-size: .82rem; color: var(--muted); }
+  .muted-inline { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: .75rem; }
+  /* a faixa da direita (44px) fica só para os valores da grade, sem barras por cima */
+  .trend { position: relative; height: 150px; display: flex; align-items: flex-end; gap: 2px; padding: 18px 44px 0 0; border-bottom: 1px solid var(--axis); }
+  .trend .grid-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); pointer-events: none; }
+  .trend .grid-line span { position: absolute; right: 0; top: -8px; width: 42px; text-align: right; font-size: .66rem; line-height: 1; background: var(--card); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .t-col { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; position: relative; background: none; border: 0; padding: 0; }
+  .t-col i { display: block; width: 100%; max-width: 24px; min-height: 2px; background: var(--chart-1-soft); border-radius: 4px 4px 0 0; }
+  .t-col.sel i { background: var(--chart-1); }
+  .t-col:hover i, .t-col:focus-visible i { background: var(--chart-1); }
+  .t-col:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 2px; }
+  .t-col .t-val { position: absolute; font-size: .68rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .trend-labels { display: flex; gap: 2px; margin-top: 4px; padding-right: 44px; }
+  .trend-labels span { flex: 1; min-width: 0; text-align: center; font-size: .66rem; color: var(--ink-muted); white-space: nowrap; overflow: hidden; }
+  .trend-labels span.sel { color: var(--text); font-weight: 700; }
+  .sb-row { display: block; width: 100%; text-align: left; background: none; border: 0; border-radius: 8px; padding: 8px 6px; cursor: pointer; font: inherit; color: inherit; }
+  .sb-row:hover, .sb-row.active { background: #f1f4f2; }
+  .sb-row:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 1px; }
+  .sb-top { display: flex; justify-content: space-between; gap: 8px; font-size: .88rem; }
+  .sb-top span:first-child { display: flex; align-items: center; gap: 7px; font-weight: 600; min-width: 0; }
+  .sb-top span:first-child em { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sb-top span:last-child { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .sb-top b { color: var(--text); }
+  .sb-key { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 3px; }
+  .sb-bar { height: 10px; background: #f0efec; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+  .sb-bar i { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+  .chart-tip {
+    position: fixed; z-index: 50; pointer-events: none; background: #1a1f1c; color: #fff; border-radius: 8px;
+    padding: 7px 10px; font-size: .78rem; line-height: 1.35; box-shadow: var(--shadow); max-width: 220px;
+  }
+  .chart-tip b { display: block; font-size: .9rem; }
+  .sd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .sd-head h3 { margin: 0; font-size: 1.15rem; }
+  .sd-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: 6px 0 14px; }
+  .sd-table th { text-align: left; font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+  .sd-table td { padding: 8px 4px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .sd-table td.num, .sd-table th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sd-table tr.link { cursor: pointer; }
+  .sd-table tr.link:hover { background: #f6f8f6; }
+  .sd-table small { display: block; color: var(--muted); font-size: .74rem; }
   .hide-btn {
     display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 0 6px; cursor: pointer;
     border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 3px 9px;
@@ -666,6 +722,39 @@
     </div>
   </div>
 
+  <!-- Aba Gastos: totais por semana/mês/ano, quebrados por categoria, subcategoria, pessoa, loja -->
+  <div id="tabSpend" class="hidden">
+    <section class="card list-card spend-card">
+      <h2>Gastos</h2>
+      <p class="lead" id="spendLead"></p>
+      <div class="seg small hidden" id="spendSrc">
+        <button class="active" data-ssrc="mine">Meus gastos</button>
+        <button data-ssrc="group">Do grupo</button>
+      </div>
+      <div class="seg small" id="spendGran">
+        <button data-gran="week">Semana</button>
+        <button class="active" data-gran="month">Mês</button>
+        <button data-gran="year">Ano</button>
+      </div>
+      <div class="period-nav">
+        <button class="icon-btn" id="spendPrev" aria-label="Período anterior">‹</button>
+        <b id="spendPeriod"></b>
+        <button class="icon-btn" id="spendNext" aria-label="Próximo período">›</button>
+      </div>
+      <div class="hero-fig"><span id="spendTotal">R$ 0,00</span><small id="spendDelta"></small></div>
+
+      <p class="bd-title">Evolução <span class="muted-inline">· toque numa barra para ver o período</span></p>
+      <div class="trend" id="spendTrend"></div>
+
+      <p class="bd-title" style="margin-top:18px">Ver por</p>
+      <div class="chips" id="spendDims"></div>
+      <div id="spendBreak"></div>
+      <p class="muted-inline" id="spendHint">Toque numa barra para ver todos os detalhes.</p>
+    </section>
+    <section class="card hidden" id="spendDetail"></section>
+    <div class="chart-tip hidden" id="chartTip" role="tooltip"></div>
+  </div>
+
   <!-- Aba Conta: dados do usuário e do grupo -->
   <div id="tabAccount" class="hidden"><div id="accountContent"></div></div>
 
@@ -711,6 +800,10 @@
     <button data-tab="group" id="tabBtnGroup">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>
       Itens do grupo
+    </button>
+    <button data-tab="spend">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      Gastos
     </button>
     <button data-tab="stock">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
@@ -820,11 +913,10 @@
     return cloudCupons.concat(mineInGroup).sort((a, b) => (b.scannedAt || 0) - (a.scannedAt || 0));
   }
 
-  // Notas pessoais: as que a pessoa escaneou e NÃO estão no grupo (as do grupo ficam só em Itens do grupo)
+  // Notas pessoais: todas que a própria pessoa escaneou (tendo ido para o grupo ou não); nunca as de outras pessoas
   function personalHistory() {
-    if (!CLOUD || !inGroup()) return loadHistory();
-    const inGrp = new Set(groupCupons.map(c => c.url));
-    return loadHistory().filter(h => !inGrp.has(h.url));
+    if (!CLOUD) return loadHistory();
+    return loadHistory().filter(h => !h.addedBy || h.addedBy === me?.uid);
   }
 
   function saveHistory(list) {
@@ -1142,6 +1234,7 @@
     if (currentTab === 'stock') renderStock();
     if (currentTab === 'mine') renderMine();
     if (currentTab === 'group') renderGroupTab();
+    if (currentTab === 'spend') renderSpend();
     renderAccount();
     $('tabBtnGroup').classList.toggle('dim', !inGroup());
   }
@@ -1770,7 +1863,7 @@
 
   // Aba Escanear: só as últimas notas que a própria pessoa escaneou
   function renderHistory() {
-    const list = loadHistory();
+    const list = personalHistory();
     $('historyEmpty').classList.toggle('hidden', list.length > 0);
     $('btnSeeAll').classList.toggle('hidden', list.length <= HISTORY_PREVIEW);
     renderCupomList($('historyList'), list.slice(0, HISTORY_PREVIEW), 'mine');
@@ -1790,7 +1883,7 @@
   function renderMine() {
     const all = personalHistory();
     $('mineLead').textContent = inGroup()
-      ? 'Notas que ficaram só com você. As que você subiu para o grupo estão em Itens do grupo.'
+      ? 'Todas as notas que você escaneou, as que foram para o grupo e as que ficaram só com você.'
       : 'Todas as notas que você escaneou.';
     if (mineCat && !all.some(h => cupomCat(h).id === mineCat)) mineCat = '';
     const q = normName($('mineFilter').value);
@@ -1798,9 +1891,7 @@
     $('mineCount').textContent = list.length;
     $('mineSpent').textContent = brl(list.reduce((s, h) => s + (h.total || 0), 0));
     $('mineChips').innerHTML = listChips(all, mineCat, 'data-mcat');
-    $('mineEmpty').textContent = all.length ? 'Nenhuma nota encontrada.'
-      : inGroup() && loadHistory().length ? 'Nenhuma nota pessoal: todas as suas notas estão em Itens do grupo.'
-      : 'Você ainda não escaneou nenhuma nota.';
+    $('mineEmpty').textContent = all.length ? 'Nenhuma nota encontrada.' : 'Você ainda não escaneou nenhuma nota.';
     $('mineEmpty').classList.toggle('hidden', list.length > 0);
     renderCupomList($('mineList'), list, 'mine');
   }
@@ -1840,6 +1931,282 @@
       'Nenhuma nota no grupo ainda. As notas que cada pessoa escolher mostrar para o grupo aparecem aqui.';
     $('groupEmpty').classList.toggle('hidden', list.length > 0);
     renderCupomList($('groupList'), list, 'group');
+  }
+
+  // ---------- Gastos: semana / mês / ano, por categoria, subcategoria, pessoa, loja ----------
+  // Cores dos gráficos por categoria: paleta validada (daltonismo e contraste), em ordem fixa.
+  // A cor segue a categoria, nunca a posição no ranking.
+  const CHART_CAT = {
+    mercado: '#2a78d6', farmacia: '#eb6834', acougue: '#1baf7a', padaria: '#eda100',
+    restaurante: '#e87ba4', posto: '#008300', outros: '#6250d6'
+  };
+  const MONTHS_FULL = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const TREND_N = { week: 8, month: 12, year: 5 };
+  const GRAN_PREV = { week: 'a semana anterior', month: 'o mês anterior', year: 'o ano anterior' };
+
+  let spendSrc = 'mine';     // 'mine' | 'group'
+  let spendGran = 'month';   // 'week' | 'month' | 'year'
+  let spendAnchor = null;    // início do período escolhido
+  let spendDim = 'cat';      // cat | sub | who | shared | store
+  let spendSel = null;       // fatia aberta no detalhe
+  let spendShowAll = false;
+
+  const spendFromGroup = () => spendSrc === 'group' && inGroup();
+  // data da compra (lida da nota); notas antigas usam a data do scan
+  const spendDate = (h) => h.issuedAt || h.scannedAt || 0;
+  const spendSource = () => spendFromGroup() ? groupCupons : personalHistory();
+  const itemValue = (i) => Number.isFinite(i.total) ? i.total
+    : (Number.isFinite(i.qtd) && Number.isFinite(i.unit) ? i.qtd * i.unit : 0);
+
+  function periodStart(ts, gran) {
+    const d = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    if (gran === 'week') d.setDate(d.getDate() - (d.getDay() + 6) % 7); // semana começa na segunda
+    else if (gran === 'month') d.setDate(1);
+    else d.setMonth(0, 1);
+    return d.getTime();
+  }
+
+  function shiftPeriod(start, gran, n) {
+    const d = new Date(start);
+    if (gran === 'week') d.setDate(d.getDate() + 7 * n);
+    else if (gran === 'month') d.setMonth(d.getMonth() + n);
+    else d.setFullYear(d.getFullYear() + n);
+    return d.getTime();
+  }
+
+  function periodLabel(start, gran) {
+    const d = new Date(start);
+    if (gran === 'year') return String(d.getFullYear());
+    if (gran === 'month') return MONTHS_FULL[d.getMonth()] + ' de ' + d.getFullYear();
+    const end = new Date(shiftPeriod(start, 'week', 1) - 1);
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' a ' + end.getDate() + ' ' + MONTHS[end.getMonth()] + ' ' + end.getFullYear();
+  }
+
+  function periodShort(start, gran) {
+    const d = new Date(start);
+    if (gran === 'year') return String(d.getFullYear());
+    if (gran === 'month') return MONTHS[d.getMonth()];
+    return d.getDate() + '/' + (d.getMonth() + 1);
+  }
+
+  const inPeriod = (h, start) => { const t = spendDate(h); return t >= start && t < shiftPeriod(start, spendGran, 1); };
+  const sumTotal = (list) => list.reduce((s, h) => s + (h.total || 0), 0);
+
+  // valor "redondo" para a linha de grade (1, 2, 5 × 10^n)
+  function niceCeil(v) {
+    if (v <= 0) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    return [1, 2, 2.5, 5, 10].map(m => m * p).find(x => x >= v);
+  }
+  const brlCompact = (v) => v >= 1000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : 'R$ ' + Math.round(v);
+
+  function spendDims() {
+    const dims = [['cat', 'Categoria'], ['sub', 'Subcategoria']];
+    if (spendFromGroup()) dims.push(['who', 'Pessoa']);
+    else if (inGroup()) dims.push(['shared', 'Pessoal × grupo']);
+    dims.push(['store', 'Loja']);
+    return dims;
+  }
+
+  // Divide os gastos do período em fatias pela dimensão escolhida
+  function spendSlices(list) {
+    const map = new Map();
+    const add = (key, label, color, value, h, items) => {
+      if (!map.has(key)) map.set(key, { key, label, color, value: 0, notes: new Set(), items: [] });
+      const s = map.get(key);
+      s.value += value;
+      s.notes.add(h);
+      items.forEach(i => s.items.push({ ...i, h }));
+    };
+    list.forEach(h => {
+      const cat = cupomCat(h);
+      const items = h.items || [];
+      if (spendDim === 'sub') {
+        items.forEach(i => {
+          const sub = itemSub(cat, i.name);
+          add(cat.id + '|' + sub, cat.name + ' › ' + sub, 'var(--chart-1)', itemValue(i), h, [i]);
+        });
+      } else if (spendDim === 'cat') {
+        add(cat.id, cat.name, CHART_CAT[cat.id] || CHART_CAT.outros, h.total || 0, h, items);
+      } else if (spendDim === 'who') {
+        add(h.addedBy || '?', h.addedBy === me.uid ? 'Você' : firstName(h.addedByName) || 'Sem nome', 'var(--chart-1)', h.total || 0, h, items);
+      } else if (spendDim === 'shared') {
+        const g = !!groupDoc(h.url);
+        add(g ? 'grp' : 'own', g ? 'Foi para o grupo' : 'Só pessoal', 'var(--chart-1)', h.total || 0, h, items);
+      } else {
+        add(normName(h.store) || '?', titleCase(h.store || 'Loja'), 'var(--chart-1)', h.total || 0, h, items);
+      }
+    });
+    return [...map.values()].filter(s => s.value > 0.004).sort((a, b) => b.value - a.value);
+  }
+
+  function renderSpend() {
+    if (spendSrc === 'group' && !inGroup()) spendSrc = 'mine';
+    if (!spendDims().some(d => d[0] === spendDim)) spendDim = 'cat';
+    const cur = periodStart(Date.now(), spendGran);
+    if (spendAnchor === null || spendAnchor > cur) spendAnchor = cur;
+
+    $('spendSrc').classList.toggle('hidden', !inGroup());
+    $('spendSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.ssrc === (spendFromGroup() ? 'group' : 'mine')));
+    $('spendGran').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.gran === spendGran));
+    $('spendLead').textContent = (spendFromGroup()
+      ? 'Gastos de todos do grupo ' + group.name + '.'
+      : 'Gastos das notas que você escaneou.') + ' Contados pela data da compra.';
+
+    const all = spendSource();
+    const inP = all.filter(h => inPeriod(h, spendAnchor));
+    const total = sumTotal(inP);
+    const prev = sumTotal(all.filter(h => inPeriod(h, shiftPeriod(spendAnchor, spendGran, -1))));
+
+    $('spendPeriod').textContent = periodLabel(spendAnchor, spendGran);
+    $('spendNext').disabled = spendAnchor >= cur;
+    $('spendTotal').textContent = brl(total);
+    const n = inP.length;
+    let delta = n + (n === 1 ? ' nota' : ' notas');
+    if (prev > 0) {
+      const pct = Math.round((total - prev) / prev * 100);
+      delta += ' · ' + (pct === 0 ? 'igual a ' : (pct > 0 ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs ') + GRAN_PREV[spendGran];
+    }
+    $('spendDelta').textContent = delta;
+
+    renderTrend(all, cur);
+    $('spendDims').innerHTML = spendDims().map(([k, label]) =>
+      '<button class="chip' + (spendDim === k ? ' active' : '') + '" data-dim="' + k + '">' + label + '</button>').join('');
+    renderSpendBreak(inP);
+  }
+
+  // Colunas: um período por coluna; o escolhido em destaque, os outros no passo claro da mesma cor
+  function renderTrend(all, cur) {
+    const N = TREND_N[spendGran];
+    const oldest = shiftPeriod(cur, spendGran, -(N - 1));
+    const end = spendAnchor < oldest ? shiftPeriod(spendAnchor, spendGran, Math.floor(N / 2)) : cur;
+    const periods = [];
+    for (let k = N - 1; k >= 0; k--) {
+      const start = shiftPeriod(end, spendGran, -k);
+      if (start > cur) continue;
+      periods.push({ start, value: sumTotal(all.filter(h => inPeriod(h, start))) });
+    }
+    const top = niceCeil(Math.max(...periods.map(p => p.value), 1));
+    const pct = (v) => Math.max(v > 0 ? 2 : 0, v / top * 100);
+
+    $('spendTrend').innerHTML =
+      '<div class="grid-line" style="top:18px"><span>' + brlCompact(top) + '</span></div>' +
+      '<div class="grid-line" style="top:calc(18px + (100% - 18px) / 2)"><span>' + brlCompact(top / 2) + '</span></div>' +
+      periods.map(p => {
+        const sel = p.start === spendAnchor;
+        const label = periodLabel(p.start, spendGran);
+        return '<button class="t-col' + (sel ? ' sel' : '') + '" data-start="' + p.start + '" aria-label="' + escapeHtml(label + ': ' + brl(p.value)) + '"' +
+          ' data-tip="' + escapeHtml('<b>' + brl(p.value) + '</b>' + label) + '">' +
+          (sel && p.value > 0 ? '<span class="t-val" style="bottom:calc(' + pct(p.value) + '% + 3px)">' + brlCompact(p.value) + '</span>' : '') +
+          '<i style="height:' + pct(p.value) + '%"></i></button>';
+      }).join('');
+    $('spendTrendLabels')?.remove();
+    $('spendTrend').insertAdjacentHTML('afterend', '<div class="trend-labels" id="spendTrendLabels">' +
+      periods.map(p => '<span' + (p.start === spendAnchor ? ' class="sel"' : '') + '>' + periodShort(p.start, spendGran) + '</span>').join('') + '</div>');
+  }
+
+  // Barras horizontais: uma por fatia, com nome e valor escritos (a cor nunca é a única pista)
+  function renderSpendBreak(inP) {
+    const slices = spendSlices(inP);
+    const sum = slices.reduce((s, x) => s + x.value, 0) || 1;
+    const max = slices.length ? slices[0].value : 1;
+    if (spendSel && !slices.some(s => s.key === spendSel)) spendSel = null;
+    const LIMIT = 8;
+    const shown = spendShowAll ? slices : slices.slice(0, LIMIT);
+
+    $('spendBreak').innerHTML = !slices.length
+      ? '<p class="empty">Nenhum gasto neste período.</p>'
+      : shown.map(s => {
+          const share = Math.round(s.value / sum * 100);
+          return '<button class="sb-row' + (spendSel === s.key ? ' active' : '') + '" data-key="' + escapeHtml(s.key) + '"' +
+            ' data-tip="' + escapeHtml('<b>' + brl(s.value) + '</b>' + s.label + ' · ' + share + '% · ' + s.notes.size + (s.notes.size === 1 ? ' nota' : ' notas')) + '">' +
+            '<div class="sb-top"><span><i class="sb-key" style="background:' + s.color + '"></i><em>' + escapeHtml(s.label) + '</em></span>' +
+            '<span><b>' + brl(s.value) + '</b> · ' + share + '%</span></div>' +
+            '<div class="sb-bar"><i style="width:' + (s.value / max * 100) + '%;background:' + s.color + '"></i></div></button>';
+        }).join('') +
+        (slices.length > LIMIT ? '<button class="link-btn" data-showall="1">' + (spendShowAll ? 'Mostrar menos' : 'Mostrar todas (' + slices.length + ')') + '</button>' : '');
+    $('spendHint').classList.toggle('hidden', !slices.length || !!spendSel);
+    $('spendHint').textContent = spendDim === 'sub'
+      ? 'Por subcategoria soma o valor de cada produto. Toque numa barra para ver os detalhes.'
+      : 'Toque numa barra para ver todos os detalhes.';
+    renderSpendDetail(slices.find(s => s.key === spendSel));
+  }
+
+  // Detalhe da fatia: produtos e notas (a tabela também é a versão em texto do gráfico)
+  let spendDetailNotes = [];
+  function renderSpendDetail(s) {
+    const box = $('spendDetail');
+    if (!s) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+    const prods = new Map();
+    s.items.forEach(i => {
+      const k = normName(i.name) + '|' + (i.un || 'un').toLowerCase();
+      if (!prods.has(k)) prods.set(k, { name: i.name, un: (i.un || 'un').toLowerCase(), qty: 0, value: 0 });
+      const p = prods.get(k);
+      p.qty += Number.isFinite(i.qtd) ? i.qtd : 1;
+      p.value += itemValue(i);
+    });
+    const prodList = [...prods.values()].sort((a, b) => b.value - a.value);
+    spendDetailNotes = [...s.notes].sort((a, b) => spendDate(b) - spendDate(a));
+    const showWho = spendFromGroup();
+
+    box.innerHTML = '<div class="sd-head"><div><h3>' + escapeHtml(s.label) + '</h3>' +
+      '<p class="muted" style="margin:2px 0 0">' + escapeHtml(periodLabel(spendAnchor, spendGran)) + ' · ' + brl(s.value) + ' · ' +
+      spendDetailNotes.length + (spendDetailNotes.length === 1 ? ' nota' : ' notas') + '</p></div>' +
+      '<button class="icon-btn" data-close-detail="1" aria-label="Fechar">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>' +
+      '<p class="bd-title" style="margin-top:12px">Produtos (' + prodList.length + ')</p>' +
+      '<table class="sd-table"><thead><tr><th>Produto</th><th class="num">Qtde.</th><th class="num">Valor</th></tr></thead><tbody>' +
+      prodList.map(p => '<tr><td>' + escapeHtml(p.name) + '</td><td class="num">' + fmtQtd(p.qty) + ' ' + escapeHtml(p.un) + '</td>' +
+        '<td class="num">' + brl(p.value) + '</td></tr>').join('') + '</tbody></table>' +
+      '<p class="bd-title">Notas (' + spendDetailNotes.length + ') <span class="muted-inline">· toque para abrir</span></p>' +
+      '<table class="sd-table"><thead><tr><th>Data</th><th>Loja</th><th class="num">Total</th></tr></thead><tbody>' +
+      spendDetailNotes.map((h, idx) => '<tr class="link" data-note="' + idx + '"><td>' + fmtDate(spendDate(h)).split(' •')[0] + '</td>' +
+        '<td>' + escapeHtml(titleCase(h.store || 'Loja')) + (showWho && h.addedByName ? '<small>por ' + escapeHtml(byWho(h)) + '</small>' : '') + '</td>' +
+        '<td class="num">' + brl(h.total || 0) + '</td></tr>').join('') + '</tbody></table>';
+    box.classList.remove('hidden');
+  }
+
+  // Dica flutuante ao passar o mouse (no celular, tocar já mostra os detalhes)
+  function showChartTip(e) {
+    const el = e.target.closest('[data-tip]');
+    const tip = $('chartTip');
+    if (!el || e.pointerType === 'touch') { tip.classList.add('hidden'); return; }
+    tip.innerHTML = el.dataset.tip;
+    tip.classList.remove('hidden');
+    const x = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = Math.max(8, x) + 'px';
+    tip.style.top = Math.max(8, e.clientY - tip.offsetHeight - 12) + 'px';
+  }
+
+  function onSpendClick(e) {
+    const t = e.target;
+    const src = t.closest('[data-ssrc]'), gran = t.closest('[data-gran]'), col = t.closest('[data-start]');
+    const dim = t.closest('[data-dim]'), row = t.closest('.sb-row'), note = t.closest('[data-note]');
+    if (src) { spendSrc = src.dataset.ssrc; spendSel = null; }
+    else if (gran) { spendGran = gran.dataset.gran; spendAnchor = null; spendSel = null; }
+    else if (t.closest('#spendPrev')) { spendAnchor = shiftPeriod(spendAnchor, spendGran, -1); }
+    else if (t.closest('#spendNext')) { spendAnchor = shiftPeriod(spendAnchor, spendGran, 1); }
+    else if (col) { spendAnchor = +col.dataset.start; }
+    else if (dim) { spendDim = dim.dataset.dim; spendSel = null; spendShowAll = false; }
+    else if (t.closest('[data-showall]')) { spendShowAll = !spendShowAll; }
+    else if (row) {
+      spendSel = spendSel === row.dataset.key ? null : row.dataset.key;
+      renderSpend();
+      if (spendSel) $('spendDetail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    else if (t.closest('[data-close-detail]')) { spendSel = null; }
+    else if (note) {
+      const h = spendDetailNotes[+note.dataset.note];
+      setStatus('');
+      renderNota(h, h.url, spendFromGroup() ? 'group' : 'mine');
+      openResultCard();
+      return;
+    }
+    else return;
+    $('chartTip').classList.add('hidden');
+    renderSpend();
   }
 
   // ---------- Estoque: junta os itens de todos os cupons ----------
@@ -1886,7 +2253,6 @@
     $('stockSeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.src === (stockFromGroup() ? 'group' : 'mine')));
     $('stockLead').textContent = stockFromGroup()
       ? 'Produtos das notas de todos do grupo ' + group.name + ', somados.'
-      : inGroup() ? 'Produtos das suas notas pessoais (sem as que foram para o grupo), somados.'
       : 'Todos os produtos das notas que você escaneou, somados.';
     const history = stockFromGroup() ? groupCupons : personalHistory();
     const all = buildStock(history);
@@ -1990,7 +2356,7 @@
     renderStock();
   }
 
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', stock: 'tabStock', account: 'tabAccount' };
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', stock: 'tabStock', account: 'tabAccount' };
   let currentTab = 'scan';
 
   function showTab(tab) {
@@ -2004,6 +2370,8 @@
     if (tab === 'stock') renderStock();
     if (tab === 'mine') renderMine();
     if (tab === 'group') renderGroupTab();
+    if (tab === 'spend') renderSpend();
+    $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
   }
@@ -2012,7 +2380,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-10-31.12';
+  const APP_VERSION = '2026-11-01.2';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -2395,7 +2763,16 @@
     const totM = text.match(/Valor\s+a\s+pagar\s*R?\$?\s*:?\s*([\d.]*\d,\d{2})/i)
       || text.match(/Valor\s+total\s*R?\$?\s*:?\s*([\d.]*\d,\d{2})/i);
     data.total = totM ? toNumber(totM[1]) : data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+    data.issuedAt = parseIssued(text);
     return data;
+  }
+
+  // Data da compra ("Emissão: 30/10/2026 18:22:10"); sem ela, os gastos usam a data do scan
+  function parseIssued(text) {
+    const m = (text || '').match(/Emiss[ãa]o\s*:?\s*(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?/i);
+    if (!m) return undefined;
+    const d = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 12), +(m[5] || 0));
+    return isNaN(d) ? undefined : d.getTime();
   }
 
   function parseNota(html) {
@@ -2443,6 +2820,7 @@
       || doc.querySelector('#totalNota .totalNumb.txtMax');
     data.total = toNumber(totalEl ? (totalEl.querySelector('.totalNumb')?.textContent || totalEl.textContent) : '');
     if (isNaN(data.total)) data.total = data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
+    data.issuedAt = parseIssued(doc.body ? doc.body.textContent.replace(/\s+/g, ' ') : '');
 
     return data;
   }
@@ -2651,6 +3029,9 @@
   });
   $('btnClose').addEventListener('click', () => resultCard.classList.add('hidden'));
   $('btnSeeAll').addEventListener('click', () => showTab('mine'));
+  $('tabSpend').addEventListener('click', onSpendClick);
+  $('tabSpend').addEventListener('pointermove', showChartTip);
+  $('tabSpend').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('mineFilter').addEventListener('input', renderMine);
   $('mineChips').addEventListener('click', (e) => {
     const b = e.target.closest('[data-mcat]');
