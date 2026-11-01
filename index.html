@@ -916,7 +916,10 @@
   // Notas pessoais: todas que a própria pessoa escaneou (tendo ido para o grupo ou não); nunca as de outras pessoas
   function personalHistory() {
     if (!CLOUD) return loadHistory();
-    return loadHistory().filter(h => !h.addedBy || h.addedBy === me?.uid);
+    // nota que está no grupo em nome de outra pessoa é dela (quem escaneou primeiro), mesmo que
+    // uma cópia tenha caído na conta desta pessoa (ex.: cupons do celular enviados no login)
+    const others = new Set(groupCupons.filter(c => c.addedBy && c.addedBy !== me?.uid).map(c => c.url));
+    return loadHistory().filter(h => (!h.addedBy || h.addedBy === me?.uid) && !others.has(h.url));
   }
 
   function saveHistory(list) {
@@ -2380,7 +2383,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-01.2';
+  const APP_VERSION = '2026-11-01.3';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
