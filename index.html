@@ -397,6 +397,21 @@
   .sd-table tr.link { cursor: pointer; }
   .sd-table tr.link:hover { background: #f6f8f6; }
   .sd-table small { display: block; color: var(--muted); font-size: .74rem; }
+
+  /* ---------- Orçamento ---------- */
+  .bud-group-title { display: flex; justify-content: space-between; align-items: baseline; margin: 16px 0 4px; font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .bud-item { padding: 10px 0; border-top: 1px solid var(--border); }
+  .bud-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .bud-name { font-weight: 600; color: var(--green-dark); text-transform: uppercase; word-break: break-word; font-size: .9rem; }
+  .bud-val { font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bud-val.off { font-weight: 500; color: var(--muted); }
+  .bud-meta { font-size: .78rem; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .bud-meta b { color: var(--text); font-weight: 600; }
+  .bud-why { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; font-size: .74rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+  .bud-why.in { background: var(--green-soft); color: var(--green-text); }
+  .bud-why.out { background: #f1f4f2; color: var(--muted); }
+  .bud-why.late { background: #fff4e0; color: #8a5300; }
+  .bud-why svg { width: 12px; height: 12px; stroke: currentColor; }
   .hide-btn {
     display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 0 6px; cursor: pointer;
     border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 3px 9px;
@@ -458,6 +473,19 @@
   .modal-card { background: #fff; border-radius: 16px; padding: 22px; width: 100%; max-width: 400px; }
   .modal-card h3 { margin: 0 0 6px; font-size: 1.3rem; }
   .modal-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .fab-feedback {
+    position: fixed; z-index: 20; right: max(12px, calc(50% - 228px)); bottom: calc(84px + env(safe-area-inset-bottom));
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer;
+    background: #fff; color: var(--green-text); box-shadow: 0 2px 10px rgba(20, 50, 30, .15);
+    display: flex; align-items: center; justify-content: center; opacity: .9;
+  }
+  .fab-feedback:hover { opacity: 1; }
+  .fab-feedback svg { width: 20px; height: 20px; stroke: currentColor; }
+  .fb-text {
+    width: 100%; min-height: 110px; padding: 10px 12px; resize: vertical; border: 1px solid var(--border); border-radius: 10px;
+    font: 400 .95rem "Inter", sans-serif; background: #f7f9f7; color: var(--text);
+  }
+  .fb-text:focus { outline: 2px solid var(--green-btn); outline-offset: -1px; background: #fff; }
   .toast {
     position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40;
     background: #1a1f1c; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .88rem;
@@ -752,7 +780,42 @@
       <p class="muted-inline" id="spendHint">Toque numa barra para ver todos os detalhes.</p>
     </section>
     <section class="card hidden" id="spendDetail"></section>
-    <div class="chart-tip hidden" id="chartTip" role="tooltip"></div>
+  </div>
+
+  <!-- Aba Orçamento: previsão de gastos pelo tempo de consumo de cada produto -->
+  <div id="tabBudget" class="hidden">
+    <section class="card list-card spend-card">
+      <h2>Orçamento</h2>
+      <p class="lead" id="budLead"></p>
+      <div class="seg small hidden" id="budSrc">
+        <button class="active" data-bsrc="mine">Meu</button>
+        <button data-bsrc="group">Do grupo</button>
+      </div>
+      <div class="seg small" id="budGran">
+        <button data-bgran="week">Semana</button>
+        <button class="active" data-bgran="month">Mês</button>
+        <button data-bgran="year">Ano</button>
+      </div>
+      <div class="period-nav">
+        <button class="icon-btn" id="budPrev" aria-label="Período anterior">‹</button>
+        <b id="budPeriod"></b>
+        <button class="icon-btn" id="budNext" aria-label="Próximo período">›</button>
+      </div>
+      <div class="hero-fig"><span id="budTotal">R$ 0,00</span><small id="budSub"></small></div>
+
+      <p class="bd-title">Previsão dos próximos períodos <span class="muted-inline">· toque numa barra</span></p>
+      <div class="trend" id="budTrend"></div>
+
+      <p class="bd-title" style="margin-top:18px">Previsto por categoria <span class="muted-inline">· toque para filtrar os produtos</span></p>
+      <div id="budCats"></div>
+    </section>
+
+    <section class="card">
+      <h3 class="card-title">Tempo de consumo dos produtos</h3>
+      <p class="muted">Calculado pelas compras na aba Gastos: de quanto em quanto tempo cada produto é comprado. Só entra na previsão o que deve ser comprado <b>neste período</b>.</p>
+      <div class="chips" id="budFilter"></div>
+      <div id="budList"></div>
+    </section>
   </div>
 
   <!-- Aba Conta: dados do usuário e do grupo -->
@@ -772,6 +835,32 @@
         <button class="btn small ghost" id="btnModalShare">Compartilhar</button>
       </div>
       <button class="btn small" id="btnModalClose">Continuar</button>
+    </div>
+  </div>
+
+  <!-- Dica flutuante dos gráficos (Gastos e Orçamento) -->
+  <div class="chart-tip hidden" id="chartTip" role="tooltip"></div>
+
+  <!-- Relatar bug / sugerir melhoria (botão pequeno em todas as abas) -->
+  <button class="fab-feedback hidden" id="btnFeedback" aria-label="Relatar bug ou sugerir melhoria" title="Relatar bug ou sugerir melhoria">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M12 8v4M12 15.5v.01"/></svg>
+  </button>
+  <div class="modal hidden" id="fbModal">
+    <div class="modal-card">
+      <h3>Relatar bug ou melhoria</h3>
+      <p>Conte o que aconteceu ou o que poderia ficar melhor. A mensagem vai direto para quem cuida do app.</p>
+      <div class="seg small" id="fbType" style="margin-top:14px">
+        <button class="active" data-fbtype="bug">Bug</button>
+        <button data-fbtype="melhoria">Melhoria</button>
+        <button data-fbtype="outro">Outro</button>
+      </div>
+      <textarea id="fbText" class="fb-text" maxlength="2000" placeholder="Ex.: na aba Estoque, ao tocar num produto, nada acontece."></textarea>
+      <p class="muted" id="fbContext" style="margin:6px 0 12px;font-size:.75rem"></p>
+      <p class="form-error hidden" id="fbError"></p>
+      <div class="btn-row">
+        <button class="btn small ghost" id="btnFbCancel">Cancelar</button>
+        <button class="btn small" id="btnFbSend">Enviar</button>
+      </div>
     </div>
   </div>
 
@@ -804,6 +893,10 @@
     <button data-tab="spend">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
       Gastos
+    </button>
+    <button data-tab="budget">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 15h3M8 18h6"/></svg>
+      Orçamento
     </button>
     <button data-tab="stock">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
@@ -1238,6 +1331,7 @@
     if (currentTab === 'mine') renderMine();
     if (currentTab === 'group') renderGroupTab();
     if (currentTab === 'spend') renderSpend();
+    if (currentTab === 'budget') renderBudget();
     renderAccount();
     $('tabBtnGroup').classList.toggle('dim', !inGroup());
   }
@@ -1376,7 +1470,7 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabAccount', 'resultCard', 'headerSpace'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback'].forEach(id => $(id).classList.add('hidden'));
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
     $('authView').classList.remove('hidden');
@@ -1387,6 +1481,7 @@
   function showApp() {
     $('authView').classList.add('hidden');
     document.querySelector('.tabbar').classList.remove('hidden');
+    $('btnFeedback').classList.remove('hidden');
     showTab('scan');
     renderHeaderSpace();
   }
@@ -1475,6 +1570,46 @@
         formMsg('signupError', authMsg(err));
         // a conta já foi criada e a tela de cadastro sumiu: avisa por toast (dá para tentar de novo na aba Conta)
         if (auth.currentUser) toast('Conta criada, mas o grupo falhou: ' + authMsg(err) + ' Tente pela aba Conta.', 6000);
+      }
+    });
+  }
+
+  // ---------- Relatar bug / melhoria ----------
+  // Vai para a coleção "feedback" do Firestore (Console → Firestore Database → feedback)
+  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', stock: 'Estoque', account: 'Minha conta' };
+  let fbType = 'bug';
+
+  function openFeedback() {
+    fbType = 'bug';
+    $('fbType').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.fbtype === fbType));
+    $('fbText').value = '';
+    formMsg('fbError', '');
+    $('fbContext').textContent = 'Junto vai: aba ' + (TAB_NAMES[currentTab] || currentTab) + ', ' + browserInfo() + (me ? ', sua conta (' + me.name + ')' : '') + '.';
+    $('fbModal').classList.remove('hidden');
+    setTimeout(() => $('fbText').focus(), 50);
+  }
+
+  async function sendFeedback() {
+    const text = $('fbText').value.trim();
+    if (text.length < 5) { formMsg('fbError', 'Escreva um pouco mais sobre o bug ou a melhoria.'); return; }
+    const report = {
+      type: fbType, text, tab: currentTab, version: APP_VERSION, device: browserInfo(),
+      uid: me?.uid || null, name: me?.name || null, email: me?.email || null, groupId: me?.groupId || null
+    };
+    if (!CLOUD || !me) {
+      // sem conta: copia a mensagem para a pessoa mandar por outro meio
+      copyText('[' + fbType + '] ' + text + '\n' + report.device + ' · aba ' + TAB_NAMES[currentTab], 'Mensagem copiada. Envie para quem cuida do app.');
+      $('fbModal').classList.add('hidden');
+      return;
+    }
+    await withBusy($('btnFbSend'), async () => {
+      try {
+        // sem await no envio: sem internet o Firestore guarda e manda quando a conexão voltar
+        fb.addDoc(fb.collection(db, 'feedback'), { ...report, createdAt: fb.serverTimestamp() }).catch(cloudError);
+        $('fbModal').classList.add('hidden');
+        toast('Obrigado! Sua mensagem foi enviada.');
+      } catch (err) {
+        formMsg('fbError', authMsg(err));
       }
     });
   }
@@ -2212,6 +2347,243 @@
     renderSpend();
   }
 
+  // ---------- Orçamento: previsão pelo tempo de consumo de cada produto ----------
+  // Para cada produto: datas de compra -> intervalo típico (mediana) -> próximas compras previstas.
+  // Um produto só entra no período se a próxima compra prevista cair dentro dele.
+  const DAY = 86400000;
+  const BUD_AHEAD = { week: 12, month: 12, year: 3 }; // quantos períodos à frente dá para ver
+  let budSrc = 'mine', budGran = 'month', budAnchor = null, budCat = '', budShow = 'all';
+
+  const budFromGroup = () => budSrc === 'group' && inGroup();
+  const median = (arr) => { const s = [...arr].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const dayStart = (ts) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const fmtDay = (ts) => { const d = new Date(ts); return d.getDate() + ' ' + MONTHS[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : ''); };
+
+  function fmtCycle(days) {
+    const d = Math.round(days);
+    if (d <= 1) return 'todo dia';
+    if (d < 14) return 'a cada ' + d + ' dias';
+    if (d < 45) return 'a cada ' + d + ' dias (~' + Math.round(d / 7) + ' semanas)';
+    const m = Math.round(d / 30.4);
+    return 'a cada ~' + (m === 1 ? '1 mês' : m + ' meses') + ' (' + d + ' dias)';
+  }
+
+  // Histórico de compras por produto (várias compras no mesmo dia contam como uma)
+  function buildProducts(list) {
+    const map = new Map();
+    list.forEach(h => {
+      const t = spendDate(h);
+      if (!t) return;
+      const cat = cupomCat(h);
+      (h.items || []).forEach(i => {
+        const un = (i.un || 'un').toLowerCase().trim();
+        const key = normName(i.name) + '|' + un;
+        if (!map.has(key)) map.set(key, { key, name: i.name, un, cat, days: new Map() });
+        const p = map.get(key);
+        const day = dayStart(t);
+        const ev = p.days.get(day) || { t: day, qty: 0, value: 0, stores: new Set() };
+        ev.qty += Number.isFinite(i.qtd) ? i.qtd : 1;
+        ev.value += itemValue(i);
+        ev.stores.add(titleCase(h.store || 'Loja'));
+        p.days.set(day, ev);
+        if (t >= (p.lastT || 0)) { p.lastT = t; p.cat = cat; p.name = i.name; }
+      });
+    });
+    const now = dayStart(Date.now());
+    return [...map.values()].map(p => {
+      const ev = [...p.days.values()].sort((a, b) => a.t - b.t);
+      const gaps = ev.slice(1).map((e, k) => (e.t - ev[k].t) / DAY);
+      const recent = ev.slice(-3);
+      const out = {
+        key: p.key, name: p.name, un: p.un, cat: p.cat, events: ev, count: ev.length,
+        first: ev[0].t, last: ev[ev.length - 1].t,
+        avgValue: recent.reduce((s, e) => s + e.value, 0) / recent.length,
+        avgQty: recent.reduce((s, e) => s + e.qty, 0) / recent.length,
+        cycle: gaps.length ? Math.max(1, median(gaps)) : null
+      };
+      out.next = out.cycle ? out.last + out.cycle * DAY : null;
+      out.sinceLast = (now - out.last) / DAY;
+      // parou de comprar: passou bem mais que o normal (3 ciclos e pelo menos 4 meses)
+      out.inactive = !!out.cycle && out.sinceLast > Math.max(3 * out.cycle, 120);
+      return out;
+    });
+  }
+
+  // Compras previstas de um produto dentro de [start, end). Atrasado (já devia ter comprado) = conta para hoje.
+  function plannedIn(p, start, end) {
+    if (!p.cycle || p.inactive) return [];
+    const today = dayStart(Date.now());
+    let t = p.next;
+    if (t < today) t = today;
+    const out = [];
+    for (let k = 0; t < end && k < 400; k++, t += p.cycle * DAY) if (t >= start) out.push(t);
+    return out;
+  }
+
+  function budgetFor(products, start) {
+    const end = shiftPeriod(start, budGran, 1);
+    const today = dayStart(Date.now());
+    return products.map(p => {
+      const dates = plannedIn(p, Math.max(start, today), end);
+      return { p, dates, value: dates.length * p.avgValue };
+    });
+  }
+
+  function renderBudget() {
+    if (budSrc === 'group' && !inGroup()) budSrc = 'mine';
+    const cur = periodStart(Date.now(), budGran);
+    const maxAnchor = shiftPeriod(cur, budGran, BUD_AHEAD[budGran]);
+    if (budAnchor === null || budAnchor < cur || budAnchor > maxAnchor) budAnchor = cur;
+    const isCur = budAnchor === cur;
+    const end = shiftPeriod(budAnchor, budGran, 1);
+
+    $('budSrc').classList.toggle('hidden', !inGroup());
+    $('budSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.bsrc === (budFromGroup() ? 'group' : 'mine')));
+    $('budGran').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.bgran === budGran));
+    $('budLead').textContent = 'Previsão ' + (budFromGroup() ? 'do grupo ' + group.name : 'dos seus gastos') +
+      ', feita pelo tempo que cada produto costuma durar até ser comprado de novo.';
+    $('budPeriod').textContent = periodLabel(budAnchor, budGran);
+    $('budPrev').disabled = budAnchor <= cur;
+    $('budNext').disabled = budAnchor >= maxAnchor;
+
+    const source = budFromGroup() ? groupCupons : personalHistory();
+    const products = buildProducts(source);
+    const rows = budgetFor(products, budAnchor);
+    const planned = rows.reduce((s, r) => s + r.value, 0);
+    // período atual: o que já foi gasto + o que ainda deve ser comprado até o fim dele
+    const spent = isCur ? sumTotal(source.filter(h => { const t = spendDate(h); return t >= budAnchor && t < end; })) : 0;
+    $('budTotal').textContent = brl(spent + planned);
+    $('budSub').textContent = isCur
+      ? 'Já gasto ' + brl(spent) + ' + previsto até o fim ' + brl(planned)
+      : 'Previsto para o período';
+
+    const spentCur = sumTotal(source.filter(h => { const t = spendDate(h); return t >= cur && t < shiftPeriod(cur, budGran, 1); }));
+    renderBudTrend(products, cur, maxAnchor, spentCur);
+    renderBudCats(rows);
+    renderBudList(rows, isCur, end);
+  }
+
+  // Colunas com a previsão de cada período à frente (o escolhido em destaque)
+  // (no período atual a barra soma o que já foi gasto, igual ao número grande)
+  function renderBudTrend(products, cur, maxAnchor, spentCur) {
+    const N = Math.min(BUD_AHEAD[budGran] + 1, budGran === 'year' ? 4 : 8);
+    let first = Math.max(cur, shiftPeriod(budAnchor, budGran, -Math.floor(N / 2)));
+    if (shiftPeriod(first, budGran, N - 1) > maxAnchor) first = Math.max(cur, shiftPeriod(maxAnchor, budGran, -(N - 1)));
+    const periods = [];
+    for (let k = 0; k < N; k++) {
+      const start = shiftPeriod(first, budGran, k);
+      if (start > maxAnchor) break;
+      periods.push({ start, value: budgetFor(products, start).reduce((s, r) => s + r.value, 0) + (start === cur ? spentCur : 0) });
+    }
+    const top = niceCeil(Math.max(...periods.map(p => p.value), 1));
+    const pct = (v) => Math.max(v > 0 ? 2 : 0, v / top * 100);
+    $('budTrend').innerHTML =
+      '<div class="grid-line" style="top:18px"><span>' + brlCompact(top) + '</span></div>' +
+      '<div class="grid-line" style="top:calc(18px + (100% - 18px) / 2)"><span>' + brlCompact(top / 2) + '</span></div>' +
+      periods.map(p => {
+        const sel = p.start === budAnchor;
+        const label = periodLabel(p.start, budGran);
+        return '<button class="t-col' + (sel ? ' sel' : '') + '" data-bstart="' + p.start + '" aria-label="' + escapeHtml(label + ': previsto ' + brl(p.value)) + '"' +
+          ' data-tip="' + escapeHtml('<b>' + brl(p.value) + '</b>' + (p.start === cur ? 'já gasto + previsto · ' : 'previsto · ') + label) + '">' +
+          (sel && p.value > 0 ? '<span class="t-val" style="bottom:calc(' + pct(p.value) + '% + 3px)">' + brlCompact(p.value) + '</span>' : '') +
+          '<i style="height:' + pct(p.value) + '%"></i></button>';
+      }).join('');
+    $('budTrendLabels')?.remove();
+    $('budTrend').insertAdjacentHTML('afterend', '<div class="trend-labels" id="budTrendLabels">' +
+      periods.map(p => '<span' + (p.start === budAnchor ? ' class="sel"' : '') + '>' + periodShort(p.start, budGran) + '</span>').join('') + '</div>');
+  }
+
+  function renderBudCats(rows) {
+    const map = new Map();
+    rows.filter(r => r.value > 0).forEach(r => map.set(r.p.cat.id, (map.get(r.p.cat.id) || 0) + r.value));
+    const list = [...map].sort((a, b) => b[1] - a[1]);
+    if (budCat && !map.has(budCat)) budCat = '';
+    const sum = list.reduce((s, x) => s + x[1], 0) || 1;
+    const max = list.length ? list[0][1] : 1;
+    $('budCats').innerHTML = !list.length ? '<p class="empty">Nada previsto para este período.</p>' :
+      list.map(([id, v]) => {
+        const c = catById(id);
+        const color = CHART_CAT[id] || CHART_CAT.outros;
+        return '<button class="sb-row' + (budCat === id ? ' active' : '') + '" data-bcat="' + id + '"' +
+          ' data-tip="' + escapeHtml('<b>' + brl(v) + '</b>' + c.name + ' · ' + Math.round(v / sum * 100) + '% do previsto') + '">' +
+          '<div class="sb-top"><span><i class="sb-key" style="background:' + color + '"></i><em>' + c.name + '</em></span>' +
+          '<span><b>' + brl(v) + '</b> · ' + Math.round(v / sum * 100) + '%</span></div>' +
+          '<div class="sb-bar"><i style="width:' + (v / max * 100) + '%;background:' + color + '"></i></div></button>';
+      }).join('');
+  }
+
+  const ICON_IN = svgIcon('<path d="M20 6 9 17l-5-5"/>');
+  const ICON_OUT = svgIcon('<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>');
+  const ICON_LATE = svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>');
+
+  // Lista explicando, produto a produto, por que entrou ou não na previsão
+  function renderBudList(rows, isCur, end) {
+    const today = dayStart(Date.now());
+    const filtered = rows.filter(r => !budCat || r.p.cat.id === budCat);
+    const inList = filtered.filter(r => r.value > 0).sort((a, b) => b.value - a.value);
+    const outList = filtered.filter(r => r.value <= 0).sort((a, b) => (a.p.next || Infinity) - (b.p.next || Infinity));
+    const counts = { all: filtered.length, in: inList.length, out: outList.length };
+
+    $('budFilter').innerHTML = [['all', 'Todos'], ['in', 'Considerados'], ['out', 'Não considerados']].map(([k, label]) =>
+      '<button class="chip' + (budShow === k ? ' active' : '') + '" data-bshow="' + k + '">' + label + ' (' + counts[k] + ')</button>').join('') +
+      (budCat ? '<button class="chip" data-bcat-clear="1">' + catById(budCat).name + ' ✕</button>' : '');
+
+    const item = (r) => {
+      const p = r.p;
+      const ok = r.value > 0;
+      const late = ok && p.next < today;
+      let why;
+      if (ok) {
+        why = late
+          ? '<span class="bud-why late">' + ICON_LATE + 'Considerado · era para comprar por volta de ' + fmtDay(p.next) + '</span>'
+          : '<span class="bud-why in">' + ICON_IN + 'Considerado · ' + (r.dates.length > 1 ? r.dates.length + ' compras previstas' : 'compra prevista em ' + fmtDay(r.dates[0])) + '</span>';
+      } else if (!p.cycle) {
+        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · comprado só 1 vez, ainda não dá para saber o tempo de consumo</span>';
+      } else if (p.inactive) {
+        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · parou de comprar (última há ' + Math.round(p.sinceLast) + ' dias)</span>';
+      } else {
+        const boughtHere = isCur && p.last >= budAnchor && p.last < end;
+        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · ' + (boughtHere ? 'já comprado em ' + fmtDay(p.last) + '; ' : '') +
+          'próxima compra prevista em ' + fmtDay(Math.max(p.next, today)) + '</span>';
+      }
+      return '<div class="bud-item"><div class="bud-top"><span class="bud-name">' + escapeHtml(p.name) + '</span>' +
+        '<span class="bud-val' + (ok ? '' : ' off') + '">' + (ok ? brl(r.value) : brl(0)) + '</span></div>' +
+        '<div class="bud-meta">' + escapeHtml(p.cat.name) + ' · comprado <b>' + p.count + (p.count === 1 ? ' vez' : ' vezes') + '</b>' +
+        (p.cycle ? ' · <b>' + fmtCycle(p.cycle) + '</b>' : '') +
+        '<br>Última compra: <b>' + fmtDay(p.last) + '</b>' + (p.cycle && !p.inactive ? ' · próxima: <b>' + fmtDay(Math.max(p.next, today)) + '</b>' : '') +
+        ' · costuma custar <b>' + brl(p.avgValue) + '</b> (' + fmtQtd(Math.round(p.avgQty * 100) / 100) + ' ' + escapeHtml(p.un) + ')</div>' +
+        why + '</div>';
+    };
+
+    let html = '';
+    if (!rows.length) {
+      html = '<p class="empty">Ainda não há compras para prever. Escaneie notas e a previsão aparece aqui.</p>';
+    } else {
+      if (budShow !== 'out') html += '<div class="bud-group-title"><span>Considerados (' + inList.length + ')</span><span>' +
+        brl(inList.reduce((s, r) => s + r.value, 0)) + '</span></div>' + (inList.map(item).join('') || '<p class="empty">Nenhum produto previsto neste período.</p>');
+      if (budShow !== 'in') html += '<div class="bud-group-title"><span>Não considerados (' + outList.length + ')</span></div>' +
+        (outList.map(item).join('') || '<p class="empty">Todos os produtos entram neste período.</p>');
+    }
+    $('budList').innerHTML = html;
+  }
+
+  function onBudgetClick(e) {
+    const t = e.target;
+    const src = t.closest('[data-bsrc]'), gran = t.closest('[data-bgran]'), col = t.closest('[data-bstart]');
+    const cat = t.closest('[data-bcat]'), show = t.closest('[data-bshow]');
+    if (src) budSrc = src.dataset.bsrc;
+    else if (gran) { budGran = gran.dataset.bgran; budAnchor = null; }
+    else if (t.closest('#budPrev')) budAnchor = shiftPeriod(budAnchor, budGran, -1);
+    else if (t.closest('#budNext')) budAnchor = shiftPeriod(budAnchor, budGran, 1);
+    else if (col) budAnchor = +col.dataset.bstart;
+    else if (cat) budCat = budCat === cat.dataset.bcat ? '' : cat.dataset.bcat;
+    else if (t.closest('[data-bcat-clear]')) budCat = '';
+    else if (show) budShow = show.dataset.bshow;
+    else return;
+    $('chartTip').classList.add('hidden');
+    renderBudget();
+  }
+
   // ---------- Estoque: junta os itens de todos os cupons ----------
   let stockSort = 'qty';
   let stockCat = '';   // filtro de categoria ('' = todas)
@@ -2359,7 +2731,7 @@
     renderStock();
   }
 
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', stock: 'tabStock', account: 'tabAccount' };
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', stock: 'tabStock', account: 'tabAccount' };
   let currentTab = 'scan';
 
   function showTab(tab) {
@@ -2374,6 +2746,7 @@
     if (tab === 'mine') renderMine();
     if (tab === 'group') renderGroupTab();
     if (tab === 'spend') renderSpend();
+    if (tab === 'budget') renderBudget();
     $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
@@ -2383,7 +2756,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-01.3';
+  const APP_VERSION = '2026-11-04.2';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -3032,9 +3405,21 @@
   });
   $('btnClose').addEventListener('click', () => resultCard.classList.add('hidden'));
   $('btnSeeAll').addEventListener('click', () => showTab('mine'));
+  $('btnFeedback').addEventListener('click', openFeedback);
+  $('btnFbCancel').addEventListener('click', () => $('fbModal').classList.add('hidden'));
+  $('btnFbSend').addEventListener('click', sendFeedback);
+  $('fbType').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-fbtype]');
+    if (!b) return;
+    fbType = b.dataset.fbtype;
+    $('fbType').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+  });
   $('tabSpend').addEventListener('click', onSpendClick);
   $('tabSpend').addEventListener('pointermove', showChartTip);
   $('tabSpend').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
+  $('tabBudget').addEventListener('click', onBudgetClick);
+  $('tabBudget').addEventListener('pointermove', showChartTip);
+  $('tabBudget').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('mineFilter').addEventListener('input', renderMine);
   $('mineChips').addEventListener('click', (e) => {
     const b = e.target.closest('[data-mcat]');
@@ -3096,6 +3481,7 @@
     initCloud();
   } else {
     $('tabBtnGroup').classList.add('hidden');
+    $('btnFeedback').classList.remove('hidden');
     renderHistory();
   }
 </script>
