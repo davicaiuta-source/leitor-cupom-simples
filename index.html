@@ -480,6 +480,18 @@
     display: flex; align-items: center; justify-content: center; opacity: .9;
   }
   .fab-feedback:hover { opacity: 1; }
+  .fb-item { padding: 12px 0; border-top: 1px solid var(--border); }
+  .fb-item.done { opacity: .65; }
+  .fb-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .fb-type { font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: #f1f4f2; color: var(--muted); }
+  .fb-type.bug { background: #fdecec; color: var(--danger); }
+  .fb-type.melhoria { background: var(--green-soft); color: var(--green-text); }
+  .fb-when { font-size: .75rem; color: var(--muted); }
+  .fb-msg { margin: 8px 0 6px; font-size: .92rem; white-space: pre-wrap; word-break: break-word; }
+  .fb-meta { margin: 0 0 10px; font-size: .76rem; color: var(--muted); line-height: 1.45; word-break: break-word; }
+  .fb-meta b { color: var(--text); }
+  .fb-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .fb-actions .btn { width: auto; flex: 1 1 auto; min-height: 38px; font-size: .82rem; padding: 0 12px; text-decoration: none; }
   .fab-feedback svg { width: 20px; height: 20px; stroke: currentColor; }
   .fb-text {
     width: 100%; min-height: 110px; padding: 10px 12px; resize: vertical; border: 1px solid var(--border); border-radius: 10px;
@@ -1238,7 +1250,8 @@
   let authResolved = false;
   function onUser(user) {
     authResolved = true;
-    unsub('user', 'group', 'groupCupons', 'cupons', 'meta');
+    unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback');
+    feedbackList = null;
     spaceKey = undefined;
     group = null;
     cloudCupons = [];
@@ -1749,6 +1762,7 @@
     }
     html += '<p class="form-error hidden" id="accError"></p></section>';
     if (inGroup()) html += myShareCard();
+    if (isAdminEmail()) html += adminCard();
 
     html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
     $('accountContent').innerHTML = html;
@@ -1767,6 +1781,68 @@
     refreshViews();
   }
 
+  // ---------- Relatos recebidos (só para quem cuida do app) ----------
+  let feedbackList = null;   // null = ainda não carregou
+  let feedbackErr = '';
+  let fbFilter = 'open';
+  const isAdminEmail = () => !!me && FEEDBACK_EMAILS.includes((me.email || '').toLowerCase());
+  const adminVerified = () => !!auth?.currentUser?.emailVerified;
+
+  function subscribeFeedback() {
+    if (unsubs.feedback || !isAdminEmail() || !adminVerified()) return;
+    feedbackErr = '';
+    const q = fb.query(fb.collection(db, 'feedback'), fb.orderBy('createdAt', 'desc'), fb.limit(300));
+    unsubs.feedback = fb.onSnapshot(q, snap => {
+      feedbackList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAccount();
+    }, err => {
+      feedbackErr = err.code === 'permission-denied'
+        ? 'O banco não liberou a leitura. Publique as regras novas do firestore.rules no Firebase.'
+        : authMsg(err);
+      unsub('feedback');
+      renderAccount();
+    });
+  }
+
+  function adminCard() {
+    let html = '<section class="card account-card"><h3 class="card-title">Relatos recebidos</h3>';
+    if (!adminVerified()) {
+      return html + '<p class="muted">Para ler os relatos de bugs e melhorias, confirme que este e-mail é seu. ' +
+        'Isso impede que outra pessoa crie uma conta com o seu e-mail e leia os relatos.</p>' +
+        '<div class="btn-row"><button class="btn small" data-action="verify-email">Enviar link de confirmação</button>' +
+        '<button class="btn small ghost" data-action="verify-check">Já confirmei</button></div></section>';
+    }
+    subscribeFeedback();
+    if (feedbackErr) return html + '<p class="notice">' + escapeHtml(feedbackErr) + '</p></section>';
+    if (!feedbackList) return html + '<p class="auth-loading"><span class="spinner"></span>Carregando relatos...</p></section>';
+
+    const open = feedbackList.filter(f => f.status !== 'resolvido');
+    const list = fbFilter === 'open' ? open : fbFilter === 'done' ? feedbackList.filter(f => f.status === 'resolvido') : feedbackList;
+    html += '<div class="chips">' + [['open', 'Abertos', open.length], ['done', 'Resolvidos', feedbackList.length - open.length], ['all', 'Todos', feedbackList.length]]
+      .map(([k, label, n]) => '<button class="chip' + (fbFilter === k ? ' active' : '') + '" data-fbf="' + k + '">' + label + ' (' + n + ')</button>').join('') + '</div>';
+    if (!list.length) return html + '<p class="empty">' + (fbFilter === 'open' ? 'Nenhum relato aberto. 🎉' : 'Nenhum relato aqui.') + '</p></section>';
+
+    html += list.map(f => {
+      const when = f.createdAt?.toMillis ? fmtDate(f.createdAt.toMillis()) : 'enviando...';
+      const done = f.status === 'resolvido';
+      const subject = encodeURIComponent('Re: seu relato no Leitor de Cupom Fiscal');
+      const body = encodeURIComponent('Oi, ' + firstName(f.name) + '!\n\nSobre o que você relatou:\n"' + f.text + '"\n\n');
+      return '<div class="fb-item' + (done ? ' done' : '') + '">' +
+        '<div class="fb-top"><span class="fb-type ' + escapeHtml(f.type) + '">' + escapeHtml(FEEDBACK_TYPE_NAMES[f.type] || f.type) + '</span>' +
+        '<span class="fb-when">' + when + '</span></div>' +
+        '<p class="fb-msg">' + escapeHtml(f.text) + '</p>' +
+        '<p class="fb-meta"><b>' + escapeHtml(f.name || 'Sem nome') + '</b>' + (f.email ? ' · ' + escapeHtml(f.email) : '') +
+        '<br>Aba ' + escapeHtml(TAB_NAMES[f.tab] || f.tab || '-') + ' · ' + escapeHtml(f.device || '') +
+        (done ? '<br>Resolvido' + (f.resolvedBy ? ' por ' + escapeHtml(f.resolvedBy) : '') : '') + '</p>' +
+        '<div class="fb-actions">' +
+        '<button class="btn small' + (done ? ' ghost' : '') + '" data-action="fb-toggle" data-id="' + f.id + '">' + (done ? 'Reabrir' : 'Marcar resolvido') + '</button>' +
+        (f.email ? '<a class="btn small ghost" href="mailto:' + escapeHtml(f.email) + '?subject=' + subject + '&body=' + body + '">Responder</a>' : '') +
+        '<button class="btn small stop" data-action="fb-delete" data-id="' + f.id + '" aria-label="Apagar relato">Apagar</button>' +
+        '</div></div>';
+    }).join('');
+    return html + '</section>';
+  }
+
   // Cada pessoa escolhe as categorias das notas dela que vão para o grupo
   function onAccountChange(e) {
     if (!e.target.closest('#myCats') || !inGroup()) return;
@@ -1778,6 +1854,8 @@
   const unhideTerm = (term) => applyMyPrefs({ hiddenItems: hiddenTerms().filter(t => t !== term) }, '"' + term + '" voltou a aparecer para o grupo.');
 
   async function onAccountAction(e) {
+    const fbf = e.target.closest('[data-fbf]');
+    if (fbf) { fbFilter = fbf.dataset.fbf; return renderAccount(); }
     const unhide = e.target.closest('[data-unhide]');
     if (unhide) return unhideTerm(unhide.dataset.unhide);
     const btn = e.target.closest('[data-action]');
@@ -1785,6 +1863,34 @@
     const action = btn.dataset.action;
     formMsg('accError', '');
     try {
+      if (action === 'verify-email') {
+        await withBusy(btn, () => fb.sendEmailVerification(auth.currentUser));
+        toast('Enviamos um link de confirmação para ' + me.email + '. Abra o e-mail e depois toque em "Já confirmei".', 6000);
+        return;
+      }
+      if (action === 'verify-check') {
+        await withBusy(btn, async () => {
+          await auth.currentUser.reload();
+          await auth.currentUser.getIdToken(true); // token novo, já com o e-mail confirmado
+        });
+        if (!auth.currentUser.emailVerified) { toast('Ainda não confirmado. Abra o link que chegou no e-mail.'); return; }
+        unsub('feedback');
+        feedbackList = null;
+        renderAccount();
+        return;
+      }
+      if (action === 'fb-toggle' || action === 'fb-delete') {
+        const f = (feedbackList || []).find(x => x.id === btn.dataset.id);
+        if (!f) return;
+        const ref = fb.doc(db, 'feedback', f.id);
+        if (action === 'fb-delete') {
+          if (confirm('Apagar este relato?')) await fb.deleteDoc(ref);
+        } else {
+          const done = f.status !== 'resolvido';
+          await fb.updateDoc(ref, { status: done ? 'resolvido' : 'aberto', resolvedAt: done ? fb.serverTimestamp() : null, resolvedBy: done ? me.name : null });
+        }
+        return;
+      }
       if (action === 'hide-term') {
         const term = normName($('accHideTerm').value);
         if (!term) { toast('Digite o nome (ou parte do nome) do produto.'); return; }
@@ -2785,7 +2891,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-04.3';
+  const APP_VERSION = '2026-11-04.4';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
