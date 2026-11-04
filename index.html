@@ -1576,6 +1576,33 @@
 
   // ---------- Relatar bug / melhoria ----------
   // Vai para a coleção "feedback" do Firestore (Console → Firestore Database → feedback)
+  // E-mails que recebem os relatos (via FormSubmit: o 1º envio pede para ativar no e-mail principal)
+  const FEEDBACK_EMAILS = ['davi.caiuta@gmail.com', 'caiuta@gmail.com'];
+  const FEEDBACK_TYPE_NAMES = { bug: 'Bug', melhoria: 'Melhoria', outro: 'Outro' };
+
+  function emailFeedback(r) {
+    const [to, ...cc] = FEEDBACK_EMAILS;
+    return fetch('https://formsubmit.co/ajax/' + to, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        _subject: '[Leitor de Cupom] ' + FEEDBACK_TYPE_NAMES[r.type] + ' de ' + (r.name || 'usuário'),
+        _cc: cc.join(','),
+        _template: 'table',
+        _captcha: 'false',
+        ...(r.email ? { _replyto: r.email } : {}),
+        Tipo: FEEDBACK_TYPE_NAMES[r.type],
+        Mensagem: r.text,
+        Aba: TAB_NAMES[r.tab] || r.tab,
+        Versão: r.version,
+        Aparelho: r.device,
+        Nome: r.name || '-',
+        'E-mail': r.email || '-',
+        Grupo: r.groupId ? (group?.name || r.groupId) : 'Individual'
+      })
+    });
+  }
+
   const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', stock: 'Estoque', account: 'Minha conta' };
   let fbType = 'bug';
 
@@ -1596,20 +1623,22 @@
       type: fbType, text, tab: currentTab, version: APP_VERSION, device: browserInfo(),
       uid: me?.uid || null, name: me?.name || null, email: me?.email || null, groupId: me?.groupId || null
     };
-    if (!CLOUD || !me) {
-      // sem conta: copia a mensagem para a pessoa mandar por outro meio
-      copyText('[' + fbType + '] ' + text + '\n' + report.device + ' · aba ' + TAB_NAMES[currentTab], 'Mensagem copiada. Envie para quem cuida do app.');
-      $('fbModal').classList.add('hidden');
-      return;
-    }
     await withBusy($('btnFbSend'), async () => {
+      // cópia no Firestore (sem await: sem internet ele guarda e manda quando a conexão voltar)
+      if (CLOUD && me) fb.addDoc(fb.collection(db, 'feedback'), { ...report, createdAt: fb.serverTimestamp() }).catch(cloudError);
       try {
-        // sem await no envio: sem internet o Firestore guarda e manda quando a conexão voltar
-        fb.addDoc(fb.collection(db, 'feedback'), { ...report, createdAt: fb.serverTimestamp() }).catch(cloudError);
+        const res = await emailFeedback(report);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         $('fbModal').classList.add('hidden');
         toast('Obrigado! Sua mensagem foi enviada.');
       } catch (err) {
-        formMsg('fbError', authMsg(err));
+        if (CLOUD && me) {
+          // o e-mail falhou, mas a mensagem ficou salva no Firebase
+          $('fbModal').classList.add('hidden');
+          toast('Obrigado! Sua mensagem foi salva e será analisada.');
+        } else {
+          formMsg('fbError', 'Não foi possível enviar agora. Confira a internet e tente de novo.');
+        }
       }
     });
   }
@@ -2756,7 +2785,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-04.2';
+  const APP_VERSION = '2026-11-04.3';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
