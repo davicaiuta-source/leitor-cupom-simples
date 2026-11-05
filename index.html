@@ -399,6 +399,32 @@
   .sd-table small { display: block; color: var(--muted); font-size: .74rem; }
 
   /* ---------- Orçamento ---------- */
+  /* cores do gráfico: vermelho = já gasto · azul = previsto · verde = gasto máximo (linha).
+     Vermelho e verde ficam parecidos para daltônicos: por isso o máximo é uma linha com o valor
+     escrito, e há legenda (a cor nunca é a única pista) */
+  .spend-card { --bud-spent: #e34948; --bud-plan: #2a78d6; --bud-max: #008300; }
+  .bud-trend .t-col { gap: 2px; }
+  .bud-trend .t-col i { background: var(--bud-plan); border-radius: 0; }
+  .bud-trend .t-col i:first-of-type { border-radius: 4px 4px 0 0; }
+  .bud-trend .t-col i.spent { background: var(--bud-spent); }
+  .bud-trend .t-col:not(.sel) i { opacity: .45; }
+  .bud-trend .t-col:hover i, .bud-trend .t-col:focus-visible i { opacity: 1; }
+  .bud-trend .t-val { z-index: 2; background: var(--card); padding: 0 2px; border-radius: 3px; }
+  .bud-trend .max-line { position: absolute; left: 0; right: 44px; border-top: 2px solid var(--bud-max); pointer-events: none; z-index: 1; }
+  .bud-trend .max-line span {
+    position: absolute; right: -44px; top: -8px; width: 42px; text-align: right; font-size: .66rem; line-height: 1;
+    font-weight: 700; color: var(--text); background: var(--card); font-variant-numeric: tabular-nums;
+  }
+  .bud-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: .75rem; color: var(--muted); }
+  .bud-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .bud-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+  .bud-legend i.line { width: 16px; height: 0; border-top: 2px solid var(--bud-max); border-radius: 0; }
+  .bud-max { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: -6px 0 16px; padding: 10px 12px; background: #f6f8f6; border-radius: 10px; font-size: .85rem; }
+  .bud-max .line-key { display: inline-block; width: 16px; border-top: 2px solid var(--bud-max); vertical-align: middle; margin-right: 6px; }
+  .bud-max b { font-variant-numeric: tabular-nums; }
+  .bud-max .over { color: var(--danger); font-weight: 700; }
+  .bud-max .inline-form { margin: 0; flex: 1 1 100%; }
+  .bud-max .link-btn { margin: 0; font-size: .82rem; }
   .bud-group-title { display: flex; justify-content: space-between; align-items: baseline; margin: 16px 0 4px; font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .bud-item { padding: 10px 0; border-top: 1px solid var(--border); }
   .bud-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
@@ -815,8 +841,12 @@
       </div>
       <div class="hero-fig"><span id="budTotal">R$ 0,00</span><small id="budSub"></small></div>
 
+      <!-- Gasto máximo (teto) do período: cada pessoa define o seu -->
+      <div class="bud-max" id="budMaxBox"></div>
+
       <p class="bd-title">Previsão dos próximos períodos <span class="muted-inline">· toque numa barra</span></p>
-      <div class="trend" id="budTrend"></div>
+      <div class="trend bud-trend" id="budTrend"></div>
+      <div class="bud-legend" id="budLegend"></div>
 
       <p class="bd-title" style="margin-top:18px">Previsto por categoria <span class="muted-inline">· toque para filtrar os produtos</span></p>
       <div id="budCats"></div>
@@ -1277,6 +1307,7 @@
       me.shareCats = d.shareCats || null;
       me.hiddenItems = d.hiddenItems || [];
       me.shareOv = d.shareOv || {};
+      me.budgetMax = d.budgetMax || {};
       subscribeSpace();
       refreshViews();
       renderHeaderSpace();
@@ -2591,6 +2622,7 @@
     $('budSub').textContent = isCur
       ? 'Já gasto ' + brl(spent) + ' + previsto até o fim ' + brl(planned)
       : 'Previsto para o período';
+    renderBudMax(spent + planned);
 
     const spentCur = sumTotal(source.filter(h => { const t = spendDate(h); return t >= cur && t < shiftPeriod(cur, budGran, 1); }));
     renderBudTrend(products, cur, maxAnchor, spentCur);
@@ -2598,8 +2630,75 @@
     renderBudList(rows, isCur, end);
   }
 
-  // Colunas com a previsão de cada período à frente (o escolhido em destaque)
-  // (no período atual a barra soma o que já foi gasto, igual ao número grande)
+  // ---------- Gasto máximo (teto) por período ----------
+  // Fica na conta da pessoa (users/{uid}.budgetMax), separado por Meu/Grupo e Semana/Mês/Ano
+  const BUD_MAX_KEY = 'orcamento_maximo';
+  let budMaxEditing = false;
+  const budMaxId = () => (budFromGroup() ? 'group' : 'mine') + '_' + budGran;
+  function budMaxAll() {
+    if (CLOUD && me) return me.budgetMax || {};
+    try { return JSON.parse(localStorage.getItem(BUD_MAX_KEY)) || {}; } catch (_) { return {}; }
+  }
+  const budMax = () => +budMaxAll()[budMaxId()] || 0;
+
+  async function saveBudMax(value) {
+    const all = { ...budMaxAll() };
+    if (value > 0) all[budMaxId()] = value; else delete all[budMaxId()];
+    if (CLOUD && me) await saveMyPrefs({ budgetMax: all });
+    else { try { localStorage.setItem(BUD_MAX_KEY, JSON.stringify(all)); } catch (_) {} }
+  }
+
+  // "1.500,00", "1500,5", "1500.50" ou "1500" -> número
+  function parseMoney(s) {
+    const t = String(s || '').replace(/[^\d.,]/g, '');
+    if (!t) return NaN;
+    if (!t.includes(',') && /^\d+\.\d{1,2}$/.test(t)) return parseFloat(t);
+    return toNumber(t);
+  }
+
+  async function onBudMax(action) {
+    if (action === 'edit') { budMaxEditing = true; return renderBudget(); }
+    try {
+      if (action === 'clear') await saveBudMax(0);
+      else {
+        const v = parseMoney($('budMaxInput').value);
+        if (!(v > 0)) { toast('Digite um valor, por exemplo 1.500,00.'); return; }
+        await saveBudMax(Math.round(v * 100) / 100);
+      }
+      budMaxEditing = false;
+      toast(action === 'clear' ? 'Gasto máximo removido.' : 'Gasto máximo salvo.');
+    } catch (err) {
+      cloudError(err);
+    }
+    renderBudget();
+  }
+
+  const GRAN_NAME = { week: 'da semana', month: 'do mês', year: 'do ano' };
+  function renderBudMax(total) {
+    const max = budMax();
+    const box = $('budMaxBox');
+    if (budMaxEditing) {
+      box.innerHTML = '<span><i class="line-key"></i>Gasto máximo ' + GRAN_NAME[budGran] + '</span>' +
+        '<div class="inline-form"><input id="budMaxInput" inputmode="decimal" placeholder="Ex.: 1.500,00" value="' + (max ? fmtNum(max) : '') + '">' +
+        '<button class="btn small" data-bmax="save">Salvar</button></div>' +
+        (max ? '<button class="link-btn" data-bmax="clear">Remover gasto máximo</button>' : '');
+      setTimeout(() => $('budMaxInput')?.focus(), 30);
+      return;
+    }
+    if (!max) {
+      box.innerHTML = '<span><i class="line-key"></i>Sem gasto máximo ' + GRAN_NAME[budGran] + '</span>' +
+        '<button class="link-btn" data-bmax="edit">Definir</button>';
+      return;
+    }
+    const diff = max - total;
+    box.innerHTML = '<span><i class="line-key"></i>Gasto máximo: <b>' + brl(max) + '</b> · ' +
+      (diff >= 0 ? 'sobram <b>' + brl(diff) + '</b>' : '<span class="over">passa ' + brl(-diff) + ' do máximo</span>') + '</span>' +
+      '<button class="link-btn" data-bmax="edit">Alterar</button>';
+  }
+
+  // Colunas com a previsão de cada período à frente (o escolhido em destaque).
+  // Cada coluna empilha o que já foi gasto (vermelho, só no período atual) e o previsto (azul);
+  // a linha verde marca o gasto máximo definido pela pessoa.
   function renderBudTrend(products, cur, maxAnchor, spentCur) {
     const N = Math.min(BUD_AHEAD[budGran] + 1, budGran === 'year' ? 4 : 8);
     let first = Math.max(cur, shiftPeriod(budAnchor, budGran, -Math.floor(N / 2)));
@@ -2608,21 +2707,33 @@
     for (let k = 0; k < N; k++) {
       const start = shiftPeriod(first, budGran, k);
       if (start > maxAnchor) break;
-      periods.push({ start, value: budgetFor(products, start).reduce((s, r) => s + r.value, 0) + (start === cur ? spentCur : 0) });
+      const plan = budgetFor(products, start).reduce((s, r) => s + r.value, 0);
+      const spent = start === cur ? spentCur : 0;
+      periods.push({ start, plan, spent, value: plan + spent });
     }
-    const top = niceCeil(Math.max(...periods.map(p => p.value), 1));
-    const pct = (v) => Math.max(v > 0 ? 2 : 0, v / top * 100);
+    const max = budMax();
+    const top = niceCeil(Math.max(...periods.map(p => p.value), max, 1));
+    const pct = (v) => v / top * 100;
+    const segH = (v) => v > 0 ? 'max(2px, ' + pct(v) + '%)' : '0';
     $('budTrend').innerHTML =
       '<div class="grid-line" style="top:18px"><span>' + brlCompact(top) + '</span></div>' +
       '<div class="grid-line" style="top:calc(18px + (100% - 18px) / 2)"><span>' + brlCompact(top / 2) + '</span></div>' +
+      (max ? '<div class="max-line" style="bottom:calc((100% - 18px) * ' + (max / top) + ')"><span>' + brlCompact(max) + '</span></div>' : '') +
       periods.map(p => {
         const sel = p.start === budAnchor;
         const label = periodLabel(p.start, budGran);
-        return '<button class="t-col' + (sel ? ' sel' : '') + '" data-bstart="' + p.start + '" aria-label="' + escapeHtml(label + ': previsto ' + brl(p.value)) + '"' +
-          ' data-tip="' + escapeHtml('<b>' + brl(p.value) + '</b>' + (p.start === cur ? 'já gasto + previsto · ' : 'previsto · ') + label) + '">' +
-          (sel && p.value > 0 ? '<span class="t-val" style="bottom:calc(' + pct(p.value) + '% + 3px)">' + brlCompact(p.value) + '</span>' : '') +
-          '<i style="height:' + pct(p.value) + '%"></i></button>';
+        const parts = (p.spent ? 'já gasto ' + brl(p.spent) + ' + ' : '') + 'previsto ' + brl(p.plan) +
+          (max ? (p.value > max ? ' · passa ' + brl(p.value - max) + ' do máximo' : ' · dentro do máximo') : '');
+        return '<button class="t-col' + (sel ? ' sel' : '') + '" data-bstart="' + p.start + '" aria-label="' + escapeHtml(label + ': ' + brl(p.value) + ' (' + parts + ')') + '"' +
+          ' data-tip="' + escapeHtml('<b>' + brl(p.value) + '</b>' + label + '<br>' + parts) + '">' +
+          (sel && p.value > 0 ? '<span class="t-val" style="bottom:calc(' + pct(p.value) + '% + 5px)">' + brlCompact(p.value) + '</span>' : '') +
+          (p.plan > 0 ? '<i style="height:' + segH(p.plan) + '"></i>' : '') +
+          (p.spent > 0 ? '<i class="spent" style="height:' + segH(p.spent) + '"></i>' : '') + '</button>';
       }).join('');
+    $('budLegend').innerHTML =
+      (periods.some(p => p.spent > 0) ? '<span><i style="background:var(--bud-spent)"></i>Já gasto</span>' : '') +
+      '<span><i style="background:var(--bud-plan)"></i>Previsto</span>' +
+      (max ? '<span><i class="line"></i>Gasto máximo</span>' : '');
     $('budTrendLabels')?.remove();
     $('budTrend').insertAdjacentHTML('afterend', '<div class="trend-labels" id="budTrendLabels">' +
       periods.map(p => '<span' + (p.start === budAnchor ? ' class="sel"' : '') + '>' + periodShort(p.start, budGran) + '</span>').join('') + '</div>');
@@ -2705,9 +2816,11 @@
   function onBudgetClick(e) {
     const t = e.target;
     const src = t.closest('[data-bsrc]'), gran = t.closest('[data-bgran]'), col = t.closest('[data-bstart]');
-    const cat = t.closest('[data-bcat]'), show = t.closest('[data-bshow]');
-    if (src) budSrc = src.dataset.bsrc;
-    else if (gran) { budGran = gran.dataset.bgran; budAnchor = null; }
+    const cat = t.closest('[data-bcat]'), show = t.closest('[data-bshow]'), bmax = t.closest('[data-bmax]');
+    if (bmax) return onBudMax(bmax.dataset.bmax);
+    if (t.closest('#budMaxInput')) return;
+    if (src) { budSrc = src.dataset.bsrc; budMaxEditing = false; }
+    else if (gran) { budGran = gran.dataset.bgran; budAnchor = null; budMaxEditing = false; }
     else if (t.closest('#budPrev')) budAnchor = shiftPeriod(budAnchor, budGran, -1);
     else if (t.closest('#budNext')) budAnchor = shiftPeriod(budAnchor, budGran, 1);
     else if (col) budAnchor = +col.dataset.bstart;
@@ -2891,7 +3004,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-04.4';
+  const APP_VERSION = '2026-11-05.1';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -3553,6 +3666,10 @@
   $('tabSpend').addEventListener('pointermove', showChartTip);
   $('tabSpend').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('tabBudget').addEventListener('click', onBudgetClick);
+  $('tabBudget').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.id === 'budMaxInput') onBudMax('save');
+    if (e.key === 'Escape' && e.target.id === 'budMaxInput') { budMaxEditing = false; renderBudget(); }
+  });
   $('tabBudget').addEventListener('pointermove', showChartTip);
   $('tabBudget').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('mineFilter').addEventListener('input', renderMine);
