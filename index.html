@@ -449,7 +449,39 @@
   .hide-btn.on { background: #fdecec; border-color: #f5c2c2; color: var(--danger); }
   ul.items li.item-hidden .item-name, ul.items li.item-hidden .item-total { opacity: .5; text-decoration: line-through; }
   .hide-chip { background: #fdecec; border-color: #f5c2c2; color: var(--danger); }
-  .tabbar button { font-size: .72rem; padding-left: 2px; padding-right: 2px; text-align: center; line-height: 1.15; }
+  .tabbar button { font-size: .66rem; padding-left: 1px; padding-right: 1px; min-width: 0; text-align: center; line-height: 1.15; }
+  .tabbar svg { width: 22px; height: 22px; }
+
+  /* ---------- Compras (carrinho) ---------- */
+  .cart-sum { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .cart-sum b { font-size: 1.6rem; font-weight: 800; }
+  .cart-sum span { font-size: .85rem; color: var(--muted); }
+  .cart-store-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .cart-store-head h3 { margin: 0; font-size: 1.1rem; }
+  .cart-store-head b { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cart-line { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-top: 1px solid var(--border); }
+  .cart-line:first-of-type { border-top: 0; }
+  .cart-info { flex: 1; min-width: 0; }
+  .cart-name { font-weight: 600; color: var(--green-dark); text-transform: uppercase; font-size: .88rem; word-break: break-word; }
+  .cart-why { font-size: .74rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .cart-price { font-size: .78rem; color: var(--muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .cart-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .cart-right b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .stepper { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .stepper button { width: 30px; height: 30px; border: 0; background: #f6f8f6; cursor: pointer; font: 700 1rem "Inter", sans-serif; color: var(--text); }
+  .stepper span { min-width: 34px; text-align: center; font-size: .82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cart-x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .74rem; padding: 0; text-decoration: underline; }
+  .cart-checkout { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .cart-checkout .muted { margin-bottom: 8px; }
+  .cart-wa { background: #1e9a4b; }
+  .cart-chip-add { border-style: dashed; }
+  .order-item { padding: 10px 0; border-top: 1px solid var(--border); font-size: .85rem; }
+  .order-item:first-of-type { border-top: 0; }
+  .order-top { display: flex; justify-content: space-between; gap: 8px; }
+  .order-top span { color: var(--muted); font-size: .75rem; white-space: nowrap; }
+  .order-items { color: var(--muted); font-size: .76rem; margin: 3px 0 6px; }
+  .order-status { font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: #fff4e0; color: #8a5300; }
+  .order-status.ok { background: var(--green-soft); color: var(--green-text); }
   .account-card h2 { margin: 0 0 8px; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
   .account-card .account-head { margin: 14px 0 4px; padding: 14px; background: #f6f8f6; border-radius: 12px; }
   .check-row { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 14px; font-size: .88rem; color: var(--muted); cursor: pointer; }
@@ -593,7 +625,7 @@
       <p class="auth-loading" id="authLoading"><span class="spinner"></span>Carregando...</p>
       <div id="authForms" class="hidden">
         <h2>Bem-vindo</h2>
-        <p class="lead">Entre para guardar seus cupons e montar o estoque sozinho ou em grupo.</p>
+        <p class="lead">Entre para guardar seus cupons e montar o histórico sozinho ou em grupo.</p>
         <div class="seg" id="authSeg">
           <button class="active" data-auth="login">Entrar</button>
           <button data-auth="signup">Criar conta</button>
@@ -613,8 +645,8 @@
           <label class="field"><span>Senha (mínimo 6 caracteres)</span><input type="password" id="suPass" autocomplete="new-password"></label>
           <p class="field-label">Tipo de cadastro</p>
           <div class="mode-cards" id="modeCards">
-            <label class="mode-card selected"><input type="radio" name="suMode" value="individual" checked><b>Individual</b><span>Só você vê seus cupons e seu estoque.</span></label>
-            <label class="mode-card"><input type="radio" name="suMode" value="group"><b>Coletivo</b><span>Família ou equipe compartilham cupons e estoque.</span></label>
+            <label class="mode-card selected"><input type="radio" name="suMode" value="individual" checked><b>Individual</b><span>Só você vê seus cupons e seu histórico.</span></label>
+            <label class="mode-card"><input type="radio" name="suMode" value="group"><b>Coletivo</b><span>Família ou equipe compartilham cupons e histórico.</span></label>
           </div>
           <div class="group-box hidden" id="suGroupBox">
             <div class="seg small" id="suGroupSeg">
@@ -733,10 +765,33 @@
     </section>
   </div>
 
-  <!-- Aba Estoque: soma os produtos de todos os cupons -->
+  <!-- Aba Compras: carrinho montado automaticamente pelo histórico; a pessoa revisa e manda o pedido para a loja -->
+  <div id="tabCart" class="hidden">
+    <section class="card list-card">
+      <h2>Compras</h2>
+      <p class="lead" id="cartLead"></p>
+      <div class="seg small hidden" id="cartSrc">
+        <button class="active" data-csrc="mine">Minhas compras</button>
+        <button data-csrc="group">Do grupo</button>
+      </div>
+      <p class="field-label" style="margin-top:4px">O que deve acabar em</p>
+      <div class="seg small" id="cartHorizon">
+        <button data-ch="7">7 dias</button>
+        <button data-ch="15">15 dias</button>
+        <button class="active" data-ch="30">30 dias</button>
+      </div>
+      <div class="cart-sum" id="cartSum"></div>
+    </section>
+    <div id="cartStores"></div>
+    <section class="card" id="cartExtras"></section>
+    <section class="card" id="cartDelivery"></section>
+    <section class="card hidden" id="cartOrders"></section>
+  </div>
+
+  <!-- Aba Histórico (antiga Estoque): soma os produtos de todos os cupons -->
   <div id="tabStock" class="hidden">
     <section class="card stock-card">
-      <h2>Estoque</h2>
+      <h2>Histórico</h2>
       <p class="lead" id="stockLead">Todos os produtos dos cupons escaneados, somados.</p>
       <div class="seg small hidden" id="stockSeg" style="margin-top:12px">
         <button class="active" data-src="mine">Pessoal</button>
@@ -898,7 +953,7 @@
         <button data-fbtype="melhoria">Melhoria</button>
         <button data-fbtype="outro">Outro</button>
       </div>
-      <textarea id="fbText" class="fb-text" maxlength="2000" placeholder="Ex.: na aba Estoque, ao tocar num produto, nada acontece."></textarea>
+      <textarea id="fbText" class="fb-text" maxlength="2000" placeholder="Ex.: na aba Histórico, ao tocar num produto, nada acontece."></textarea>
       <p class="muted" id="fbContext" style="margin:6px 0 12px;font-size:.75rem"></p>
       <p class="form-error hidden" id="fbError"></p>
       <div class="btn-row">
@@ -942,9 +997,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 15h3M8 18h6"/></svg>
       Orçamento
     </button>
+    <button data-tab="cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.3a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L21 8H6.2"/></svg>
+      Compras
+    </button>
     <button data-tab="stock">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
-      Estoque
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+      Histórico
     </button>
   </nav>
 </div>
@@ -1282,8 +1341,9 @@
   let authResolved = false;
   function onUser(user) {
     authResolved = true;
-    unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback');
+    unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback', 'orders');
     feedbackList = null;
+    cartOrders = null;
     spaceKey = undefined;
     group = null;
     cloudCupons = [];
@@ -1310,6 +1370,8 @@
       me.hiddenItems = d.hiddenItems || [];
       me.shareOv = d.shareOv || {};
       me.budgetMax = d.budgetMax || {};
+      me.delivery = d.delivery || {};
+      me.storePhones = d.storePhones || {};
       subscribeSpace();
       refreshViews();
       renderHeaderSpace();
@@ -1378,6 +1440,7 @@
     if (currentTab === 'group') renderGroupTab();
     if (currentTab === 'spend') renderSpend();
     if (currentTab === 'budget') renderBudget();
+    if (currentTab === 'cart') renderCart();
     renderAccount();
     $('tabBtnGroup').classList.toggle('dim', !inGroup());
   }
@@ -1516,7 +1579,7 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabCart', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback'].forEach(id => $(id).classList.add('hidden'));
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
     $('authView').classList.remove('hidden');
@@ -1649,7 +1712,7 @@
     });
   }
 
-  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', stock: 'Estoque', account: 'Minha conta' };
+  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', cart: 'Compras', stock: 'Histórico', account: 'Minha conta' };
   let fbType = 'bug';
 
   function openFeedback() {
@@ -1714,7 +1777,7 @@
       '<div class="account-head"><div class="avatar">' + ICON_USER + '</div><div><b>Modo sem conta</b>' +
       '<span>' + loadHistory().length + ' cupons neste aparelho</span></div></div>' +
       '<hr class="divider"><h3 class="card-title">Criar um grupo</h3>' +
-      '<p class="muted">Com um grupo, a família ou a equipe junta as notas fiscais no mesmo estoque. ' +
+      '<p class="muted">Com um grupo, a família ou a equipe junta as notas fiscais no mesmo histórico. ' +
       'Quem entra no grupo usa um código único de 6 caracteres.</p>' +
       '<p class="notice">Os grupos ainda não estão ligados: falta colocar a configuração do Firebase no arquivo do app (<b>FIREBASE_CONFIG</b>). ' +
       'Depois disso, esta tela vira o seu cadastro, com login e criação de grupo.</p>' +
@@ -2854,6 +2917,305 @@
     renderBudget();
   }
 
+  // ---------- Compras: carrinho montado automaticamente pelo histórico ----------
+  // Usa a mesma previsão do Orçamento: entra no carrinho o que deve acabar nos próximos N dias,
+  // na quantidade de costume, na loja onde a pessoa mais compra o produto. A pessoa revisa e
+  // manda o pedido para a loja pelo WhatsApp (a loja entrega e cobra: Pix, cartão ou dinheiro).
+  let cartSrc = 'mine', cartH = 30;
+  let cartOrders = null;
+  const cartFromGroup = () => cartSrc === 'group' && inGroup();
+  const cartKey = () => 'carrinho_' + (me?.uid || 'local') + '_' + (cartFromGroup() ? 'grupo' : 'meu');
+  const PAYMENTS = ['Pix na entrega', 'Cartão na entrega', 'Dinheiro na entrega'];
+
+  // ajustes da pessoa no carrinho (itens tirados, quantidades, loja, itens extras, já pedidos)
+  function cartState() {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem(cartKey())) || {}; } catch (_) {}
+    return { removed: s.removed || {}, qty: s.qty || {}, store: s.store || {}, extra: s.extra || [], ordered: s.ordered || {} };
+  }
+  function saveCartState(s) { try { localStorage.setItem(cartKey(), JSON.stringify(s)); } catch (_) {} }
+
+  // dados de entrega e WhatsApp das lojas: na conta (com login) ou no aparelho
+  function getPref(name, def) {
+    if (CLOUD && me) return me[name] || def;
+    try { return JSON.parse(localStorage.getItem('pref_' + name)) || def; } catch (_) { return def; }
+  }
+  async function setPref(name, value) {
+    if (CLOUD && me) await saveMyPrefs({ [name]: value });
+    else { try { localStorage.setItem('pref_' + name, JSON.stringify(value)); } catch (_) {} }
+  }
+
+  const isBulk = (un) => /^(kg|g|l|lt|ml)$/.test(un);
+  const roundQty = (q, un) => isBulk(un) ? Math.max(0.1, Math.round(q * 10) / 10) : Math.max(1, Math.round(q));
+
+  // loja onde a pessoa mais compra o produto (empate: a mais recente)
+  function favStore(p) {
+    const count = new Map();
+    p.events.forEach(e => e.stores.forEach(s => count.set(s, (count.get(s) || 0) + 1)));
+    let best = '', n = -1;
+    p.events.slice().reverse().forEach(e => e.stores.forEach(s => { if (count.get(s) > n) { best = s; n = count.get(s); } }));
+    return best || 'Loja';
+  }
+
+  // quando cada produto foi pedido pela última vez (pedidos salvos + ajustes deste aparelho)
+  function orderedMap(st) {
+    const map = { ...st.ordered };
+    (cartOrders || []).forEach(o => {
+      const t = o.createdAt?.toMillis ? o.createdAt.toMillis() : (o.at || 0);
+      (o.items || []).forEach(i => { if (i.key && t > (map[i.key] || 0)) map[i.key] = t; });
+    });
+    return map;
+  }
+
+  function cartLines(products, st) {
+    const today = dayStart(Date.now());
+    const end = today + cartH * DAY;
+    const ordered = orderedMap(st);
+    const lines = [];
+    products.forEach(p => {
+      const dates = plannedIn(p, today, end);
+      if (!dates.length || (ordered[p.key] || 0) > p.last) return; // não vai acabar, ou já foi pedido
+      const unitPrice = p.avgQty > 0 ? p.avgValue / p.avgQty : p.avgValue;
+      lines.push({
+        key: p.key, name: p.name, un: p.un, cat: p.cat, unitPrice, auto: true,
+        qty: st.qty[p.key] ?? roundQty(p.avgQty * dates.length, p.un),
+        store: st.store[p.key] || favStore(p), removed: !!st.removed[p.key],
+        why: (p.next < today ? 'Já devia ter sido comprado (por volta de ' + fmtDay(p.next) + ')' : 'Deve acabar por volta de ' + fmtDay(dates[0])) +
+          ' · você compra ' + fmtCycle(p.cycle)
+      });
+    });
+    st.extra.forEach(x => lines.push({ ...x, qty: st.qty[x.key] ?? x.qty, store: st.store[x.key] || x.store, removed: false, auto: false, why: 'Adicionado por você' }));
+    return lines;
+  }
+
+  function renderCart() {
+    if (cartSrc === 'group' && !inGroup()) cartSrc = 'mine';
+    subscribeOrders();
+    $('cartSrc').classList.toggle('hidden', !inGroup());
+    $('cartSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.csrc === (cartFromGroup() ? 'group' : 'mine')));
+    $('cartHorizon').querySelectorAll('button').forEach(b => b.classList.toggle('active', +b.dataset.ch === cartH));
+    $('cartLead').textContent = 'O app montou este carrinho sozinho, com o que ' + (cartFromGroup() ? 'o grupo costuma' : 'você costuma') +
+      ' comprar e que deve acabar nos próximos ' + cartH + ' dias. Revise, ajuste e confirme o pedido com a loja.';
+
+    const source = cartFromGroup() ? groupCupons : personalHistory();
+    const products = buildProducts(source);
+    const st = cartState();
+    const lines = cartLines(products, st);
+    const active = lines.filter(l => !l.removed && l.qty > 0);
+    const removed = lines.filter(l => l.removed);
+    const total = active.reduce((s, l) => s + l.qty * l.unitPrice, 0);
+    const byStore = new Map();
+    active.forEach(l => { if (!byStore.has(l.store)) byStore.set(l.store, []); byStore.get(l.store).push(l); });
+    const allStores = [...new Set(products.flatMap(p => p.events.flatMap(e => [...e.stores])))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    $('cartSum').innerHTML = '<span>' + active.length + (active.length === 1 ? ' item' : ' itens') + ' · ' + byStore.size +
+      (byStore.size === 1 ? ' loja' : ' lojas') + ' · estimado</span><b>' + brl(total) + '</b>';
+
+    const phones = getPref('storePhones', {});
+    const delivery = getPref('delivery', {});
+    let html = '';
+    if (!source.length) {
+      html = '<section class="card"><p class="empty">Escaneie algumas notas fiscais: o carrinho é montado com o que você costuma comprar.</p></section>';
+    } else if (!active.length) {
+      html = '<section class="card"><p class="empty">Nada para comprar nos próximos ' + cartH + ' dias. 🎉<br>Aumente o prazo acima ou adicione itens abaixo.</p></section>';
+    }
+    byStore.forEach((items, store) => {
+      const sub = items.reduce((s, l) => s + l.qty * l.unitPrice, 0);
+      const phone = phones[normName(store)] || '';
+      html += '<section class="card"><div class="cart-store-head"><h3>' + escapeHtml(store) + '</h3><b>' + brl(sub) + '</b></div>' +
+        items.map(l => '<div class="cart-line"><div class="cart-info"><div class="cart-name">' + escapeHtml(l.name) + '</div>' +
+          '<div class="cart-why">' + escapeHtml(l.why) + '</div>' +
+          '<div class="cart-price">' + (l.unitPrice ? brl(l.unitPrice) + ' / ' + escapeHtml(l.un) + ' (último preço pago)' : 'sem preço anterior') + '</div>' +
+          (allStores.length > 1 ? '<select class="cat-select" style="margin-top:6px;font-size:.75rem;padding:4px 26px 4px 10px" data-cstore="' + escapeHtml(l.key) + '" aria-label="Loja">' +
+            allStores.map(s => '<option' + (s === l.store ? ' selected' : '') + '>' + escapeHtml(s) + '</option>').join('') + '</select>' : '') +
+          '</div><div class="cart-right"><b>' + brl(l.qty * l.unitPrice) + '</b>' +
+          '<span class="stepper"><button data-cq="-1" data-key="' + escapeHtml(l.key) + '" aria-label="Menos">−</button><span>' + fmtQtd(l.qty) + ' ' + escapeHtml(l.un) + '</span>' +
+          '<button data-cq="1" data-key="' + escapeHtml(l.key) + '" aria-label="Mais">+</button></span>' +
+          '<button class="cart-x" data-crm="' + escapeHtml(l.key) + '">remover</button></div></div>').join('') +
+        '<div class="cart-checkout">' +
+        (phone ? '<p class="muted">WhatsApp da loja: <b>' + escapeHtml(fmtPhone(phone)) + '</b> · <button class="cart-x" data-cphone-edit="' + escapeHtml(store) + '">trocar</button></p>'
+          : '<p class="muted">Para mandar o pedido, informe o WhatsApp de ' + escapeHtml(store) + ' (só uma vez):</p>' +
+            '<div class="inline-form"><input data-cphone="' + escapeHtml(store) + '" inputmode="tel" placeholder="(41) 99999-9999"><button class="btn small" data-cphone-save="' + escapeHtml(store) + '">Salvar</button></div>') +
+        '<button class="btn cart-wa" data-corder="' + escapeHtml(store) + '">Confirmar pedido · ' + brl(sub) + '</button>' +
+        '<button class="link-btn" data-ccopy="' + escapeHtml(store) + '">Copiar lista</button></div></section>';
+    });
+    if (removed.length) {
+      html += '<section class="card"><p class="muted" style="margin:0">Você tirou do carrinho: ' + removed.map(l => escapeHtml(l.name)).join(', ') +
+        '. <button class="cart-x" data-crestore="1">Voltar todos</button></p></section>';
+    }
+    $('cartStores').innerHTML = html;
+
+    // adicionar itens: o que a pessoa já comprou e não está no carrinho
+    const inCart = new Set(lines.map(l => l.key));
+    const others = products.filter(p => !inCart.has(p.key) && !p.inactive).sort((a, b) => b.count - a.count || b.last - a.last).slice(0, 14);
+    $('cartExtras').innerHTML = '<h3 class="card-title">Adicionar ao carrinho</h3>' +
+      (others.length ? '<p class="muted">Você também costuma comprar:</p><div class="cat-picker">' +
+        others.map(p => '<button class="chip cart-chip-add" data-cadd="' + escapeHtml(p.key) + '">+ ' + escapeHtml(titleCase(p.name)) + '</button>').join('') + '</div>' : '') +
+      '<p class="muted" style="margin-bottom:8px">Ou digite um produto:</p>' +
+      '<div class="inline-form"><input id="cartNewName" placeholder="Ex.: Sabão em pó"><input id="cartNewQty" inputmode="decimal" style="flex:0 0 64px" value="1" aria-label="Quantidade">' +
+      '<button class="btn small" data-cnew="1">Adicionar</button></div>';
+
+    // entrega
+    const d = delivery;
+    $('cartDelivery').innerHTML = '<h3 class="card-title">Entrega e pagamento</h3>' +
+      '<p class="muted">Vai junto no pedido para a loja. A loja confirma o valor final, entrega e cobra.</p>' +
+      '<label class="field"><span>Nome</span><input id="cartDName" value="' + escapeHtml(d.name || me?.name || '') + '" autocomplete="name"></label>' +
+      '<label class="field"><span>Endereço de entrega</span><input id="cartDAddr" value="' + escapeHtml(d.address || '') + '" placeholder="Rua, número, bairro, complemento" autocomplete="street-address"></label>' +
+      '<label class="field"><span>Pagamento</span><select class="cat-select" id="cartDPay" style="width:100%;padding:11px 30px 11px 12px">' +
+      PAYMENTS.map(p => '<option' + (p === d.payment ? ' selected' : '') + '>' + p + '</option>').join('') + '</select></label>' +
+      '<button class="btn small ghost" data-cdeliv="1">Salvar dados de entrega</button>';
+
+    renderCartOrders();
+  }
+
+  const fmtPhone = (p) => { const d = p.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''); return d.length === 11 ? '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7) : d.length === 10 ? '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6) : p; };
+  const waNumber = (p) => { const d = p.replace(/\D/g, ''); return d.length <= 11 ? '55' + d : d; };
+
+  // pedidos já enviados (ficam na conta: users/{uid}/orders)
+  function subscribeOrders() {
+    if (!CLOUD || !me || unsubs.orders) return;
+    const q = fb.query(fb.collection(db, 'users', me.uid, 'orders'), fb.orderBy('createdAt', 'desc'), fb.limit(10));
+    unsubs.orders = fb.onSnapshot(q, snap => {
+      cartOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (currentTab === 'cart') renderCart();
+    }, () => { cartOrders = []; });
+  }
+
+  function renderCartOrders() {
+    const box = $('cartOrders');
+    if (!cartOrders || !cartOrders.length) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.innerHTML = '<h3 class="card-title">Pedidos enviados</h3>' + cartOrders.map(o => {
+      const ok = o.status === 'recebido';
+      const when = o.createdAt?.toMillis ? fmtDate(o.createdAt.toMillis()) : 'agora';
+      return '<div class="order-item"><div class="order-top"><b>' + escapeHtml(o.store) + ' · ' + brl(o.total || 0) + '</b><span>' + when + '</span></div>' +
+        '<div class="order-items">' + (o.items || []).map(i => fmtQtd(i.qty) + ' ' + escapeHtml(i.un) + ' ' + escapeHtml(i.name)).join(', ') + '</div>' +
+        '<span class="order-status' + (ok ? ' ok' : '') + '">' + (ok ? 'Recebido' : 'Enviado à loja') + '</span> ' +
+        (ok ? '' : '<button class="cart-x" data-creceived="' + o.id + '">marcar como recebido</button>') + '</div>';
+    }).join('') + '<p class="muted" style="margin:10px 0 0;font-size:.75rem">Quando a compra chegar, escaneie a nota fiscal: ela entra no histórico e a previsão se ajusta.</p>';
+  }
+
+  function cartMessage(store, items) {
+    const d = getPref('delivery', {});
+    const total = items.reduce((s, l) => s + l.qty * l.unitPrice, 0);
+    return 'Olá, ' + store + '! Gostaria de fazer um pedido para entrega:\n\n' +
+      items.map(l => '• ' + fmtQtd(l.qty) + ' ' + l.un + ' ' + l.name).join('\n') +
+      '\n\nTotal estimado: ' + brl(total) + ' (pelos últimos preços que paguei)' +
+      '\n\nNome: ' + (d.name || me?.name || '') +
+      '\nEndereço: ' + (d.address || '') +
+      '\nPagamento: ' + (d.payment || PAYMENTS[0]) +
+      '\n\nPode confirmar o valor final, por favor? Obrigado!';
+  }
+
+  function currentCart() {
+    const source = cartFromGroup() ? groupCupons : personalHistory();
+    const products = buildProducts(source);
+    const st = cartState();
+    return { products, st, lines: cartLines(products, st) };
+  }
+
+  async function onCartClick(e) {
+    const t = e.target;
+    const g = (attr) => t.closest('[' + attr + ']')?.getAttribute(attr);
+    let st = cartState();
+    if (g('data-csrc')) { cartSrc = g('data-csrc'); return renderCart(); }
+    if (g('data-ch')) { cartH = +g('data-ch'); return renderCart(); }
+    const q = g('data-cq');
+    if (q) {
+      const key = t.closest('[data-key]').dataset.key;
+      const line = currentCart().lines.find(l => l.key === key);
+      const step = isBulk(line.un) ? 0.5 : 1;
+      st.qty[key] = Math.max(0, Math.round((line.qty + step * +q) * 10) / 10);
+      if (st.qty[key] === 0) { st.removed[key] = true; delete st.qty[key]; st.extra = st.extra.filter(x => x.key !== key); }
+      saveCartState(st); return renderCart();
+    }
+    if (g('data-crm')) {
+      const key = g('data-crm');
+      st.removed[key] = true; st.extra = st.extra.filter(x => x.key !== key);
+      saveCartState(st); return renderCart();
+    }
+    if (g('data-crestore')) { st.removed = {}; saveCartState(st); return renderCart(); }
+    if (g('data-cadd')) {
+      const p = currentCart().products.find(x => x.key === g('data-cadd'));
+      if (!p) return;
+      st.extra.push({ key: p.key, name: p.name, un: p.un, qty: roundQty(p.avgQty, p.un), unitPrice: p.avgQty > 0 ? p.avgValue / p.avgQty : p.avgValue, store: favStore(p) });
+      delete st.removed[p.key];
+      saveCartState(st); toast(titleCase(p.name) + ' adicionado ao carrinho.'); return renderCart();
+    }
+    if (g('data-cnew')) {
+      const name = $('cartNewName').value.trim();
+      const qty = parseMoney($('cartNewQty').value) || 1;
+      if (!name) { toast('Digite o nome do produto.'); return; }
+      const { products, lines } = currentCart();
+      const known = products.find(p => normName(p.name) === normName(name));
+      const store = known ? favStore(known) : (lines[0]?.store || products[0] && favStore(products[0]) || 'Loja');
+      st.extra.push({ key: 'extra|' + normName(name) + '|' + Date.now(), name: name.toUpperCase(), un: known?.un || 'un', qty,
+        unitPrice: known ? (known.avgQty > 0 ? known.avgValue / known.avgQty : known.avgValue) : 0, store });
+      saveCartState(st); return renderCart();
+    }
+    if (g('data-cphone-save')) {
+      const store = g('data-cphone-save');
+      const input = [...document.querySelectorAll('[data-cphone]')].find(i => i.dataset.cphone === store);
+      const digits = (input?.value || '').replace(/\D/g, '');
+      if (digits.length < 10) { toast('Digite o WhatsApp com DDD, por exemplo (41) 99999-9999.'); return; }
+      await setPref('storePhones', { ...getPref('storePhones', {}), [normName(store)]: digits });
+      toast('WhatsApp de ' + store + ' salvo.'); return renderCart();
+    }
+    if (g('data-cphone-edit')) {
+      const phones = { ...getPref('storePhones', {}) };
+      delete phones[normName(g('data-cphone-edit'))];
+      await setPref('storePhones', phones); return renderCart();
+    }
+    if (g('data-cdeliv')) {
+      await setPref('delivery', { name: $('cartDName').value.trim(), address: $('cartDAddr').value.trim(), payment: $('cartDPay').value });
+      toast('Dados de entrega salvos.'); return renderCart();
+    }
+    if (g('data-ccopy')) {
+      const store = g('data-ccopy');
+      const items = currentCart().lines.filter(l => !l.removed && l.qty > 0 && l.store === store);
+      return copyText(cartMessage(store, items), 'Lista copiada.');
+    }
+    if (g('data-corder')) {
+      const store = g('data-corder');
+      const items = currentCart().lines.filter(l => !l.removed && l.qty > 0 && l.store === store);
+      const phone = getPref('storePhones', {})[normName(store)];
+      const d = getPref('delivery', {});
+      if (!phone) { toast('Informe o WhatsApp de ' + store + ' acima.'); return; }
+      if (!d.address) { toast('Preencha e salve o endereço de entrega (mais abaixo).', 4000); $('cartDAddr').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (!confirm('Enviar o pedido de ' + items.length + (items.length === 1 ? ' item' : ' itens') + ' para ' + store + ' pelo WhatsApp?')) return;
+      // abre o WhatsApp já no clique (senão o navegador bloqueia a janela)
+      const waUrl = 'https://wa.me/' + waNumber(phone) + '?text=' + encodeURIComponent(cartMessage(store, items));
+      const win = window.open(waUrl, '_blank');
+      const now = Date.now();
+      const order = {
+        store, total: Math.round(items.reduce((s, l) => s + l.qty * l.unitPrice, 0) * 100) / 100, status: 'enviado', at: now,
+        source: cartFromGroup() ? 'grupo' : 'meu',
+        items: items.map(l => ({ key: l.key, name: l.name, qty: l.qty, un: l.un, unitPrice: Math.round(l.unitPrice * 100) / 100 }))
+      };
+      items.forEach(l => { st.ordered[l.key] = now; delete st.qty[l.key]; });
+      st.extra = st.extra.filter(x => !items.some(l => l.key === x.key));
+      saveCartState(st);
+      if (CLOUD && me) fb.addDoc(fb.collection(db, 'users', me.uid, 'orders'), { ...order, createdAt: fb.serverTimestamp() }).catch(cloudError);
+      toast('Pedido enviado para ' + store + '. Confirme o valor e o pagamento com a loja no WhatsApp.', 5000);
+      renderCart();
+      if (!win) location.href = waUrl; // janela bloqueada: abre o WhatsApp direto
+      return;
+    }
+    if (g('data-creceived')) {
+      if (CLOUD && me) await fb.updateDoc(fb.doc(db, 'users', me.uid, 'orders', g('data-creceived')), { status: 'recebido' }).catch(cloudError);
+      return;
+    }
+  }
+
+  function onCartChange(e) {
+    const sel = e.target.closest('[data-cstore]');
+    if (!sel) return;
+    const st = cartState();
+    st.store[sel.dataset.cstore] = sel.value;
+    saveCartState(st);
+    renderCart();
+  }
+
   // ---------- Estoque: junta os itens de todos os cupons ----------
   let stockSort = 'qty';
   let stockCat = '';   // filtro de categoria ('' = todas)
@@ -3001,7 +3363,7 @@
     renderStock();
   }
 
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', stock: 'tabStock', account: 'tabAccount' };
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', cart: 'tabCart', stock: 'tabStock', account: 'tabAccount' };
   let currentTab = 'scan';
 
   function showTab(tab) {
@@ -3017,6 +3379,7 @@
     if (tab === 'group') renderGroupTab();
     if (tab === 'spend') renderSpend();
     if (tab === 'budget') renderBudget();
+    if (tab === 'cart') renderCart();
     $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
@@ -3026,7 +3389,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-07.3';
+  const APP_VERSION = '2026-11-07.5';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -3688,6 +4051,8 @@
   $('tabSpend').addEventListener('pointermove', showChartTip);
   $('tabSpend').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('tabBudget').addEventListener('click', onBudgetClick);
+  $('tabCart').addEventListener('click', onCartClick);
+  $('tabCart').addEventListener('change', onCartChange);
   $('tabBudget').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.id === 'budMaxInput') onBudMax('save');
     if (e.key === 'Escape' && e.target.id === 'budMaxInput') { budMaxEditing = false; renderBudget(); }
