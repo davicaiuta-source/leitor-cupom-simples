@@ -475,6 +475,10 @@
   .cart-checkout .muted { margin-bottom: 8px; }
   .cart-wa { background: #1e9a4b; }
   .cart-chip-add { border-style: dashed; }
+  .cart-days { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .88rem; margin: -2px 0 4px; }
+  .cart-days input { width: 64px; min-height: 38px; padding: 6px 8px; text-align: center; border: 1px solid var(--border); border-radius: 10px; font: 600 1rem "Inter", sans-serif; background: #f7f9f7; color: var(--text); }
+  .cart-last { font-size: .78rem; color: var(--text); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .cart-last span { color: var(--muted); }
   .order-item { padding: 10px 0; border-top: 1px solid var(--border); font-size: .85rem; }
   .order-item:first-of-type { border-top: 0; }
   .order-top { display: flex; justify-content: space-between; gap: 8px; }
@@ -774,12 +778,13 @@
         <button class="active" data-csrc="mine">Minhas compras</button>
         <button data-csrc="group">Do grupo</button>
       </div>
-      <p class="field-label" style="margin-top:4px">O que deve acabar em</p>
-      <div class="seg small" id="cartHorizon">
-        <button data-ch="7">7 dias</button>
-        <button data-ch="15">15 dias</button>
-        <button class="active" data-ch="30">30 dias</button>
+      <p class="field-label" style="margin-top:4px">O que comprar</p>
+      <div class="seg small" id="cartMode">
+        <button class="active" data-cmode="out">Provavelmente acabaram</button>
+        <button data-cmode="soon">Vão acabar em…</button>
       </div>
+      <label class="cart-days hidden" id="cartDaysBox">Itens que vão acabar nos próximos
+        <input id="cartDays" type="number" inputmode="numeric" min="1" max="90" value="7"> dias</label>
       <div class="cart-sum" id="cartSum"></div>
     </section>
     <div id="cartStores"></div>
@@ -2921,7 +2926,9 @@
   // Usa a mesma previsão do Orçamento: entra no carrinho o que deve acabar nos próximos N dias,
   // na quantidade de costume, na loja onde a pessoa mais compra o produto. A pessoa revisa e
   // manda o pedido para a loja pelo WhatsApp (a loja entrega e cobra: Pix, cartão ou dinheiro).
-  let cartSrc = 'mine', cartH = 30;
+  let cartSrc = 'mine';
+  // 'out' (padrão) = provavelmente já acabaram · 'soon' = vão acabar nos próximos cartDays dias
+  let cartMode = 'out', cartDays = 7;
   let cartOrders = null;
   const cartFromGroup = () => cartSrc === 'group' && inGroup();
   const cartKey = () => 'carrinho_' + (me?.uid || 'local') + '_' + (cartFromGroup() ? 'grupo' : 'meu');
@@ -2967,22 +2974,33 @@
     return map;
   }
 
+  // preço unitário da última compra do produto
+  function lastUnitPrice(p) {
+    const e = p.events[p.events.length - 1];
+    return e.qty > 0 ? e.value / e.qty : e.value;
+  }
+
+  // Não temos como saber o consumo real: o "acabou" é estimado pelo intervalo entre as compras.
+  // Quantidade sugerida = média do que a pessoa leva a cada compra.
   function cartLines(products, st) {
     const today = dayStart(Date.now());
-    const end = today + cartH * DAY;
+    // provavelmente acabou = a próxima compra prevista já chegou (hoje ou antes)
+    const limit = cartMode === 'out' ? today + DAY : today + (cartDays + 1) * DAY;
     const ordered = orderedMap(st);
     const lines = [];
     products.forEach(p => {
-      const dates = plannedIn(p, today, end);
-      if (!dates.length || (ordered[p.key] || 0) > p.last) return; // não vai acabar, ou já foi pedido
-      const unitPrice = p.avgQty > 0 ? p.avgValue / p.avgQty : p.avgValue;
+      if (!p.cycle || p.inactive || p.next >= limit) return;
+      if ((ordered[p.key] || 0) > p.last) return; // já foi pedido depois da última compra
+      const sinceDays = Math.round((today - dayStart(p.last)) / DAY);
       lines.push({
-        key: p.key, name: p.name, un: p.un, cat: p.cat, unitPrice, auto: true,
-        // um pedido = uma compra de costume (o prazo só decide se o item entra no carrinho)
+        key: p.key, name: p.name, un: p.un, cat: p.cat, unitPrice: lastUnitPrice(p), auto: true,
         qty: st.qty[p.key] ?? roundQty(p.avgQty, p.un),
         store: st.store[p.key] || favStore(p), removed: !!st.removed[p.key],
-        why: (p.next < today ? 'Já devia ter sido comprado (por volta de ' + fmtDay(p.next) + ')' : 'Deve acabar por volta de ' + fmtDay(dates[0])) +
-          ' · você compra ' + fmtCycle(p.cycle) + ' e costuma levar ' + fmtQtd(roundQty(p.avgQty, p.un)) + ' ' + p.un + ' por compra'
+        lastAt: p.last,
+        why: (p.next < today + DAY
+          ? 'Provavelmente acabou: você compra ' + fmtCycle(p.cycle) + ' e a última compra foi há ' + sinceDays + (sinceDays === 1 ? ' dia' : ' dias')
+          : 'Deve acabar por volta de ' + fmtDay(p.next) + ' · você compra ' + fmtCycle(p.cycle)) +
+          ' · costuma levar ' + fmtQtd(roundQty(p.avgQty, p.un)) + ' ' + p.un + ' por compra'
       });
     });
     st.extra.forEach(x => lines.push({ ...x, qty: st.qty[x.key] ?? x.qty, store: st.store[x.key] || x.store, removed: false, auto: false, why: 'Adicionado por você' }));
@@ -2994,9 +3012,13 @@
     subscribeOrders();
     $('cartSrc').classList.toggle('hidden', !inGroup());
     $('cartSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.csrc === (cartFromGroup() ? 'group' : 'mine')));
-    $('cartHorizon').querySelectorAll('button').forEach(b => b.classList.toggle('active', +b.dataset.ch === cartH));
-    $('cartLead').textContent = 'O app montou este carrinho sozinho, com o que ' + (cartFromGroup() ? 'o grupo costuma' : 'você costuma') +
-      ' comprar e que deve acabar nos próximos ' + cartH + ' dias. Revise, ajuste e confirme o pedido com a loja.';
+    $('cartMode').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.cmode === cartMode));
+    $('cartDaysBox').classList.toggle('hidden', cartMode !== 'soon');
+    if (document.activeElement !== $('cartDays')) $('cartDays').value = cartDays;
+    $('cartLead').textContent = (cartMode === 'out'
+      ? 'O app montou este carrinho com o que ' + (cartFromGroup() ? 'o grupo' : 'você') + ' provavelmente já não tem em casa,'
+      : 'O app montou este carrinho com o que deve acabar nos próximos ' + cartDays + (cartDays === 1 ? ' dia,' : ' dias,')) +
+      ' pelo tempo que cada item costuma durar. É uma estimativa: revise, ajuste e confirme o pedido com a loja.';
 
     const source = cartFromGroup() ? groupCupons : personalHistory();
     const products = buildProducts(source);
@@ -3018,7 +3040,9 @@
     if (!source.length) {
       html = '<section class="card"><p class="empty">Escaneie algumas notas fiscais: o carrinho é montado com o que você costuma comprar.</p></section>';
     } else if (!active.length) {
-      html = '<section class="card"><p class="empty">Nada para comprar nos próximos ' + cartH + ' dias. 🎉<br>Aumente o prazo acima ou adicione itens abaixo.</p></section>';
+      html = '<section class="card"><p class="empty">' + (cartMode === 'out'
+        ? 'Pelas estimativas, nada acabou ainda. 🎉<br>Veja "Vão acabar em…" acima ou adicione itens abaixo.'
+        : 'Nada deve acabar nos próximos ' + cartDays + ' dias. 🎉<br>Aumente o prazo acima ou adicione itens abaixo.') + '</p></section>';
     }
     byStore.forEach((items, store) => {
       const sub = items.reduce((s, l) => s + l.qty * l.unitPrice, 0);
@@ -3026,7 +3050,9 @@
       html += '<section class="card"><div class="cart-store-head"><h3>' + escapeHtml(store) + '</h3><b>' + brl(sub) + '</b></div>' +
         items.map(l => '<div class="cart-line"><div class="cart-info"><div class="cart-name">' + escapeHtml(l.name) + '</div>' +
           '<div class="cart-why">' + escapeHtml(l.why) + '</div>' +
-          '<div class="cart-price">' + (l.unitPrice ? brl(l.unitPrice) + ' / ' + escapeHtml(l.un) + ' (último preço pago)' : 'sem preço anterior') + '</div>' +
+          (l.lastAt
+            ? '<div class="cart-last"><span>Última compra:</span> ' + fmtDay(l.lastAt) + ' · <span>último preço:</span> ' + brl(l.unitPrice) + ' / ' + escapeHtml(l.un) + '</div>'
+            : '<div class="cart-price">' + (l.unitPrice ? brl(l.unitPrice) + ' / ' + escapeHtml(l.un) + ' (último preço pago)' : 'sem preço anterior') + '</div>') +
           (allStores.length > 1 ? '<select class="cat-select" style="margin-top:6px;font-size:.75rem;padding:4px 26px 4px 10px" data-cstore="' + escapeHtml(l.key) + '" aria-label="Loja">' +
             allStores.map(s => '<option' + (s === l.store ? ' selected' : '') + '>' + escapeHtml(s) + '</option>').join('') + '</select>' : '') +
           '</div><div class="cart-right"><b>' + brl(l.qty * l.unitPrice) + '</b>' +
@@ -3120,7 +3146,7 @@
     const g = (attr) => t.closest('[' + attr + ']')?.getAttribute(attr);
     let st = cartState();
     if (g('data-csrc')) { cartSrc = g('data-csrc'); return renderCart(); }
-    if (g('data-ch')) { cartH = +g('data-ch'); return renderCart(); }
+    if (g('data-cmode')) { cartMode = g('data-cmode'); return renderCart(); }
     const q = g('data-cq');
     if (q) {
       const key = t.closest('[data-key]').dataset.key;
@@ -3139,7 +3165,7 @@
     if (g('data-cadd')) {
       const p = currentCart().products.find(x => x.key === g('data-cadd'));
       if (!p) return;
-      st.extra.push({ key: p.key, name: p.name, un: p.un, qty: roundQty(p.avgQty, p.un), unitPrice: p.avgQty > 0 ? p.avgValue / p.avgQty : p.avgValue, store: favStore(p) });
+      st.extra.push({ key: p.key, name: p.name, un: p.un, qty: roundQty(p.avgQty, p.un), unitPrice: lastUnitPrice(p), lastAt: p.last, store: favStore(p) });
       delete st.removed[p.key];
       saveCartState(st); toast(titleCase(p.name) + ' adicionado ao carrinho.'); return renderCart();
     }
@@ -3151,7 +3177,7 @@
       const known = products.find(p => normName(p.name) === normName(name));
       const store = known ? favStore(known) : (lines[0]?.store || products[0] && favStore(products[0]) || 'Loja');
       st.extra.push({ key: 'extra|' + normName(name) + '|' + Date.now(), name: name.toUpperCase(), un: known?.un || 'un', qty,
-        unitPrice: known ? (known.avgQty > 0 ? known.avgValue / known.avgQty : known.avgValue) : 0, store });
+        unitPrice: known ? lastUnitPrice(known) : 0, lastAt: known?.last, store });
       saveCartState(st); return renderCart();
     }
     if (g('data-cphone-save')) {
@@ -3209,6 +3235,10 @@
   }
 
   function onCartChange(e) {
+    if (e.target.id === 'cartDays') {
+      cartDays = Math.min(90, Math.max(1, Math.round(+e.target.value) || 7));
+      return renderCart();
+    }
     const sel = e.target.closest('[data-cstore]');
     if (!sel) return;
     const st = cartState();
@@ -3390,7 +3420,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-07.6';
+  const APP_VERSION = '2026-11-07.7';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
