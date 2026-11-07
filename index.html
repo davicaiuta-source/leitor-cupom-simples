@@ -3,31 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14532d">
+<meta name="theme-color" content="#F5F2EA">
 <title>Leitor de Cupom Fiscal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   :root {
     color-scheme: light;
-    --bg: #eef1ee;
+    /* visual "Suave": creme, verde-musgo, cartões claros, títulos em serifa */
+    --bg: #F5F2EA;
     --card: #ffffff;
-    --text: #1a1f1c;
-    --muted: #5f6b64;
-    --green: #16a34a;
-    --green-btn: #1e9a4b;
-    --green-btn-dark: #187d3d;
-    --green-dark: #14532d;
-    --green-deep: #0f3d22;
-    --green-soft: #dcf2e3;
-    --green-text: #15803d;
-    --orange-soft: #fbd38d;
-    --orange: #b45309;
-    --border: #e3e8e4;
-    --danger: #b91c1c;
-    --shadow: 0 6px 24px rgba(20, 50, 30, .10);
+    --text: #1D2A23;
+    --muted: #5E6A62;
+    --green: #2F6B4F;
+    --green-btn: #24563F;
+    --green-btn-dark: #1B4331;
+    --green-dark: #24563F;
+    --green-deep: #1D2A23;
+    --green-soft: #DCEDE2;
+    --green-text: #24563F;
+    --lavender: #E8E3F5;
+    --lavender-text: #4B3F78;
+    --cream: #F3EBDD;
+    --orange-soft: #F3E6D3;
+    --orange: #8A5300;
+    --border: #E7E2D6;
+    --danger: #B42318;
+    --shadow: 0 4px 20px rgba(29, 42, 35, .06);
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -597,25 +602,156 @@
     ul.items { margin: 0 -16px; }
     ul.items li { padding: 11px 16px; }
   }
+  /* =====================================================================
+     Visual "Suave" (proposta C): fundo creme, cartões brancos bem arredondados,
+     títulos em serifa (Fraunces), verde-musgo e tons pastel (menta, lilás, creme).
+     Fica no fim para valer sobre as regras antigas.
+     ===================================================================== */
+  .app::before, .app::after { display: none; }
+  .app { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+
+  header {
+    background: none; color: var(--text); overflow: visible;
+    padding: calc(24px + env(safe-area-inset-top)) 20px 14px;
+  }
+  header h1 { font-family: var(--serif); font-size: 1.9rem; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; }
+  .header-sub { margin: 4px 0 0; font-size: .9rem; color: var(--muted); }
+  .header-row { align-items: center; }
+  .header-icons { padding-top: 0; }
+  .header-icons button {
+    width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--text);
+    align-items: center; justify-content: center; box-shadow: var(--shadow);
+  }
+  .header-icons svg { width: 22px; height: 22px; stroke: currentColor; }
+  .header-icons button.active { box-shadow: 0 0 0 3px var(--green-soft); }
+  .space-pill { background: #fff; color: var(--text); box-shadow: var(--shadow); }
+  main { margin-top: 0; padding: 0 16px 24px; }
+
+  .card { border-radius: 26px; box-shadow: none; padding: 20px 18px; margin-bottom: 14px; }
+  .card h2, .list-card h2, .stock-card h2, .scan-card h2, .account-card h2, .auth-card h2,
+  .detail-head h2, .card-title, .modal-card h3, .sd-head h3, .cart-store-head h3 {
+    font-family: var(--serif); font-weight: 600; letter-spacing: -.01em;
+  }
+  .scan-card h2 { font-size: 1.35rem; }
+  .list-card h2, .stock-card h2, .account-card h2, .auth-card h2 { font-size: 1.7rem; }
+  .illustration { display: none !important; }
+  .section-head h3 { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; }
+  .section-head button { color: var(--green-text); }
+
+  .btn { border-radius: 999px; font-size: 1rem; min-height: 52px; }
+  .btn.small { min-height: 44px; font-size: .92rem; }
+  .btn.ghost { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+  .btn.ghost:hover { background: #FBFAF6; }
+  .btn.stop { border-width: 1.5px; }
+  .btn svg { width: 22px; height: 22px; }
+  .link-btn { border-bottom-color: var(--border); }
+
+  .seg { background: #EFEBE1; border-radius: 999px; }
+  .seg button { border-radius: 999px; }
+  .seg button.active { color: var(--text); box-shadow: 0 1px 6px rgba(29, 42, 35, .08); }
+  .chip { border-color: var(--border); }
+  .chip.active { background: var(--green-btn); border-color: var(--green-btn); }
+  .stat { background: var(--green-soft); border-radius: 18px; }
+  .stat b { color: var(--text); font-family: var(--serif); font-weight: 600; }
+  .field input, .inline-form input, .manual input, .filter, .fb-text, .paste-box textarea {
+    border-radius: 14px; background: #FBFAF6; border-color: var(--border);
+  }
+
+  .history li { border-radius: 22px; box-shadow: none; border: 1px solid var(--border); }
+  .h-icon { background: var(--green-soft); }
+  .h-total { color: var(--text); font-weight: 700; font-size: 1.05rem; }
+  .h-name { font-weight: 600; }
+  .badge { border-radius: 999px; }
+  .empty-history { border-radius: 22px; box-shadow: none; border: 1px solid var(--border); }
+  .item-name, .s-name, .bud-name, .cart-name, .store { color: var(--green-dark); }
+  .summary { border-top-color: var(--text); color: var(--text); }
+  .modal-card { border-radius: 26px; }
+  .toast { border-radius: 999px; background: var(--text); }
+  .fab-feedback { bottom: calc(100px + env(safe-area-inset-bottom)); }
+
+  /* barra de abas flutuante, branca, com a aba ativa em menta */
+  .tabbar {
+    left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); width: calc(100% - 24px); max-width: 456px;
+    padding: 6px; gap: 4px; border: 0; border-radius: 26px; background: #fff;
+    box-shadow: 0 6px 24px rgba(29, 42, 35, .10);
+  }
+  .tabbar button {
+    padding: 8px 0 7px; border-radius: 20px; gap: 4px;
+    font: 500 .7rem "Inter", sans-serif; color: var(--muted); line-height: 1.1;
+  }
+  .tabbar button.active { background: var(--green-soft); color: var(--text); font-weight: 600; }
+  .tabbar svg { width: 21px; height: 21px; }
+
+  /* sub-abas (Notas: Minhas · Do grupo / Análises: Gastos · Orçamento · Histórico) */
+  .subnav { display: flex; gap: 4px; padding: 4px; margin: 0 0 14px; background: #EFEBE1; border-radius: 999px; }
+  .subnav button {
+    flex: 1; min-height: 40px; border: 0; border-radius: 999px; background: none; cursor: pointer;
+    font: 600 .85rem "Inter", sans-serif; color: var(--muted);
+  }
+  .subnav button.active { background: #fff; color: var(--text); box-shadow: 0 1px 6px rgba(29, 42, 35, .08); }
+  .subnav button.dim:not(.active) { opacity: .55; }
+
+  /* ---------- Início: resumo ---------- */
+  .home-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+  .h-card { border: 0; border-radius: 26px; background: #fff; padding: 16px 18px; text-align: left; font: inherit; color: inherit; width: 100%; cursor: pointer; display: block; }
+  .h-card:focus-visible { outline: 2px solid var(--green-btn); outline-offset: 2px; }
+  .h-eyebrow { display: block; font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #3F5A4A; }
+  .h-serif { font-family: var(--serif); font-weight: 600; }
+  .h-budget { background: var(--green-soft); display: flex; align-items: center; gap: 16px; }
+  .h-budget svg { flex: 0 0 auto; }
+  .h-budget .h-serif { display: block; font-size: 1.4rem; margin: 2px 0; }
+  .h-budget small { font-size: .82rem; color: #3F5A4A; }
+  .h-week-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .h-week-head .h-serif { font-size: 1.1rem; }
+  .h-week-head span:last-child { font-size: .85rem; color: var(--muted); }
+  .h-bars { margin-top: 14px; height: 96px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end; }
+  .h-bar { display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .h-bar i { display: block; width: 100%; max-width: 24px; min-height: 8px; border-radius: 12px; background: #E3EDE6; }
+  .h-bar.today i { background: var(--green-btn); }
+  .h-bar.future i { background: #EFEDE6; }
+  .h-bar span { font-size: .72rem; color: var(--muted); }
+  .h-bar.today span { color: var(--text); font-weight: 700; }
+  .h-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .h-two .h-card { padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .h-two .h-serif { font-size: 1.02rem; line-height: 1.2; }
+  .h-two small { font-size: .8rem; color: var(--muted); }
+  .h-lav { background: var(--lavender); }
+  .h-lav .h-eyebrow { color: var(--lavender-text); }
+  .h-pill { align-self: flex-start; margin-top: 2px; display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border-radius: 999px; background: #fff; color: #2E2650; font-size: .8rem; font-weight: 600; }
+  .h-group-head { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 2px 0; }
+  .h-group-head h3 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 1.15rem; }
+  .h-group-head span { font-size: .82rem; color: var(--muted); }
+  .h-people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .h-person { background: #fff; border-radius: 22px; padding: 14px 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .h-person span { font-size: .8rem; color: var(--muted); }
+  .h-person b { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; color: var(--text); display: block; }
+
+  /* ---------- Mais ---------- */
+  .more-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .more-list button {
+    width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 0; border-radius: 22px;
+    background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  }
+  .more-ic { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 14px; background: var(--green-soft); color: var(--green-text); display: flex; align-items: center; justify-content: center; }
+  .more-ic.lav { background: var(--lavender); color: var(--lavender-text); }
+  .more-ic.cream { background: var(--cream); color: var(--orange); }
+  .more-ic svg { width: 22px; height: 22px; stroke: currentColor; }
+  .more-txt { display: flex; flex-direction: column; gap: 2px; }
+  .more-txt b { font-size: .98rem; }
+  .more-txt small { font-size: .8rem; color: var(--muted); }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <svg class="leaves" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-width="1.2" aria-hidden="true">
-      <path d="M250 200 C 280 140, 330 100, 400 80"/>
-      <path d="M280 200 C 310 150, 350 125, 400 115"/>
-      <path d="M320 0 L 400 70 M340 0 L 400 50 M300 0 L 400 90 M360 0 L 400 32"/>
-      <path d="M180 200 C 200 150, 240 120, 230 60 C 200 100, 180 150, 180 200 Z" fill="#fff" fill-opacity=".25"/>
-      <path d="M300 200 C 340 170, 380 170, 400 150 C 360 140, 320 160, 300 200 Z" fill="#fff" fill-opacity=".2"/>
-      <path d="M20 200 C 40 160, 80 140, 110 150 C 80 170, 50 180, 20 200 Z" fill="#fff" fill-opacity=".15"/>
-    </svg>
     <div class="header-row">
-      <h1>Leitor de<br>Cupom Fiscal</h1>
+      <div>
+        <h1 id="headerTitle">Leitor de Cupom</h1>
+        <p class="header-sub" id="headerSub">Suas compras, sem susto.</p>
+      </div>
       <div class="header-icons">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         <button id="btnHeaderUser" aria-label="Minha conta">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a6 6 0 0 1 10 0"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
         </button>
       </div>
     </div>
@@ -672,11 +808,17 @@
     </section>
   </div>
 
+  <!-- Sub-abas de Notas (Minhas / Grupo) e Análises (Gastos / Orçamento / Histórico) -->
+  <div class="subnav hidden" id="subNav" role="tablist"></div>
+
   <div id="tabScan">
+    <!-- Resumo da tela inicial: orçamento, semana, compras, última nota, gastos do grupo -->
+    <div id="homeSummary"></div>
+
     <!-- Card de scan -->
     <section class="card scan-card" id="scanCard">
-      <h2>Escaneie o QR Code</h2>
-      <p class="lead">Aponte a câmera para o QR code do cupom fiscal NFC-e e valide automaticamente com a SEFAZ</p>
+      <h2>Escanear cupom fiscal</h2>
+      <p class="lead">Aponte a câmera para o QR Code da NFC-e. A nota é validada direto na SEFAZ.</p>
 
       <div class="inapp-warn hidden" id="inAppWarn">
         Você abriu este link <b>dentro de outro app</b> (WhatsApp, Instagram...), que pode bloquear a câmera.
@@ -922,6 +1064,25 @@
     </section>
   </div>
 
+  <!-- Aba Mais: atalhos para conta, relatos e informações -->
+  <div id="tabMore" class="hidden">
+    <section class="card list-card">
+      <h2>Mais</h2>
+      <p class="lead">Conta, grupo e ajuda.</p>
+    </section>
+    <ul class="more-list">
+      <li><button data-more="account"><span class="more-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+        <span class="more-txt"><b>Minha conta</b><small>Dados, grupo e o que você mostra para ele</small></span></button></li>
+      <li><button data-more="group"><span class="more-ic lav">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg></span>
+        <span class="more-txt"><b>Itens do grupo</b><small>Notas que todos do grupo escanearam</small></span></button></li>
+      <li><button data-more="feedback"><span class="more-ic cream">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M12 8v4M12 15.5v.01"/></svg></span>
+        <span class="more-txt"><b>Relatar bug ou melhoria</b><small>A mensagem vai para quem cuida do app</small></span></button></li>
+    </ul>
+  </div>
+
   <!-- Aba Conta: dados do usuário e do grupo -->
   <div id="tabAccount" class="hidden"><div id="accountContent"></div></div>
 
@@ -981,34 +1142,27 @@
     </div>
   </div>
 
-  <nav class="tabbar">
-    <button class="active" data-tab="scan">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v4M7 13v4h4"/></svg>
-      Escanear
+  <!-- Barra de abas: 5 seções; Notas e Análises têm sub-abas no topo da tela -->
+  <nav class="tabbar" aria-label="Seções do app">
+    <button class="active" data-nav="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9H3z"/></svg>
+      Início
     </button>
-    <button data-tab="mine">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
-      Minhas notas
+    <button data-nav="notes">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/></svg>
+      Notas
     </button>
-    <button data-tab="group" id="tabBtnGroup">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg>
-      Itens do grupo
+    <button data-nav="analytics">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-7"/></svg>
+      Análises
     </button>
-    <button data-tab="spend">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-      Gastos
-    </button>
-    <button data-tab="budget">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 15h3M8 18h6"/></svg>
-      Orçamento
-    </button>
-    <button data-tab="cart">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.3a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L21 8H6.2"/></svg>
+    <button data-nav="cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.7 12.3a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L21 8H6.2"/></svg>
       Compras
     </button>
-    <button data-tab="stock">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
-      Histórico
+    <button data-nav="more">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+      Mais
     </button>
   </nav>
 </div>
@@ -1447,7 +1601,9 @@
     if (currentTab === 'budget') renderBudget();
     if (currentTab === 'cart') renderCart();
     renderAccount();
-    $('tabBtnGroup').classList.toggle('dim', !inGroup());
+    if (currentTab === 'scan') renderHome();
+    renderSubNav();
+    renderHeaderGreeting();
   }
 
   // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
@@ -1584,7 +1740,8 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabCart', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabCart', 'tabMore', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback', 'subNav'].forEach(id => $(id).classList.add('hidden'));
+    renderHeaderGreeting();
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
     $('authView').classList.remove('hidden');
@@ -3394,13 +3551,150 @@
     renderStock();
   }
 
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', cart: 'tabCart', stock: 'tabStock', account: 'tabAccount' };
+  // ---------- Início: resumo (orçamento, semana, compras, última nota, gastos do grupo) ----------
+  const WEEKDAYS = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+
+  function ringSvg(pct, label, size = 84, r = 36, stroke = 8, track = '#FFFFFF', fill = 'none', fontSize = 20) {
+    const c = 2 * Math.PI * r;
+    const dash = Math.max(0, Math.min(1, pct)) * c;
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true">' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="' + fill + '" stroke="' + track + '" stroke-width="' + stroke + '"/>' +
+      (dash > 0 ? '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#24563F" stroke-width="' + stroke + '" stroke-linecap="round"' +
+        ' stroke-dasharray="' + dash.toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/>' : '') +
+      '<text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="' + fontSize + '" fill="#1D2A23">' + escapeHtml(label) + '</text></svg>';
+  }
+
+  function renderHeaderGreeting() {
+    const h = new Date().getHours();
+    const hello = h >= 5 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite';
+    $('headerTitle').textContent = me?.name ? hello + ', ' + firstName(me.name) : 'Leitor de Cupom';
+  }
+
+  function renderHome() {
+    renderHeaderGreeting();
+    const box = $('homeSummary');
+    if (CLOUD && !me) { box.innerHTML = ''; return; }
+    const mine = personalHistory();
+    const now = Date.now();
+    const today = dayStart(now);
+    const inRange = (h, a, b) => { const t = spendDate(h); return t >= a && t < b; };
+    const mStart = periodStart(now, 'month'), mEnd = shiftPeriod(mStart, 'month', 1);
+    const spent = sumTotal(mine.filter(h => inRange(h, mStart, mEnd)));
+    const products = buildProducts(mine);
+    const max = +budMaxAll().mine_month || 0;
+    let html = '<div class="home-grid">';
+
+    // orçamento do mês (ou gasto x previsão, se não houver gasto máximo definido)
+    if (max) {
+      const left = max - spent;
+      html += '<button class="h-card h-budget" data-home="budget">' + ringSvg(spent / max, Math.round(spent / max * 100) + '%') +
+        '<span><span class="h-eyebrow">Orçamento do mês</span><span class="h-serif">' + brl(spent) + '</span>' +
+        '<small>de ' + brl(max) + ' · ' + (left >= 0 ? 'sobram ' + brl(left) : 'passou ' + brl(-left)) + '</small></span></button>';
+    } else {
+      const planned = products.reduce((s, p) => s + plannedIn(p, today, mEnd).length * p.avgValue, 0);
+      const forecast = spent + planned;
+      html += '<button class="h-card h-budget" data-home="budget">' + ringSvg(forecast ? spent / forecast : 0, forecast ? Math.round(spent / forecast * 100) + '%' : '–') +
+        '<span><span class="h-eyebrow">Gasto do mês</span><span class="h-serif">' + brl(spent) + '</span>' +
+        '<small>previsão para o mês: ' + brl(forecast) + '</small></span></button>';
+    }
+
+    // gastos da semana (segunda a domingo), hoje em destaque
+    const wStart = periodStart(now, 'week');
+    const days = WEEKDAYS.map((d, i) => {
+      const a = wStart + i * DAY;
+      return { d, a, v: sumTotal(mine.filter(h => inRange(h, a, a + DAY))) };
+    });
+    const top = Math.max(...days.map(x => x.v), 1);
+    html += '<button class="h-card" data-home="week"><span class="h-week-head"><span class="h-serif">Gastos da semana</span><span>' +
+      brl(days.reduce((s, x) => s + x.v, 0)) + '</span></span><span class="h-bars">' +
+      days.map(x => '<span class="h-bar' + (x.a === today ? ' today' : x.a > today ? ' future' : '') + '"><i style="height:' +
+        Math.max(8, Math.round(x.v / top * 72)) + 'px"></i><span>' + x.d + '</span></span>').join('') + '</span></button>';
+
+    // compras (itens que provavelmente acabaram) + última nota
+    const ordered = orderedMap(cartState());
+    const out = products.filter(p => p.cycle && !p.inactive && p.next < today + DAY && !((ordered[p.key] || 0) > p.last)).length;
+    const last = mine[0];
+    html += '<div class="h-two">' +
+      '<button class="h-card h-lav" data-home="cart"><span class="h-eyebrow">Compras</span>' +
+      '<span class="h-serif">' + (out ? out + (out === 1 ? ' item deve ter acabado' : ' itens devem ter acabado') : 'Nada acabando agora') + '</span>' +
+      '<span class="h-pill">' + (out ? 'Revisar' : 'Ver carrinho') + '</span></button>' +
+      '<button class="h-card" data-home="last"><span class="h-eyebrow">Última nota</span>' +
+      (last ? '<span class="h-serif">' + escapeHtml(titleCase(last.store || 'Loja')) + '</span><small>' + brl(last.total || 0) + ' · ' + fmtDay(spendDate(last)) + '</small>'
+        : '<span class="h-serif">Nenhuma ainda</span><small>Escaneie seu primeiro cupom abaixo</small>') + '</button></div>';
+
+    // gastos do grupo no mês, por pessoa
+    if (inGroup()) {
+      const gm = groupCupons.filter(h => inRange(h, mStart, mEnd));
+      const total = sumTotal(gm) || 0;
+      const people = (group.members || []).map(uid => ({
+        uid, name: (group.memberNames || {})[uid] || 'Participante',
+        v: sumTotal(gm.filter(h => h.addedBy === uid))
+      })).sort((a, b) => b.v - a.v).slice(0, 3);
+      const fills = ['#DCEDE2', '#E8E3F5', '#F3EBDD'];
+      html += '<div class="h-group-head"><h3>Gastos do grupo</h3><span>' + MONTHS_FULL[new Date(now).getMonth()] + '</span></div>' +
+        '<div class="h-people">' + people.map((p, i) => {
+          const pct = total ? p.v / total : 0;
+          const ini = (p.name || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+          return '<button class="h-person h-card" data-home="group" aria-label="' + escapeHtml(firstName(p.name)) + ': ' + Math.round(pct * 100) + '% dos gastos do grupo">' +
+            ringSvg(pct, ini, 60, 25, 5, '#E3EDE6', fills[i % fills.length], 15) +
+            '<span>' + escapeHtml(p.uid === me.uid ? 'Você' : firstName(p.name)) + '<b>' + Math.round(pct * 100) + '%</b></span></button>';
+        }).join('') + '</div>';
+    }
+    box.innerHTML = html + '</div>';
+  }
+
+  function onHomeClick(e) {
+    const b = e.target.closest('[data-home]');
+    if (!b) return;
+    const what = b.dataset.home;
+    if (what === 'budget') { budGran = 'month'; budSrc = 'mine'; budAnchor = null; return showTab('budget'); }
+    if (what === 'week') { spendGran = 'week'; spendSrc = 'mine'; spendAnchor = null; spendSel = null; return showTab('spend'); }
+    if (what === 'cart') { cartMode = 'out'; cartSrc = 'mine'; return showTab('cart'); }
+    if (what === 'group') { spendGran = 'month'; spendSrc = 'group'; spendDim = 'who'; spendAnchor = null; spendSel = null; return showTab('spend'); }
+    if (what === 'last') {
+      const h = personalHistory()[0];
+      if (!h) { $('scanCard').scrollIntoView({ behavior: 'smooth' }); return; }
+      setStatus('');
+      renderNota(h, h.url, 'mine');
+      openResultCard();
+    }
+  }
+
+  // ---------- Navegação: 5 seções na barra; Notas e Análises com sub-abas ----------
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', cart: 'tabCart', stock: 'tabStock', more: 'tabMore', account: 'tabAccount' };
+  const NAV_OF = { scan: 'home', mine: 'notes', group: 'notes', spend: 'analytics', budget: 'analytics', stock: 'analytics', cart: 'cart', more: 'more', account: 'more' };
+  const SUB_TABS = {
+    notes: [['mine', 'Minhas notas'], ['group', 'Do grupo']],
+    analytics: [['spend', 'Gastos'], ['budget', 'Orçamento'], ['stock', 'Histórico']]
+  };
+  const lastSub = { notes: 'mine', analytics: 'spend' }; // volta para a última sub-aba usada
   let currentTab = 'scan';
+
+  function goNav(nav) {
+    if (nav === 'home') return showTab('scan');
+    if (SUB_TABS[nav]) return showTab(lastSub[nav]);
+    showTab(nav);
+  }
+
+  function renderSubNav() {
+    const subs = SUB_TABS[NAV_OF[currentTab]];
+    const el = $('subNav');
+    el.classList.toggle('hidden', !subs);
+    if (!subs) return;
+    el.innerHTML = subs.filter(([t]) => t !== 'group' || CLOUD).map(([t, label]) =>
+      '<button role="tab" aria-selected="' + (t === currentTab) + '" class="' + (t === currentTab ? 'active' : '') +
+      (t === 'group' && !inGroup() ? ' dim' : '') + '" data-sub="' + t + '">' + label + '</button>').join('');
+  }
 
   function showTab(tab) {
     currentTab = tab;
-    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    const nav = NAV_OF[tab];
+    if (SUB_TABS[nav]) lastSub[nav] = tab;
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.nav === nav));
+    renderSubNav();
+    renderHeaderGreeting();
     Object.entries(TAB_IDS).forEach(([t, id]) => $(id).classList.toggle('hidden', t !== tab));
+    if (tab === 'scan') renderHome();
     $('btnHeaderUser').classList.toggle('active', tab === 'account');
     // o detalhe da nota fica na aba onde foi aberto
     if (!$(TAB_IDS[tab]).contains(resultCard)) resultCard.classList.add('hidden');
@@ -3420,7 +3714,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-07.7';
+  const APP_VERSION = '2026-11-08.1';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4007,7 +4301,15 @@
   });
   $('btnTorch').addEventListener('click', toggleTorch);
   $('btnCamSwitch').addEventListener('click', switchCamera);
-  document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => goNav(b.dataset.nav)));
+  $('subNav').addEventListener('click', (e) => { const b = e.target.closest('[data-sub]'); if (b) showTab(b.dataset.sub); });
+  $('homeSummary').addEventListener('click', onHomeClick);
+  $('tabMore').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-more]');
+    if (!b) return;
+    if (b.dataset.more === 'feedback') return openFeedback();
+    showTab(b.dataset.more);
+  });
   $('stockFilter').addEventListener('input', renderStock);
   $('stockSort').addEventListener('change', (e) => {
     stockSort = e.target.value;
@@ -4150,9 +4452,9 @@
     $('authView').classList.remove('hidden');
     initCloud();
   } else {
-    $('tabBtnGroup').classList.add('hidden');
     $('btnFeedback').classList.remove('hidden');
     renderHistory();
+    renderHome();
   }
 </script>
 </body>
