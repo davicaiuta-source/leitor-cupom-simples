@@ -739,6 +739,55 @@
   .more-txt { display: flex; flex-direction: column; gap: 2px; }
   .more-txt b { font-size: .98rem; }
   .more-txt small { font-size: .8rem; color: var(--muted); }
+
+  /* ---------- Animações (leves; desligadas com "reduzir movimento") ---------- */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 14px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes growUp { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes growRight { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes tabPop { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+  /* ao abrir o app */
+  body.booting header { animation: fadeDown .5s cubic-bezier(.2, .7, .2, 1) both; }
+  body.booting .tabbar { animation: toastIn .5s cubic-bezier(.2, .7, .2, 1) .15s both; }
+
+  /* ao entrar numa aba: o conteúdo sobe de leve, um bloco após o outro */
+  .anim-in > *, .anim-in .home-grid > *, .anim-in .more-list > li {
+    animation: fadeUp .42s cubic-bezier(.2, .7, .2, 1) both;
+  }
+  .anim-in > *:nth-child(2), .anim-in .home-grid > *:nth-child(2), .anim-in .more-list > li:nth-child(2) { animation-delay: .05s; }
+  .anim-in > *:nth-child(3), .anim-in .home-grid > *:nth-child(3), .anim-in .more-list > li:nth-child(3) { animation-delay: .1s; }
+  .anim-in > *:nth-child(4), .anim-in .home-grid > *:nth-child(4) { animation-delay: .15s; }
+  .anim-in > *:nth-child(5), .anim-in .home-grid > *:nth-child(5) { animation-delay: .2s; }
+  .anim-in > *:nth-child(n+6), .anim-in .home-grid > *:nth-child(n+6) { animation-delay: .25s; }
+  .anim-in .h-bar i, .anim-in .t-col i { transform-origin: bottom; animation: growUp .55s cubic-bezier(.2, .7, .2, 1) .15s both; }
+  .anim-in .sb-bar i, .anim-in .bd-bar i { transform-origin: left; animation: growRight .55s cubic-bezier(.2, .7, .2, 1) .15s both; }
+  .subnav.anim-in { animation: fadeIn .3s ease both; }
+  .anim-in > #homeSummary { animation: none; } /* os cartões dentro dele já entram um a um */
+
+  /* aba ativa: o destaque muda com suavidade e o ícone dá um pulinho */
+  .tabbar button, .subnav button, .seg button, .chip { transition: background-color .25s ease, color .25s ease, box-shadow .25s ease; }
+  .tabbar button.active svg { animation: tabPop .35s ease; }
+
+  /* toque: botões e cartões "afundam" um pouco */
+  .btn, .h-card, .more-list button, .history li, .chip, .tabbar button, .icon-btn {
+    transition: transform .12s ease, background-color .2s ease, box-shadow .2s ease;
+  }
+  .btn:active, .h-card:active, .more-list button:active, .history li:active, .icon-btn:active { transform: scale(.97); }
+  .tabbar button:active { transform: scale(.94); }
+
+  /* detalhe da nota, avisos e janelas */
+  #resultCard:not(.hidden) { animation: fadeUp .35s cubic-bezier(.2, .7, .2, 1) both; }
+  .toast:not(.hidden) { animation: toastIn .3s cubic-bezier(.2, .7, .2, 1) both; }
+  .modal:not(.hidden) { animation: fadeIn .2s ease both; }
+  .modal:not(.hidden) .modal-card { animation: popIn .25s cubic-bezier(.2, .7, .2, 1) both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -1747,6 +1796,7 @@
     $('authView').classList.remove('hidden');
     $('authLoading').classList.add('hidden');
     $('authForms').classList.remove('hidden');
+    animateIn($('authView'));
   }
 
   function showApp() {
@@ -3686,14 +3736,27 @@
       (t === 'group' && !inGroup() ? ' dim' : '') + '" data-sub="' + t + '">' + label + '</button>').join('');
   }
 
+  // Reinicia a animação de entrada (o conteúdo sobe de leve, bloco a bloco). A classe sai logo
+  // depois, para que as atualizações de dados não fiquem animando a tela de novo.
+  function animateIn(el) {
+    el.classList.remove('anim-in');
+    void el.offsetWidth; // força o navegador a recomeçar a animação
+    el.classList.add('anim-in');
+    clearTimeout(el._animTimer);
+    el._animTimer = setTimeout(() => el.classList.remove('anim-in'), 900);
+  }
+
   function showTab(tab) {
+    const prevNav = NAV_OF[currentTab];
     currentTab = tab;
     const nav = NAV_OF[tab];
     if (SUB_TABS[nav]) lastSub[nav] = tab;
     document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.nav === nav));
     renderSubNav();
+    if (SUB_TABS[nav] && prevNav !== nav) animateIn($('subNav'));
     renderHeaderGreeting();
     Object.entries(TAB_IDS).forEach(([t, id]) => $(id).classList.toggle('hidden', t !== tab));
+    animateIn($(TAB_IDS[tab]));
     if (tab === 'scan') renderHome();
     $('btnHeaderUser').classList.toggle('active', tab === 'account');
     // o detalhe da nota fica na aba onde foi aberto
@@ -3714,7 +3777,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.1';
+  const APP_VERSION = '2026-11-08.2';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4444,6 +4507,10 @@
     showTab($('tabAccount').classList.contains('hidden') ? 'account' : 'scan');
   });
   $('headerSpace').addEventListener('click', () => { if (CLOUD && me) showTab('account'); });
+
+  // animação de abertura (topo e barra de abas); sai depois para não repetir
+  document.body.classList.add('booting');
+  setTimeout(() => document.body.classList.remove('booting'), 1200);
 
   if (CLOUD) {
     // espera o Firebase dizer se há alguém logado
