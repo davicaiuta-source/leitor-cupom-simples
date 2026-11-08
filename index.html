@@ -463,6 +463,52 @@
   .bud-why.out { background: #f1f4f2; color: var(--muted); }
   .bud-why.late { background: #fff4e0; color: #8a5300; }
   .bud-why svg { width: 12px; height: 12px; stroke: currentColor; }
+
+  /* metas por categoria */
+  .meta-row { padding: 10px 0 2px; }
+  .meta-row small { display: block; font-size: .74rem; margin-top: 4px; }
+  .meta-row .sb-bar { margin-top: 6px; }
+  .meta-row .sb-bar i { border-radius: 0 4px 4px 0; }
+  i.meta-ok { background: var(--green-btn); }
+  i.meta-near { background: #E0A100; }
+  i.meta-over { background: var(--danger); }
+  .meta-ok-txt { color: var(--muted); }
+  .meta-near-txt { color: var(--orange); font-weight: 600; }
+  .meta-over-txt { color: var(--danger); font-weight: 600; }
+  .meta-edit { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: .9rem; font-weight: 600; }
+  .meta-edit span { display: flex; align-items: center; gap: 7px; }
+  .meta-edit input { width: 130px; min-height: 40px; padding: 6px 10px; text-align: right; border: 1px solid var(--border); border-radius: 12px; font: 500 .95rem "Inter", sans-serif; background: var(--input, #FBFAF6); color: var(--text); }
+
+  /* economia */
+  .sv-hero span { display: block; font-family: var(--serif); font-size: 2rem; font-weight: 600; line-height: 1.1; }
+  .sv-hero small { color: var(--muted); font-size: .82rem; }
+  .sv-delta { margin: 10px 0 12px; padding: 8px 12px; border-radius: 12px; font-size: .85rem; font-weight: 600; }
+  .sv-delta.good { background: var(--green-soft); color: var(--green-text); }
+  .sv-delta.bad { background: var(--orange-soft); color: var(--orange); }
+  .sv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .sv-grid > div { background: var(--surface-2, #F6F8F6); border-radius: 16px; padding: 10px 12px; min-width: 0; }
+  .sv-grid small { display: block; font-size: .7rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .sv-grid b { display: block; font-size: .95rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sv-grid span { font-size: .8rem; color: var(--muted); }
+  .sv-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: .9rem; }
+  .sv-line small { color: var(--muted); font-size: .76rem; margin-left: 4px; }
+  .sv-line b { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sv-pos { color: var(--green-text); }
+  .sv-neg { color: var(--danger); }
+  .sv-split-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); margin-bottom: 6px; }
+  .sv-split-head b { color: var(--text); }
+  .sv-pay { display: flex; align-items: center; gap: 6px; padding: 8px 12px; margin-top: 6px; border-radius: 12px; background: var(--surface-2, #F6F8F6); font-size: .9rem; font-weight: 600; }
+  .sv-pay b { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .sv-alert, .sv-cmp { padding: 10px 0; border-top: 1px solid var(--border); }
+  .sv-alert { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .sv-alert b, .sv-cmp b { font-size: .9rem; }
+  .sv-alert small, .sv-cmp small { display: block; font-size: .78rem; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .sv-cmp small b { font-size: .78rem; color: var(--text); }
+  .sv-cmp-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .sv-tag { flex: 0 0 auto; font-size: .75rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .sv-tag.up { background: var(--orange-soft); color: var(--orange); }
+  .sv-tag.down { background: var(--green-soft); color: var(--green-text); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .hide-btn {
     display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 0 6px; cursor: pointer;
     border: 1px solid var(--border); background: #fff; border-radius: 999px; padding: 3px 9px;
@@ -1056,6 +1102,27 @@
     </section>
   </div>
 
+  <!-- Aba Economia: resumo do mês, alertas de preço, comparação entre lojas, divisão do grupo -->
+  <div id="tabSave" class="hidden">
+    <section class="card list-card">
+      <h2>Economia</h2>
+      <p class="lead" id="saveLead"></p>
+      <div class="seg small hidden" id="saveSrc">
+        <button class="active" data-svsrc="mine">Meu</button>
+        <button data-svsrc="group">Do grupo</button>
+      </div>
+      <div class="period-nav">
+        <button class="icon-btn" id="savePrev" aria-label="Mês anterior">‹</button>
+        <b id="saveMonthLabel"></b>
+        <button class="icon-btn" id="saveNext" aria-label="Próximo mês">›</button>
+      </div>
+    </section>
+    <section class="card" id="saveSummary"></section>
+    <section class="card hidden" id="saveSplit"></section>
+    <section class="card" id="saveAlerts"></section>
+    <section class="card" id="saveCompare"></section>
+  </div>
+
   <!-- Aba Compras: carrinho montado automaticamente pelo histórico; a pessoa revisa e manda o pedido para a loja -->
   <div id="tabCart" class="hidden">
     <section class="card list-card">
@@ -1200,6 +1267,9 @@
       <p class="bd-title" style="margin-top:18px">Previsto por categoria <span class="muted-inline">· toque para filtrar os produtos</span></p>
       <div id="budCats"></div>
     </section>
+
+    <!-- Metas por categoria: um teto para cada categoria no período -->
+    <section class="card" id="budCatMetas"></section>
 
     <section class="card">
       <h3 class="card-title">Tempo de consumo dos produtos</h3>
@@ -1839,6 +1909,7 @@
     if (currentTab === 'group') renderGroupTab();
     if (currentTab === 'spend') renderSpend();
     if (currentTab === 'budget') renderBudget();
+    if (currentTab === 'save') renderSave();
     if (currentTab === 'cart') renderCart();
     renderAccount();
     if (currentTab === 'scan') renderHome();
@@ -1982,7 +2053,7 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabCart', 'tabMore', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback', 'subNav'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabSave', 'tabCart', 'tabMore', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback', 'subNav'].forEach(id => $(id).classList.add('hidden'));
     renderHeaderGreeting();
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
@@ -2117,7 +2188,7 @@
     });
   }
 
-  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', cart: 'Compras', stock: 'Histórico', account: 'Minha conta' };
+  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', save: 'Economia', cart: 'Compras', stock: 'Histórico', more: 'Mais', account: 'Minha conta' };
   let fbType = 'bug';
 
   function openFeedback() {
@@ -3099,7 +3170,70 @@
     const spentCur = sumTotal(source.filter(h => { const t = spendDate(h); return t >= cur && t < shiftPeriod(cur, budGran, 1); }));
     renderBudTrend(products, cur, maxAnchor, spentCur, source);
     renderBudCats(rows);
+    renderCatMetas(rows, source, isCur, end);
     renderBudList(rows, isCur, end);
+  }
+
+  // ---------- Metas por categoria ----------
+  // Um teto por categoria, separado como o gasto máximo (Meu/Grupo e Semana/Mês/Ano).
+  // Compara com o já gasto + previsto do período escolhido.
+  let catMetaEditing = false;
+  const catMetaKey = (id) => budMaxId() + '_cat_' + id;
+  const catMeta = (id) => +budMaxAll()[catMetaKey(id)] || 0;
+
+  async function saveBudMaxAll(all) {
+    if (CLOUD && me) await saveMyPrefs({ budgetMax: all });
+    else { try { localStorage.setItem(BUD_MAX_KEY, JSON.stringify(all)); } catch (_) {} }
+  }
+
+  function renderCatMetas(rows, source, isCur, end) {
+    const box = $('budCatMetas');
+    const spent = new Map(), planned = new Map();
+    if (isCur) source.filter(h => { const t = spendDate(h); return t >= budAnchor && t < end; })
+      .forEach(h => { const id = cupomCat(h).id; spent.set(id, (spent.get(id) || 0) + (h.total || 0)); });
+    rows.forEach(r => { if (r.value > 0) planned.set(r.p.cat.id, (planned.get(r.p.cat.id) || 0) + r.value); });
+
+    let html = '<div class="cart-store-head"><h3 class="card-title" style="margin:0">Metas por categoria</h3>' +
+      (catMetaEditing ? '' : '<button class="link-btn" data-cmeta="edit" style="margin:0">' + (CATEGORIES.some(c => catMeta(c.id)) ? 'Alterar' : 'Definir metas') + '</button>') + '</div>';
+    if (catMetaEditing) {
+      html += '<p class="muted" style="margin-top:8px">Teto ' + GRAN_NAME[budGran] + ' para cada categoria. Deixe em branco para não ter meta.</p>' +
+        CATEGORIES.map(c => '<label class="meta-edit"><span><i class="sb-key" style="background:' + (CHART_CAT[c.id] || CHART_CAT.outros) + '"></i>' + c.name + '</span>' +
+          '<input inputmode="decimal" data-meta-cat="' + c.id + '" placeholder="sem meta" value="' + (catMeta(c.id) ? fmtNum(catMeta(c.id)) : '') + '"></label>').join('') +
+        '<div class="btn-row" style="margin:12px 0 0"><button class="btn small ghost" data-cmeta="cancel">Cancelar</button><button class="btn small" data-cmeta="save">Salvar metas</button></div>';
+      box.innerHTML = html;
+      return;
+    }
+    const cats = CATEGORIES.filter(c => catMeta(c.id) || spent.get(c.id) || planned.get(c.id));
+    if (!cats.length) { box.innerHTML = html + '<p class="muted" style="margin:8px 0 0">Nenhum gasto previsto neste período.</p>'; return; }
+    html += cats.map(c => {
+      const used = (spent.get(c.id) || 0) + (planned.get(c.id) || 0);
+      const meta = catMeta(c.id);
+      const pct = meta ? used / meta : 0;
+      const state = !meta ? '' : pct > 1 ? 'over' : pct >= .8 ? 'near' : 'ok';
+      return '<div class="meta-row"><div class="sb-top"><span><i class="sb-key" style="background:' + (CHART_CAT[c.id] || CHART_CAT.outros) + '"></i><em>' + c.name + '</em></span>' +
+        '<span><b>' + brl(used) + '</b>' + (meta ? ' de ' + brl(meta) : ' · sem meta') + '</span></div>' +
+        (meta ? '<div class="sb-bar"><i class="meta-' + state + '" style="width:' + Math.min(100, pct * 100) + '%"></i></div>' +
+          '<small class="meta-' + state + '-txt">' + (state === 'over' ? 'Passou ' + brl(used - meta) + ' da meta' :
+            state === 'near' ? 'Perto da meta: sobram ' + brl(meta - used) : 'Sobram ' + brl(meta - used)) + '</small>' : '') + '</div>';
+    }).join('') + '<p class="muted" style="margin:10px 0 0;font-size:.75rem">' + (isCur ? 'Já gasto + previsto até o fim do período.' : 'Previsto para o período.') + '</p>';
+    box.innerHTML = html;
+  }
+
+  async function onCatMeta(action) {
+    if (action === 'edit') { catMetaEditing = true; return renderBudget(); }
+    if (action === 'cancel') { catMetaEditing = false; return renderBudget(); }
+    const all = { ...budMaxAll() };
+    document.querySelectorAll('[data-meta-cat]').forEach(inp => {
+      const v = parseMoney(inp.value);
+      const key = catMetaKey(inp.dataset.metaCat);
+      if (v > 0) all[key] = Math.round(v * 100) / 100; else delete all[key];
+    });
+    try {
+      await saveBudMaxAll(all);
+      catMetaEditing = false;
+      toast('Metas salvas.');
+    } catch (err) { cloudError(err); }
+    renderBudget();
   }
 
   // ---------- Gasto máximo (teto) por período ----------
@@ -3299,6 +3433,9 @@
     const src = t.closest('[data-bsrc]'), gran = t.closest('[data-bgran]'), col = t.closest('[data-bstart]');
     const cat = t.closest('[data-bcat]'), show = t.closest('[data-bshow]'), bmax = t.closest('[data-bmax]');
     if (bmax) return onBudMax(bmax.dataset.bmax);
+    const cmeta = t.closest('[data-cmeta]');
+    if (cmeta) return onCatMeta(cmeta.dataset.cmeta);
+    if (t.closest('[data-meta-cat]')) return;
     // barra de um período que já passou: abre esse período na aba Gastos
     const past = t.closest('[data-bpast]');
     if (past) {
@@ -3320,6 +3457,203 @@
     else return;
     $('chartTip').classList.add('hidden');
     renderBudget();
+  }
+
+  // ---------- Economia: resumo do mês, alertas de preço, comparação entre lojas, divisão do grupo ----------
+  let saveSrc = 'mine', saveMonth = null, saveShowAllCmp = false;
+  const saveFromGroup = () => saveSrc === 'group' && inGroup();
+  const PRICE_ALERT_MIN = 0.10;   // variação a partir de 10% vira alerta
+  const PRICE_RECENT_DAYS = 60;   // só alerta sobre o que foi comprado nos últimos 60 dias
+
+  // Para preços: as notas da pessoa + as do grupo, sem contar a mesma compra duas vezes
+  function priceSource() {
+    const seen = new Set();
+    return personalHistory().concat(inGroup() ? groupCupons : []).filter(h => {
+      const k = noteKey(h);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
+  // Produto -> compras com preço unitário, loja, data e se foi a própria pessoa que comprou
+  // (da mais antiga para a mais nova)
+  function priceHistory(list) {
+    const mineKeys = new Set(personalHistory().map(noteKey));
+    const map = new Map();
+    list.forEach(h => {
+      const t = spendDate(h);
+      if (!t) return;
+      const store = titleCase(h.store || 'Loja');
+      const mine = mineKeys.has(noteKey(h));
+      (h.items || []).forEach(i => {
+        const q = Number.isFinite(i.qtd) && i.qtd > 0 ? i.qtd : null;
+        const unit = q ? itemValue(i) / q : (Number.isFinite(i.unit) ? i.unit : null);
+        if (!unit || unit <= 0) return;
+        const un = (i.un || 'un').toLowerCase().trim();
+        const key = normName(i.name) + '|' + un;
+        if (!map.has(key)) map.set(key, { key, name: i.name, un, buys: [] });
+        const p = map.get(key);
+        p.buys.push({ t, store, unit, mine });
+        if (t >= (p.lastT || 0)) { p.lastT = t; p.name = i.name; }
+      });
+    });
+    map.forEach(p => p.buys.sort((a, b) => a.t - b.t));
+    return [...map.values()];
+  }
+
+  // Variação do preço da última compra em relação à compra anterior
+  function priceChanges(prices) {
+    const since = Date.now() - PRICE_RECENT_DAYS * DAY;
+    return prices.filter(p => p.buys.length >= 2 && p.lastT >= since).map(p => {
+      const last = p.buys[p.buys.length - 1], prev = p.buys[p.buys.length - 2];
+      return { p, last, prev, change: (last.unit - prev.unit) / prev.unit };
+    }).filter(x => Math.abs(x.change) >= PRICE_ALERT_MIN);
+  }
+
+  // Onde cada produto está mais barato (último preço visto em cada loja), comparado com
+  // a última vez que a PRÓPRIA pessoa comprou (as notas do grupo só entram como referência de preço)
+  function priceComparisons(prices) {
+    return prices.map(p => {
+      const byStore = new Map();
+      p.buys.forEach(b => byStore.set(b.store, b)); // fica o mais recente de cada loja
+      if (byStore.size < 2) return null;
+      const last = p.buys.filter(b => b.mine).pop();
+      if (!last) return null; // a pessoa nunca comprou esse produto
+      const stores = [...byStore.values()].sort((a, b) => a.unit - b.unit);
+      const best = stores[0];
+      const saving = last.unit - best.unit;
+      if (best.store === last.store || saving <= 0) return null;
+      return { p, last, best, stores, pct: saving / last.unit };
+    }).filter(x => x && x.pct >= 0.03).sort((a, b) => b.pct - a.pct);
+  }
+
+  const fmtUnit = (v, un) => brl(v) + '/' + un;
+  const pctTxt = (x) => Math.round(Math.abs(x) * 100) + '%';
+
+  function renderSave() {
+    if (saveSrc === 'group' && !inGroup()) saveSrc = 'mine';
+    const cur = periodStart(Date.now(), 'month');
+    if (saveMonth === null || saveMonth > cur) saveMonth = cur;
+    const mEnd = shiftPeriod(saveMonth, 'month', 1);
+    const prevStart = shiftPeriod(saveMonth, 'month', -1);
+    const monthName = (s) => MONTHS_FULL[new Date(s).getMonth()].toLowerCase();
+
+    $('saveSrc').classList.toggle('hidden', !inGroup());
+    $('saveSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.svsrc === (saveFromGroup() ? 'group' : 'mine')));
+    $('saveLead').textContent = 'Onde dá para economizar, pelos preços das notas ' + (inGroup() ? 'suas e do grupo.' : 'que você escaneou.');
+    $('saveMonthLabel').textContent = periodLabel(saveMonth, 'month');
+    $('saveNext').disabled = saveMonth >= cur;
+
+    // ----- resumo do mês -----
+    const source = saveFromGroup() ? groupCupons : personalHistory();
+    const inR = (h, a, b) => { const t = spendDate(h); return t >= a && t < b; };
+    const notes = source.filter(h => inR(h, saveMonth, mEnd));
+    const total = sumTotal(notes), prevTotal = sumTotal(source.filter(h => inR(h, prevStart, saveMonth)));
+    const top = (fn) => { const m = new Map(); notes.forEach(h => { const k = fn(h); m.set(k, (m.get(k) || 0) + (h.total || 0)); }); return [...m].sort((a, b) => b[1] - a[1])[0]; };
+    const topCat = top(h => cupomCat(h).name), topStore = top(h => titleCase(h.store || 'Loja'));
+    const biggest = notes.slice().sort((a, b) => (b.total || 0) - (a.total || 0))[0];
+    const prods = new Map();
+    notes.forEach(h => (h.items || []).forEach(i => { const k = normName(i.name); const x = prods.get(k) || { name: i.name, v: 0 }; x.v += itemValue(i); prods.set(k, x); }));
+    const topProds = [...prods.values()].sort((a, b) => b.v - a.v).slice(0, 3);
+    const monthPrices = priceHistory(priceSource()).filter(p => p.lastT >= saveMonth && p.lastT < mEnd);
+    const rose = priceChanges(monthPrices).filter(x => x.change > 0).sort((a, b) => b.change - a.change)[0];
+
+    let s = '<h3 class="card-title">Resumo de ' + monthName(saveMonth) + '</h3>';
+    if (!notes.length) {
+      s += '<p class="muted" style="margin:0">Nenhuma nota neste mês.</p>';
+    } else {
+      const diff = total - prevTotal;
+      s += '<div class="sv-hero"><span>' + brl(total) + '</span><small>' + notes.length + (notes.length === 1 ? ' nota' : ' notas') +
+        ' · média ' + brl(total / notes.length) + ' por nota</small></div>' +
+        (prevTotal > 0 ? '<p class="sv-delta ' + (diff <= 0 ? 'good' : 'bad') + '">' + (diff <= 0
+          ? '▼ Você gastou ' + brl(-diff) + ' a menos que em ' + monthName(prevStart) + ' (' + pctTxt(diff / prevTotal) + ')'
+          : '▲ Você gastou ' + brl(diff) + ' a mais que em ' + monthName(prevStart) + ' (' + pctTxt(diff / prevTotal) + ')') + '</p>' : '') +
+        '<div class="sv-grid">' +
+        '<div><small>Onde mais gastou</small><b>' + escapeHtml(topCat[0]) + '</b><span>' + brl(topCat[1]) + '</span></div>' +
+        '<div><small>Loja favorita</small><b>' + escapeHtml(topStore[0]) + '</b><span>' + brl(topStore[1]) + '</span></div>' +
+        '<div><small>Maior compra</small><b>' + escapeHtml(titleCase(biggest.store || 'Loja')) + '</b><span>' + brl(biggest.total || 0) + ' · ' + fmtDay(spendDate(biggest)) + '</span></div>' +
+        '<div><small>O que mais subiu</small>' + (rose ? '<b>' + escapeHtml(titleCase(rose.p.name)) + '</b><span>+' + pctTxt(rose.change) + '</span>' : '<b>Nada subiu</b><span>pelo menos 10%</span>') + '</div>' +
+        '</div>' +
+        (topProds.length ? '<p class="field-label" style="margin-top:12px">Produtos em que mais gastou</p>' +
+          topProds.map(x => '<div class="sv-line"><span>' + escapeHtml(titleCase(x.name)) + '</span><b>' + brl(x.v) + '</b></div>').join('') : '');
+    }
+    $('saveSummary').innerHTML = s;
+
+    // ----- divisão de gastos do grupo (no mês escolhido) -----
+    const split = $('saveSplit');
+    split.classList.toggle('hidden', !inGroup());
+    if (inGroup()) split.innerHTML = renderSplit(saveMonth, mEnd, monthName(saveMonth));
+
+    // ----- alertas de preço -----
+    const prices = priceHistory(priceSource());
+    const changes = priceChanges(prices);
+    const up = changes.filter(x => x.change > 0).sort((a, b) => b.change - a.change);
+    const down = changes.filter(x => x.change < 0).sort((a, b) => a.change - b.change);
+    const alertRow = (x) => '<div class="sv-alert"><div><b>' + escapeHtml(titleCase(x.p.name)) + '</b>' +
+      '<small>' + fmtUnit(x.prev.unit, x.p.un) + ' → ' + fmtUnit(x.last.unit, x.p.un) + ' · ' + escapeHtml(x.last.store) + ', ' + fmtDay(x.last.t) + '</small></div>' +
+      '<span class="sv-tag ' + (x.change > 0 ? 'up' : 'down') + '">' + (x.change > 0 ? '▲ +' : '▼ −') + pctTxt(x.change) + '</span></div>';
+    $('saveAlerts').innerHTML = '<h3 class="card-title">Alertas de preço</h3>' +
+      '<p class="muted">Produtos que você comprou nos últimos ' + PRICE_RECENT_DAYS + ' dias com preço pelo menos 10% diferente da compra anterior.</p>' +
+      (!changes.length ? '<p class="muted" style="margin:0">Nenhuma mudança grande de preço. 👍</p>' :
+        (up.length ? '<p class="field-label">Ficaram mais caros</p>' + up.slice(0, 8).map(alertRow).join('') : '') +
+        (down.length ? '<p class="field-label" style="margin-top:12px">Ficaram mais baratos</p>' + down.slice(0, 8).map(alertRow).join('') : ''));
+
+    // ----- comparar preços entre lojas -----
+    const cmps = priceComparisons(prices);
+    const shown = saveShowAllCmp ? cmps : cmps.slice(0, 6);
+    $('saveCompare').innerHTML = '<h3 class="card-title">Comparar preços entre lojas</h3>' +
+      '<p class="muted">Produtos que você comprou e que estavam mais baratos em outra loja (último preço visto em cada uma).</p>' +
+      (!cmps.length ? '<p class="muted" style="margin:0">Ainda não há o mesmo produto comprado em lojas diferentes com preço menor.</p>' :
+        shown.map(x => '<div class="sv-cmp"><div class="sv-cmp-top"><b>' + escapeHtml(titleCase(x.p.name)) + '</b><span class="sv-tag down">−' + pctTxt(x.pct) + '</span></div>' +
+          '<small>Você pagou <b>' + fmtUnit(x.last.unit, x.p.un) + '</b> no ' + escapeHtml(x.last.store) + ' (' + fmtDay(x.last.t) + ')</small>' +
+          '<small>No <b>' + escapeHtml(x.best.store) + '</b>: <b>' + fmtUnit(x.best.unit, x.p.un) + '</b> (' + fmtDay(x.best.t) + ')</small>' +
+          (x.stores.length > 2 ? '<small>' + x.stores.map(st => escapeHtml(st.store) + ' ' + fmtUnit(st.unit, x.p.un)).join(' · ') + '</small>' : '') + '</div>').join('') +
+        (cmps.length > 6 ? '<button class="link-btn" data-svall="1">' + (saveShowAllCmp ? 'Mostrar menos' : 'Ver todos (' + cmps.length + ')') + '</button>' : '') +
+        '<p class="muted" style="margin:10px 0 0;font-size:.75rem">Os preços são os do dia de cada nota; podem ter mudado desde então.</p>');
+  }
+
+  // Divisão igual entre os participantes: quem pagou mais recebe, quem pagou menos acerta
+  function renderSplit(start, end, monthName) {
+    const notes = groupCupons.filter(h => { const t = spendDate(h); return t >= start && t < end; });
+    const members = (group.members || []).map(uid => ({ uid, name: (group.memberNames || {})[uid] || 'Participante' }));
+    const total = sumTotal(notes);
+    let html = '<h3 class="card-title">Divisão do grupo em ' + monthName + '</h3>' +
+      '<p class="muted">Pelas notas que foram para o grupo, dividindo o total igualmente entre as ' + members.length + ' pessoas.</p>';
+    if (!total || members.length < 2) return html + '<p class="muted" style="margin:0">' + (members.length < 2 ? 'O grupo só tem uma pessoa.' : 'Nenhuma nota do grupo neste mês.') + '</p>';
+    const share = total / members.length;
+    const rows = members.map(m => ({ ...m, paid: sumTotal(notes.filter(h => h.addedBy === m.uid)) })).map(m => ({ ...m, bal: m.paid - share }));
+    html += '<div class="sv-split-head"><span>Total do grupo <b>' + brl(total) + '</b></span><span>Parte de cada um <b>' + brl(share) + '</b></span></div>' +
+      rows.sort((a, b) => b.paid - a.paid).map(m => '<div class="sv-line"><span>' + escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name)) +
+        ' <small>pagou ' + brl(m.paid) + '</small></span><b class="' + (m.bal >= 0 ? 'sv-pos' : 'sv-neg') + '">' +
+        (Math.abs(m.bal) < 0.01 ? 'quite' : m.bal > 0 ? 'recebe ' + brl(m.bal) : 'deve ' + brl(-m.bal)) + '</b></div>').join('');
+    // acertos: quem deve paga para quem tem a receber (o mínimo de transferências)
+    const debt = rows.filter(m => m.bal < -0.009).map(m => ({ ...m, v: -m.bal }));
+    const cred = rows.filter(m => m.bal > 0.009).map(m => ({ ...m, v: m.bal }));
+    const pays = [];
+    let i = 0, j = 0;
+    while (i < debt.length && j < cred.length) {
+      const v = Math.min(debt[i].v, cred[j].v);
+      pays.push({ from: debt[i], to: cred[j], v });
+      debt[i].v -= v; cred[j].v -= v;
+      if (debt[i].v < 0.01) i++;
+      if (cred[j].v < 0.01) j++;
+    }
+    const who = (m) => escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name));
+    if (pays.length) html += '<p class="field-label" style="margin-top:12px">Para acertar as contas</p>' +
+      pays.map(p => '<div class="sv-pay">' + who(p.from) + ' <span aria-hidden="true">→</span><span class="sr-only">paga para</span> ' + who(p.to) + '<b>' + brl(p.v) + '</b></div>').join('');
+    return html;
+  }
+
+  function onSaveClick(e) {
+    const t = e.target;
+    const src = t.closest('[data-svsrc]');
+    if (src) saveSrc = src.dataset.svsrc;
+    else if (t.closest('#savePrev')) saveMonth = shiftPeriod(saveMonth, 'month', -1);
+    else if (t.closest('#saveNext')) saveMonth = shiftPeriod(saveMonth, 'month', 1);
+    else if (t.closest('[data-svall]')) saveShowAllCmp = !saveShowAllCmp;
+    else return;
+    renderSave();
   }
 
   // ---------- Compras: carrinho montado automaticamente pelo histórico ----------
@@ -3905,11 +4239,11 @@
   }
 
   // ---------- Navegação: 5 seções na barra; Notas e Análises com sub-abas ----------
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', cart: 'tabCart', stock: 'tabStock', more: 'tabMore', account: 'tabAccount' };
-  const NAV_OF = { scan: 'home', mine: 'notes', group: 'notes', spend: 'analytics', budget: 'analytics', stock: 'analytics', cart: 'cart', more: 'more', account: 'more' };
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', save: 'tabSave', cart: 'tabCart', stock: 'tabStock', more: 'tabMore', account: 'tabAccount' };
+  const NAV_OF = { scan: 'home', mine: 'notes', group: 'notes', spend: 'analytics', budget: 'analytics', save: 'analytics', stock: 'analytics', cart: 'cart', more: 'more', account: 'more' };
   const SUB_TABS = {
     notes: [['mine', 'Minhas notas'], ['group', 'Do grupo']],
-    analytics: [['spend', 'Gastos'], ['budget', 'Orçamento'], ['stock', 'Histórico']]
+    analytics: [['spend', 'Gastos'], ['budget', 'Orçamento'], ['save', 'Economia'], ['stock', 'Histórico']]
   };
   const lastSub = { notes: 'mine', analytics: 'spend' }; // volta para a última sub-aba usada
   let currentTab = 'scan';
@@ -3984,6 +4318,7 @@
     if (tab === 'group') renderGroupTab();
     if (tab === 'spend') renderSpend();
     if (tab === 'budget') renderBudget();
+    if (tab === 'save') renderSave();
     if (tab === 'cart') renderCart();
     $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
@@ -3994,7 +4329,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.8';
+  const APP_VERSION = '2026-11-08.9';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4672,6 +5007,7 @@
   $('tabSpend').addEventListener('pointermove', showChartTip);
   $('tabSpend').addEventListener('pointerleave', () => $('chartTip').classList.add('hidden'));
   $('tabBudget').addEventListener('click', onBudgetClick);
+  $('tabSave').addEventListener('click', onSaveClick);
   $('tabCart').addEventListener('click', onCartClick);
   $('tabCart').addEventListener('change', onCartChange);
   $('tabBudget').addEventListener('keydown', (e) => {
