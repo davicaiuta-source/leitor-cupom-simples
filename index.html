@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F5F2EA">
+<meta name="theme-color" content="#F5F2EA" id="metaTheme">
+<script>
+  // Tema escolhido antes de desenhar a página (evita piscar branco no modo escuro).
+  // 'auto' segue o celular; 'light'/'dark' é a escolha da pessoa (aba Mais → Aparência).
+  (function () {
+    var choice = 'auto';
+    try { choice = localStorage.getItem('tema') || 'auto'; } catch (e) {}
+    var dark = choice === 'dark' || (choice === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
 <title>Leitor de Cupom Fiscal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -478,7 +488,7 @@
   .cart-x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .74rem; padding: 0; text-decoration: underline; }
   .cart-checkout { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
   .cart-checkout .muted { margin-bottom: 8px; }
-  .cart-wa { background: #1e9a4b; }
+  .cart-wa { background: var(--green-btn); }
   .cart-chip-add { border-style: dashed; }
   .cart-days { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .88rem; margin: -2px 0 4px; }
   .cart-days input { width: 64px; min-height: 38px; padding: 6px 8px; text-align: center; border: 1px solid var(--border); border-radius: 10px; font: 600 1rem "Inter", sans-serif; background: #f7f9f7; color: var(--text); }
@@ -788,6 +798,73 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
+
+  /* =====================================================================
+     Modo escuro: os mesmos tons do visual "Suave" (musgo, menta, lilás, creme)
+     em versões escuras. Ativado por <html data-theme="dark">.
+     ===================================================================== */
+  :root {
+    --surface-2: #F6F8F6; --input: #FBFAF6; --seg: #EFEBE1; --eyebrow: #3F5A4A;
+    --ring-track: #FFFFFF; --ring-soft: #E3EDE6; --ring-stroke: #24563F;
+  }
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #111713; --card: #1A221D; --text: #E6ECE8; --muted: #9DAAA2;
+    --green: #6FBF94; --green-btn: #2F7552; --green-btn-dark: #3A8A62;
+    --green-dark: #8ED3AC; --green-deep: #E6ECE8; --green-soft: #1F3328; --green-text: #8ED3AC;
+    --lavender: #29263A; --lavender-text: #C8BFF2; --cream: #322B20;
+    --orange-soft: #35291A; --orange: #F2B66A; --border: #2A342E; --danger: #F28B82;
+    --shadow: 0 4px 20px rgba(0, 0, 0, .35);
+    --surface-2: #212A24; --input: #151C18; --seg: #232C26; --eyebrow: #9CC8AE;
+    --ring-track: #2E4637; --ring-soft: #2C3A31; --ring-stroke: #7CCB9F;
+  }
+  html[data-theme="dark"] body { background: var(--bg); }
+
+  /* fundos brancos fixos -> cartão escuro */
+  html[data-theme="dark"] .btn.stop, html[data-theme="dark"] .btn.ghost, html[data-theme="dark"] .chip,
+  html[data-theme="dark"] .pick span, html[data-theme="dark"] .modal-card, html[data-theme="dark"] .fab-feedback,
+  html[data-theme="dark"] .header-icons button, html[data-theme="dark"] .space-pill, html[data-theme="dark"] .tabbar,
+  html[data-theme="dark"] .subnav button.active, html[data-theme="dark"] .seg button.active, html[data-theme="dark"] .h-card,
+  html[data-theme="dark"] .h-person, html[data-theme="dark"] .more-list button, html[data-theme="dark"] .hide-btn,
+  html[data-theme="dark"] .stepper span { background-color: var(--card); }
+  html[data-theme="dark"] .h-budget { background: var(--green-soft); }
+  html[data-theme="dark"] .h-lav { background: var(--lavender); }
+  html[data-theme="dark"] .btn.ghost:hover { background: var(--surface-2); }
+  html[data-theme="dark"] .chip.active { background: var(--green-btn); color: #fff; }
+  html[data-theme="dark"] .pick input:checked + span { background: var(--green-btn); color: #fff; }
+  html[data-theme="dark"] .h-pill { background: var(--card); color: var(--lavender-text); }
+  html[data-theme="dark"] .h-eyebrow, html[data-theme="dark"] .h-budget small { color: var(--eyebrow); }
+  html[data-theme="dark"] .h-lav .h-eyebrow { color: var(--lavender-text); }
+
+  /* fundos cinza-claros -> superfície escura; campos de texto */
+  html[data-theme="dark"] ul.items li:nth-child(odd), html[data-theme="dark"] .stock-list li:nth-child(odd),
+  html[data-theme="dark"] .cat-row, html[data-theme="dark"] .bd-row.active, html[data-theme="dark"] .sb-row:hover,
+  html[data-theme="dark"] .sb-row.active, html[data-theme="dark"] .sd-table tr.link:hover, html[data-theme="dark"] .bud-max,
+  html[data-theme="dark"] .bud-why.out, html[data-theme="dark"] .account-card .account-head, html[data-theme="dark"] .group-box,
+  html[data-theme="dark"] .icon-btn, html[data-theme="dark"] .stepper button, html[data-theme="dark"] .fb-type,
+  html[data-theme="dark"] .bd-bar, html[data-theme="dark"] .sb-bar { background-color: var(--surface-2); }
+  html[data-theme="dark"] .seg, html[data-theme="dark"] .subnav { background: var(--seg); }
+  html[data-theme="dark"] .manual input, html[data-theme="dark"] .filter, html[data-theme="dark"] .paste-box textarea,
+  html[data-theme="dark"] .field input, html[data-theme="dark"] .inline-form input, html[data-theme="dark"] .fb-text,
+  html[data-theme="dark"] .cart-days input, html[data-theme="dark"] .cat-select { background-color: var(--input); color: var(--text); }
+  html[data-theme="dark"] .field input:focus, html[data-theme="dark"] .inline-form input:focus,
+  html[data-theme="dark"] .fb-text:focus { background-color: var(--card); }
+  html[data-theme="dark"] .mode-card.selected { background: var(--green-soft); }
+
+  /* avisos e etiquetas coloridas */
+  html[data-theme="dark"] .inapp-warn, html[data-theme="dark"] .notice { background: #2E2616; border-color: #5C4A22; color: #F2D29B; }
+  html[data-theme="dark"] .inapp-warn b { color: #FBE3B5; }
+  html[data-theme="dark"] .bud-why.late, html[data-theme="dark"] .order-status { background: #2E2616; color: #F2C17A; }
+  html[data-theme="dark"] .hide-btn.on, html[data-theme="dark"] .hide-chip, html[data-theme="dark"] .fb-type.bug { background: #3A1F1E; border-color: #5E2F2C; color: #F4A39C; }
+  html[data-theme="dark"] .toast { background: #E6ECE8; color: #111713; }
+  html[data-theme="dark"] .h-bar i { background: #2C3A31; }
+  html[data-theme="dark"] .h-bar.future i { background: #222A25; }
+  html[data-theme="dark"] .h-bar.today i { background: var(--ring-stroke); }
+  html[data-theme="dark"] .tabbar { box-shadow: 0 6px 24px rgba(0, 0, 0, .5); }
+
+  /* gráficos (Gastos e Orçamento): grade e barras não selecionadas mais escuras */
+  html[data-theme="dark"] .spend-card { --grid: #2A342E; --axis: #3A463F; --ink-muted: #8E9A92; --chart-1: #3987e5; --chart-1-soft: #2A4F7A; }
+  html[data-theme="dark"] .chart-tip { background: #E6ECE8; color: #111713; }
 </style>
 </head>
 <body>
@@ -1130,6 +1207,15 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M12 8v4M12 15.5v.01"/></svg></span>
         <span class="more-txt"><b>Relatar bug ou melhoria</b><small>A mensagem vai para quem cuida do app</small></span></button></li>
     </ul>
+    <section class="card" style="margin-top:14px">
+      <h3 class="card-title">Aparência</h3>
+      <p class="muted">"Automático" segue o modo claro ou escuro do seu celular.</p>
+      <div class="seg small" id="themeSeg" role="radiogroup" aria-label="Tema do app" style="margin-bottom:0">
+        <button data-theme-choice="auto" role="radio">Automático</button>
+        <button data-theme-choice="light" role="radio">Claro</button>
+        <button data-theme-choice="dark" role="radio">Escuro</button>
+      </div>
+    </section>
   </div>
 
   <!-- Aba Conta: dados do usuário e do grupo -->
@@ -3604,14 +3690,15 @@
   // ---------- Início: resumo (orçamento, semana, compras, última nota, gastos do grupo) ----------
   const WEEKDAYS = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
 
-  function ringSvg(pct, label, size = 84, r = 36, stroke = 8, track = '#FFFFFF', fill = 'none', fontSize = 20) {
+  // track/fill: cores CSS (variáveis do tema), para o anel acompanhar o modo claro/escuro
+  function ringSvg(pct, label, size = 84, r = 36, stroke = 8, track = 'var(--ring-track)', fill = 'none', fontSize = 20) {
     const c = 2 * Math.PI * r;
     const dash = Math.max(0, Math.min(1, pct)) * c;
     return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true">' +
-      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="' + fill + '" stroke="' + track + '" stroke-width="' + stroke + '"/>' +
-      (dash > 0 ? '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#24563F" stroke-width="' + stroke + '" stroke-linecap="round"' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" stroke-width="' + stroke + '" style="fill:' + fill + ';stroke:' + track + '"/>' +
+      (dash > 0 ? '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke-width="' + stroke + '" stroke-linecap="round" style="stroke:var(--ring-stroke)"' +
         ' stroke-dasharray="' + dash.toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/>' : '') +
-      '<text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="' + fontSize + '" fill="#1D2A23">' + escapeHtml(label) + '</text></svg>';
+      '<text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="' + fontSize + '" style="fill:var(--text)">' + escapeHtml(label) + '</text></svg>';
   }
 
   function renderHeaderGreeting() {
@@ -3680,13 +3767,13 @@
         uid, name: (group.memberNames || {})[uid] || 'Participante',
         v: sumTotal(gm.filter(h => h.addedBy === uid))
       })).sort((a, b) => b.v - a.v).slice(0, 3);
-      const fills = ['#DCEDE2', '#E8E3F5', '#F3EBDD'];
+      const fills = ['var(--green-soft)', 'var(--lavender)', 'var(--cream)'];
       html += '<div class="h-group-head"><h3>Gastos do grupo</h3><span>' + MONTHS_FULL[new Date(now).getMonth()] + '</span></div>' +
         '<div class="h-people">' + people.map((p, i) => {
           const pct = total ? p.v / total : 0;
           const ini = (p.name || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
           return '<button class="h-person h-card" data-home="group" aria-label="' + escapeHtml(firstName(p.name)) + ': ' + Math.round(pct * 100) + '% dos gastos do grupo">' +
-            ringSvg(pct, ini, 60, 25, 5, '#E3EDE6', fills[i % fills.length], 15) +
+            ringSvg(pct, ini, 60, 25, 5, 'var(--ring-soft)', fills[i % fills.length], 15) +
             '<span>' + escapeHtml(p.uid === me.uid ? 'Você' : firstName(p.name)) + '<b>' + Math.round(pct * 100) + '%</b></span></button>';
         }).join('') + '</div>';
     }
@@ -3736,6 +3823,29 @@
       (t === 'group' && !inGroup() ? ' dim' : '') + '" data-sub="' + t + '">' + label + '</button>').join('');
   }
 
+  // ---------- Tema (claro / escuro) ----------
+  // A escolha fica neste aparelho; "auto" acompanha o modo do celular, inclusive quando ele muda sozinho à noite.
+  const darkQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+  function themeChoice() {
+    try { return localStorage.getItem('tema') || 'auto'; } catch (_) { return 'auto'; }
+  }
+  function applyTheme() {
+    const choice = themeChoice();
+    const dark = choice === 'dark' || (choice === 'auto' && !!darkQuery?.matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('metaTheme').setAttribute('content', dark ? '#111713' : '#F5F2EA');
+    document.querySelectorAll('#themeSeg [data-theme-choice]').forEach(b => {
+      const on = b.dataset.themeChoice === choice;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', String(on));
+    });
+  }
+  function setTheme(choice) {
+    try { localStorage.setItem('tema', choice); } catch (_) {}
+    applyTheme();
+  }
+  darkQuery?.addEventListener?.('change', () => { if (themeChoice() === 'auto') applyTheme(); });
+
   // Reinicia a animação de entrada (o conteúdo sobe de leve, bloco a bloco). A classe sai logo
   // depois, para que as atualizações de dados não fiquem animando a tela de novo.
   function animateIn(el) {
@@ -3777,7 +3887,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.3';
+  const APP_VERSION = '2026-11-08.4';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4367,7 +4477,10 @@
   document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => goNav(b.dataset.nav)));
   $('subNav').addEventListener('click', (e) => { const b = e.target.closest('[data-sub]'); if (b) showTab(b.dataset.sub); });
   $('homeSummary').addEventListener('click', onHomeClick);
+  applyTheme();
   $('tabMore').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-theme-choice]');
+    if (t) return setTheme(t.dataset.themeChoice);
     const b = e.target.closest('[data-more]');
     if (!b) return;
     if (b.dataset.more === 'feedback') return openFeedback();
