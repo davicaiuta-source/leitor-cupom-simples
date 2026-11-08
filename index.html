@@ -751,39 +751,39 @@
   @keyframes tabPop { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
   /* ao abrir o app */
-  body.booting header { animation: fadeDown .5s cubic-bezier(.2, .7, .2, 1) both; }
-  body.booting .tabbar { animation: toastIn .5s cubic-bezier(.2, .7, .2, 1) .15s both; }
+  body.booting header { animation: fadeDown .8s cubic-bezier(.2, .7, .2, 1) both; }
+  body.booting .tabbar { animation: toastIn .8s cubic-bezier(.2, .7, .2, 1) .3s both; }
 
   /* ao entrar numa aba: o conteúdo sobe de leve, um bloco após o outro */
   .anim-in > *, .anim-in .home-grid > *, .anim-in .more-list > li {
-    animation: fadeUp .42s cubic-bezier(.2, .7, .2, 1) both;
+    animation: fadeUp .7s cubic-bezier(.2, .7, .2, 1) both;
   }
-  .anim-in > *:nth-child(2), .anim-in .home-grid > *:nth-child(2), .anim-in .more-list > li:nth-child(2) { animation-delay: .05s; }
-  .anim-in > *:nth-child(3), .anim-in .home-grid > *:nth-child(3), .anim-in .more-list > li:nth-child(3) { animation-delay: .1s; }
-  .anim-in > *:nth-child(4), .anim-in .home-grid > *:nth-child(4) { animation-delay: .15s; }
-  .anim-in > *:nth-child(5), .anim-in .home-grid > *:nth-child(5) { animation-delay: .2s; }
-  .anim-in > *:nth-child(n+6), .anim-in .home-grid > *:nth-child(n+6) { animation-delay: .25s; }
-  .anim-in .h-bar i, .anim-in .t-col i { transform-origin: bottom; animation: growUp .55s cubic-bezier(.2, .7, .2, 1) .15s both; }
-  .anim-in .sb-bar i, .anim-in .bd-bar i { transform-origin: left; animation: growRight .55s cubic-bezier(.2, .7, .2, 1) .15s both; }
-  .subnav.anim-in { animation: fadeIn .3s ease both; }
+  .anim-in > *:nth-child(2), .anim-in .home-grid > *:nth-child(2), .anim-in .more-list > li:nth-child(2) { animation-delay: .09s; }
+  .anim-in > *:nth-child(3), .anim-in .home-grid > *:nth-child(3), .anim-in .more-list > li:nth-child(3) { animation-delay: .18s; }
+  .anim-in > *:nth-child(4), .anim-in .home-grid > *:nth-child(4) { animation-delay: .27s; }
+  .anim-in > *:nth-child(5), .anim-in .home-grid > *:nth-child(5) { animation-delay: .36s; }
+  .anim-in > *:nth-child(n+6), .anim-in .home-grid > *:nth-child(n+6) { animation-delay: .45s; }
+  .anim-in .h-bar i, .anim-in .t-col i { transform-origin: bottom; animation: growUp .9s cubic-bezier(.2, .7, .2, 1) .3s both; }
+  .anim-in .sb-bar i, .anim-in .bd-bar i { transform-origin: left; animation: growRight .9s cubic-bezier(.2, .7, .2, 1) .3s both; }
+  .subnav.anim-in { animation: fadeIn .5s ease both; }
   .anim-in > #homeSummary { animation: none; } /* os cartões dentro dele já entram um a um */
 
   /* aba ativa: o destaque muda com suavidade e o ícone dá um pulinho */
-  .tabbar button, .subnav button, .seg button, .chip { transition: background-color .25s ease, color .25s ease, box-shadow .25s ease; }
-  .tabbar button.active svg { animation: tabPop .35s ease; }
+  .tabbar button, .subnav button, .seg button, .chip { transition: background-color .4s ease, color .4s ease, box-shadow .4s ease; }
+  .tabbar button.active svg { animation: tabPop .55s ease; }
 
-  /* toque: botões e cartões "afundam" um pouco */
+  /* toque: botões e cartões "afundam" um pouco (rápido de propósito, para responder ao dedo) */
   .btn, .h-card, .more-list button, .history li, .chip, .tabbar button, .icon-btn {
-    transition: transform .12s ease, background-color .2s ease, box-shadow .2s ease;
+    transition: transform .18s ease, background-color .35s ease, box-shadow .35s ease;
   }
   .btn:active, .h-card:active, .more-list button:active, .history li:active, .icon-btn:active { transform: scale(.97); }
   .tabbar button:active { transform: scale(.94); }
 
   /* detalhe da nota, avisos e janelas */
-  #resultCard:not(.hidden) { animation: fadeUp .35s cubic-bezier(.2, .7, .2, 1) both; }
-  .toast:not(.hidden) { animation: toastIn .3s cubic-bezier(.2, .7, .2, 1) both; }
-  .modal:not(.hidden) { animation: fadeIn .2s ease both; }
-  .modal:not(.hidden) .modal-card { animation: popIn .25s cubic-bezier(.2, .7, .2, 1) both; }
+  #resultCard:not(.hidden) { animation: fadeUp .6s cubic-bezier(.2, .7, .2, 1) both; }
+  .toast:not(.hidden) { animation: toastIn .5s cubic-bezier(.2, .7, .2, 1) both; }
+  .modal:not(.hidden) { animation: fadeIn .35s ease both; }
+  .modal:not(.hidden) .modal-card { animation: popIn .45s cubic-bezier(.2, .7, .2, 1) both; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -3743,7 +3743,7 @@
     void el.offsetWidth; // força o navegador a recomeçar a animação
     el.classList.add('anim-in');
     clearTimeout(el._animTimer);
-    el._animTimer = setTimeout(() => el.classList.remove('anim-in'), 900);
+    el._animTimer = setTimeout(() => el.classList.remove('anim-in'), 1500); // depois da mais longa (.45s + .9s)
   }
 
   function showTab(tab) {
@@ -3777,7 +3777,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.2';
+  const APP_VERSION = '2026-11-08.3';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4510,7 +4510,7 @@
 
   // animação de abertura (topo e barra de abas); sai depois para não repetir
   document.body.classList.add('booting');
-  setTimeout(() => document.body.classList.remove('booting'), 1200);
+  setTimeout(() => document.body.classList.remove('booting'), 1800);
 
   if (CLOUD) {
     // espera o Firebase dizer se há alguém logado
