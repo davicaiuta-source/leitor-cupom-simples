@@ -1303,6 +1303,19 @@
     </div>
   </div>
 
+  <!-- Nota repetida: alguém do grupo já escaneou a mesma compra -->
+  <div class="modal hidden" id="dupModal">
+    <div class="modal-card">
+      <h3>Essa nota já está no grupo</h3>
+      <p id="dupModalInfo"></p>
+      <p style="margin-top:10px">Quer mesmo fixar essa nota nas suas notas pessoais? Ela passa a contar no seu orçamento e nos seus gastos, mas <b>não sobe de novo para o grupo</b>.</p>
+      <div style="display:grid;gap:8px;margin-top:16px">
+        <button class="btn small" id="btnDupKeep">Salvar nas minhas notas</button>
+        <button class="btn small ghost" id="btnDupSkip">Não salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Pergunta se a nota recém-escaneada vai para o grupo -->
   <div class="modal hidden" id="shareModal">
     <div class="modal-card">
@@ -1442,13 +1455,28 @@
     return cloudCupons.concat(mineInGroup).sort((a, b) => (b.scannedAt || 0) - (a.scannedAt || 0));
   }
 
+  // ---------- Comparar notas: a mesma compra escaneada duas vezes ----------
+  // A chave de acesso da NFC-e (44 dígitos) é a mesma em qualquer formato do link (http/https, parâmetros).
+  // Sem chave (nota colada como texto), compara loja + total + data e hora da compra.
+  function noteKey(h) {
+    const m = String(h.url || '').match(/\d{44}/);
+    if (m) return 'chave:' + m[0];
+    if (h.issuedAt) return 'nota:' + normName(h.store) + '|' + Math.round((h.total || 0) * 100) + '|' + Math.round(h.issuedAt / 60000);
+    return 'link:' + h.url;
+  }
+  const sameNote = (a, b) => a.url === b.url || noteKey(a) === noteKey(b);
+  // a mesma compra, no grupo, em nome de outra pessoa
+  const groupTwin = (h) => inGroup() ? groupCupons.find(c => c.addedBy && c.addedBy !== me.uid && sameNote(c, h)) : null;
+
   // Notas pessoais: todas que a própria pessoa escaneou (tendo ido para o grupo ou não); nunca as de outras pessoas
   function personalHistory() {
     if (!CLOUD) return loadHistory();
     // nota que está no grupo em nome de outra pessoa é dela (quem escaneou primeiro), mesmo que
-    // uma cópia tenha caído na conta desta pessoa (ex.: cupons do celular enviados no login)
-    const others = new Set(groupCupons.filter(c => c.addedBy && c.addedBy !== me?.uid).map(c => c.url));
-    return loadHistory().filter(h => (!h.addedBy || h.addedBy === me?.uid) && !others.has(h.url));
+    // uma cópia tenha caído na conta desta pessoa (ex.: cupons do celular enviados no login),
+    // a não ser que a pessoa tenha confirmado que quer a nota também nas notas dela (keepPersonal)
+    const others = groupCupons.filter(c => c.addedBy && c.addedBy !== me?.uid);
+    return loadHistory().filter(h => (!h.addedBy || h.addedBy === me?.uid) &&
+      (h.keepPersonal || !others.some(c => sameNote(c, h))));
   }
 
   function saveHistory(list) {
@@ -1494,6 +1522,7 @@
       const ref = fb.doc(db, 'groups', gid, 'cupons', id);
       const cur = groupDoc(h.url);
       if (cur && cur.addedBy && cur.addedBy !== me.uid) continue; // nota de outra pessoa
+      if (!cur && groupTwin(h)) continue; // a mesma compra já está no grupo (outra pessoa escaneou)
       if (wantsShare(h, id)) {
         const doc = groupVersion(h);
         if (cur && sig(cur) === sig(doc)) continue;
@@ -1538,8 +1567,45 @@
     });
   }
 
+  // Alguém do grupo já escaneou a mesma compra: pergunta se a pessoa quer a nota também nas notas dela
+  function askDuplicate(twin, h) {
+    $('dupModalInfo').innerHTML = '<b>' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</b> · ' + brl(h.total || 0) +
+      '<br>Essa compra já foi escaneada por <b>' + escapeHtml(firstName(twin.addedByName) || 'outra pessoa') + '</b>' +
+      (twin.scannedAt ? ' em ' + fmtDay(twin.scannedAt) : '') + ' e está no grupo <b>' + escapeHtml(group.name) + '</b>.';
+    $('dupModal').classList.remove('hidden');
+    return new Promise(resolve => {
+      const done = (keep) => {
+        $('dupModal').classList.add('hidden');
+        $('btnDupKeep').onclick = $('btnDupSkip').onclick = null;
+        resolve(keep);
+      };
+      $('btnDupKeep').onclick = () => done(true);
+      $('btnDupSkip').onclick = () => done(false);
+    });
+  }
+
   function addToHistory(url, data) {
     if (CLOUD) {
+      const probe = { ...data, url };
+      // a mesma compra já está nas minhas notas, com outro link? não duplica
+      const mineTwin = cloudCupons.find(c => c.url !== url && sameNote(c, probe));
+      if (mineTwin) {
+        toast('Você já tinha escaneado essa nota em ' + fmtDay(spendDate(mineTwin)) + '. Ela não foi duplicada.', 4500);
+        return;
+      }
+      // alguém do grupo já escaneou a mesma compra: não sobe de novo e só fica nas minhas notas se eu confirmar
+      const twin = groupTwin(probe);
+      if (twin && !cloudCupons.some(c => c.url === url)) {
+        askDuplicate(twin, probe).then(async (keep) => {
+          if (!keep) {
+            toast('Nota não salva. Ela continua no grupo, escaneada por ' + firstName(twin.addedByName) + '.', 4500);
+            return;
+          }
+          await cloudSaveCupom(url, { ...data, keepPersonal: true });
+          toast('Nota salva nas suas notas pessoais. Ela não sobe de novo para o grupo.', 4500);
+        }).catch(cloudError);
+        return;
+      }
       cloudSaveCupom(url, data).then(async (saved) => {
         if (!inGroup()) return;
         const other = groupDoc(url);
@@ -1788,7 +1854,9 @@
   async function cloudSaveCupom(url, data) {
     const prev = cloudCupons.find(c => c.url === url);
     const docData = cleanDoc({
-      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
+      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name,
+      // "fixada nas minhas notas" (mesma compra que outra pessoa já subiu ao grupo): não perde ao escanear de novo
+      keepPersonal: data.keepPersonal || prev?.keepPersonal || undefined
     });
     await fb.setDoc(fb.doc(db, ...spacePath(), 'cupons', await hashId(url)), docData);
     return docData;
@@ -3926,7 +3994,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.7';
+  const APP_VERSION = '2026-11-08.8';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4429,8 +4497,12 @@
     const gd = inGroup() ? groupDoc(url) : null;
     const canUnshare = gd && (gd.addedBy === me.uid || group.ownerUid === me.uid);
     let groupBtn = '';
-    if (inGroup() && ctx !== 'group' && !gd) groupBtn = '<button class="btn small" id="btnShare">Enviar ao grupo</button>';
+    // a mesma compra já está no grupo em nome de outra pessoa: não dá para enviar de novo
+    const twin = !gd && ctx !== 'group' ? groupTwin({ ...data, url }) : null;
+    if (inGroup() && ctx !== 'group' && !gd && !twin) groupBtn = '<button class="btn small" id="btnShare">Enviar ao grupo</button>';
     if (canUnshare) groupBtn = '<button class="btn small ghost" id="btnUnshare">Tirar do grupo</button>';
+    if (twin) html += '<p class="notice" style="margin-top:14px">Essa compra também está no grupo, escaneada por <b>' +
+      escapeHtml(firstName(twin.addedByName)) + '</b>. Nas suas notas ela conta só no seu orçamento.</p>';
     html += '<div class="detail-actions">' +
       (/^https?:\/\//i.test(url) ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener"><span class="btn small ghost">Nota original</span></a>' : '') +
       groupBtn +
