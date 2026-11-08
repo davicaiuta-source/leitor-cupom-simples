@@ -758,6 +758,17 @@
   .more-txt b { font-size: .98rem; }
   .more-txt small { font-size: .8rem; color: var(--muted); }
 
+  /* guia de instalação */
+  #installModal .modal-card { max-height: calc(100vh - 40px); overflow-y: auto; }
+  .install-steps { margin: 12px 0 14px; padding-left: 22px; font-size: .92rem; line-height: 1.5; }
+  .install-steps li { margin-bottom: 6px; }
+  .install-steps b { color: var(--text); }
+  .install-diag { list-style: none; margin: 0; padding: 0; font-size: .82rem; }
+  .install-diag li { display: flex; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); color: var(--muted); }
+  .install-diag li:first-child { border-top: 0; }
+  .install-diag .ok { color: var(--green-text); font-weight: 700; }
+  .install-diag .bad { color: var(--danger); font-weight: 700; }
+
   /* ---------- Animações (leves; desligadas com "reduzir movimento") ---------- */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
@@ -1271,6 +1282,23 @@
       <div class="btn-row">
         <button class="btn small ghost" id="btnFbCancel">Cancelar</button>
         <button class="btn small" id="btnFbSend">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guia de instalação: passo a passo conforme o navegador + diagnóstico -->
+  <div class="modal hidden" id="installModal">
+    <div class="modal-card">
+      <h3>Instalar o app</h3>
+      <p id="installBrowser"></p>
+      <ol class="install-steps" id="installSteps"></ol>
+      <button class="btn small hidden" id="btnInstallNow">Instalar agora</button>
+      <button class="btn small ghost hidden" id="btnInstallCopyLink" style="margin-top:8px">Copiar link do app</button>
+      <p class="field-label" style="margin-top:16px">Diagnóstico</p>
+      <ul class="install-diag" id="installDiag"><li>Verificando...</li></ul>
+      <div class="btn-row" style="margin-top:12px;margin-bottom:0">
+        <button class="btn small ghost" id="btnInstallCopyDiag">Copiar diagnóstico</button>
+        <button class="btn small" id="btnInstallClose">Fechar</button>
       </div>
     </div>
   </div>
@@ -3898,7 +3926,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.6';
+  const APP_VERSION = '2026-11-08.7';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4658,17 +4686,85 @@
     $('installRow').classList.remove('hidden');
     if (IS_IOS) $('installHint').textContent = 'No Safari: Compartilhar → Adicionar à Tela de Início';
   }
-  async function installApp() {
-    if (installPrompt) {
-      installPrompt.prompt();
-      try { await installPrompt.userChoice; } catch (_) {}
-      installPrompt = null;
-      return;
-    }
-    toast(IS_IOS
-      ? 'Toque em Compartilhar (o quadrado com a seta) e depois em "Adicionar à Tela de Início".'
-      : 'Toque nos três pontinhos ⋮ do Chrome (canto de cima) e depois em "Instalar app" ou "Adicionar à tela inicial".', 7000);
+  // Cada navegador instala de um jeito: o guia reconhece qual é e mostra o passo a passo dele
+  function installBrowser() {
+    const ua = navigator.userAgent;
+    if (IN_APP_BROWSER) return 'inapp';
+    if (IS_IOS) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua) ? 'ios-other' : 'ios-safari';
+    if (/SamsungBrowser/.test(ua)) return 'samsung';
+    if (/MiuiBrowser|XiaoMi|HeyTapBrowser|VivoBrowser|UCBrowser/.test(ua)) return 'vendor';
+    if (/Firefox/.test(ua)) return 'firefox';
+    if (/OPR\/|Opera/.test(ua)) return 'opera';
+    if (/EdgA\//.test(ua)) return 'edge';
+    if (/Chrome\//.test(ua)) return 'chrome';
+    return 'other';
   }
+
+  const INSTALL_GUIDES = {
+    chrome: ['Chrome', ['Toque nos <b>três pontinhos ⋮</b> no canto de cima da tela.', 'Toque em <b>Instalar app</b>. Se não aparecer, toque em <b>Adicionar à tela inicial</b> e depois em <b>Instalar</b>.', 'Confirme. O ícone aparece na tela inicial.']],
+    samsung: ['Samsung Internet', ['Toque no <b>menu ☰</b> (três tracinhos), embaixo à direita.', 'Toque em <b>Adicionar página a</b> e escolha <b>Tela inicial</b>.', 'Se aparecer um ícone de <b>download</b> na barra de endereço, ele também instala.']],
+    vendor: ['navegador do fabricante (Xiaomi, Oppo, Vivo...)', ['Esse navegador não instala apps da web direito.', 'Toque em <b>Copiar link do app</b> abaixo, abra o <b>Chrome</b> e cole o link.', 'No Chrome: <b>⋮ → Instalar app</b>.']],
+    firefox: ['Firefox', ['Toque nos <b>três pontinhos ⋮</b>.', 'Toque em <b>Instalar</b> (ou <b>Adicionar à tela inicial</b>).']],
+    opera: ['Opera', ['Toque nos <b>três pontinhos ⋮</b>.', 'Toque em <b>Adicionar a…</b> e escolha <b>Tela inicial</b>.']],
+    edge: ['Microsoft Edge', ['Toque no <b>menu ⋯</b> embaixo.', 'Toque em <b>Adicionar ao telefone</b> (ou <b>Instalar app</b>).']],
+    inapp: ['navegador interno de outro app (WhatsApp, Instagram...)', ['Esse navegador não deixa instalar.', 'Toque em <b>Copiar link do app</b> abaixo, abra o <b>Chrome</b> (ou o Safari, no iPhone) e cole o link.', 'Lá, siga o passo a passo para instalar.']],
+    'ios-safari': ['Safari (iPhone)', ['Toque em <b>Compartilhar</b> (o quadrado com a seta para cima), na barra de baixo.', 'Role a lista e toque em <b>Adicionar à Tela de Início</b>.', 'Toque em <b>Adicionar</b>.']],
+    'ios-other': ['navegador do iPhone', ['No iPhone, o jeito mais garantido é pelo <b>Safari</b>.', 'Toque em <b>Copiar link do app</b>, abra o <b>Safari</b> e cole o link.', 'No Safari: <b>Compartilhar → Adicionar à Tela de Início</b>.']],
+    other: ['navegador', ['Abra o site no <b>Chrome</b> (Android) ou no <b>Safari</b> (iPhone).', 'Chrome: <b>⋮ → Instalar app</b>. Safari: <b>Compartilhar → Adicionar à Tela de Início</b>.']]
+  };
+
+  let installDiagText = '';
+  async function runInstallDiag() {
+    const rows = [];
+    const add = (ok, label, detail) => rows.push({ ok, label, detail });
+    add(window.isSecureContext, 'Site seguro (https)', window.isSecureContext ? 'ok' : 'o site precisa abrir com https');
+    const manHref = document.querySelector('link[rel=manifest]')?.href;
+    try {
+      const r = await fetch(manHref, { cache: 'no-store' });
+      const ok = r.ok && !!(await r.json().catch(() => null))?.name;
+      add(ok, 'Arquivo manifest.json', ok ? 'encontrado' : 'não encontrado (erro ' + r.status + '): falta subir no GitHub');
+    } catch (_) { add(false, 'Arquivo manifest.json', 'não encontrado: falta subir no GitHub'); }
+    try {
+      const r = await fetch('icon-192.png', { method: 'HEAD', cache: 'no-store' });
+      add(r.ok, 'Ícones', r.ok ? 'encontrados' : 'não encontrados (erro ' + r.status + '): falta subir os .png');
+    } catch (_) { add(false, 'Ícones', 'não encontrados: falta subir os .png'); }
+    let swOk = false;
+    try { swOk = !!(await navigator.serviceWorker?.getRegistration())?.active; } catch (_) {}
+    add(swOk, 'Service worker (sw.js)', swOk ? 'ativo' : ('serviceWorker' in navigator ? 'não ativo: confira se o sw.js está no GitHub e recarregue a página' : 'este navegador não suporta'));
+    const kind = installBrowser();
+    if (kind === 'chrome' || kind === 'edge' || kind === 'samsung') {
+      add(!!installPrompt, 'Navegador liberou a instalação', installPrompt ? 'sim' : 'ainda não (use o menu, como no passo a passo)');
+    }
+    $('installDiag').innerHTML = rows.map(r => '<li><span class="' + (r.ok ? 'ok' : 'bad') + '">' + (r.ok ? '✓' : '✗') + '</span><span><b>' +
+      escapeHtml(r.label) + ':</b> ' + escapeHtml(r.detail) + '</span></li>').join('');
+    installDiagText = 'Diagnóstico de instalação · ' + browserInfo() + ' · ' + location.href + '\n' +
+      rows.map(r => (r.ok ? '[ok] ' : '[x] ') + r.label + ': ' + r.detail).join('\n') + '\nUA: ' + navigator.userAgent;
+  }
+
+  function installApp() {
+    const kind = installBrowser();
+    const [name, steps] = INSTALL_GUIDES[kind];
+    $('installBrowser').innerHTML = isStandalone()
+      ? 'O app <b>já está instalado</b> e aberto como app. 🎉'
+      : 'Você está usando o <b>' + escapeHtml(name) + '</b>.' + (installPrompt ? ' Toque em <b>Instalar agora</b>, ou siga o passo a passo:' : ' Siga o passo a passo:');
+    $('installSteps').innerHTML = isStandalone() ? '' : steps.map(s => '<li>' + s + '</li>').join('');
+    $('btnInstallNow').classList.toggle('hidden', !installPrompt || isStandalone());
+    $('btnInstallCopyLink').classList.toggle('hidden', !['vendor', 'inapp', 'ios-other', 'other'].includes(kind));
+    $('installDiag').innerHTML = '<li>Verificando...</li>';
+    $('installModal').classList.remove('hidden');
+    runInstallDiag();
+  }
+
+  $('btnInstallNow').addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    try { await installPrompt.userChoice; } catch (_) {}
+    installPrompt = null;
+    $('installModal').classList.add('hidden');
+  });
+  $('btnInstallCopyLink').addEventListener('click', () => copyText(location.href.split('#')[0], 'Link copiado! Cole no Chrome ou no Safari.'));
+  $('btnInstallCopyDiag').addEventListener('click', () => copyText(installDiagText || 'Diagnóstico ainda carregando', 'Diagnóstico copiado. Pode colar para o suporte.'));
+  $('btnInstallClose').addEventListener('click', () => $('installModal').classList.add('hidden'));
 
   // animação de abertura (topo e barra de abas); sai depois para não repetir
   document.body.classList.add('booting');
