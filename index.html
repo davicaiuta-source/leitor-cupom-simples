@@ -930,6 +930,132 @@
   /* gráficos (Gastos e Orçamento): grade e barras não selecionadas mais escuras */
   html[data-theme="dark"] .spend-card { --grid: #2A342E; --axis: #3A463F; --ink-muted: #8E9A92; --chart-1: #3987e5; --chart-1-soft: #2A4F7A; }
   html[data-theme="dark"] .chart-tip { background: #E6ECE8; color: #111713; }
+
+  /* =====================================================================
+     Novidades: avatares, lista de compras, busca, várias notas, comentários,
+     etiquetas, acertos, supérfluos e resumo semanal
+     ===================================================================== */
+  .av, .h-person span.av, .by span.av { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-weight: 700; overflow: hidden; line-height: 1; }
+  span.av { color: #fff !important; font-weight: 700 !important; } /* letra branca mesmo dentro de blocos com cor de texto própria */
+  .account-head span.av { display: inline-flex; margin: 0; font-size: 20px; }
+  .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .by .av { margin-right: 2px; }
+  .members li .av { margin-right: 0; }
+  .account-head .av { box-shadow: 0 0 0 3px var(--card); }
+  .header-icons button.has-photo { padding: 0; overflow: hidden; }
+  .header-icons button.has-photo .av { width: 100% !important; height: 100% !important; }
+  .h-ring-av { position: relative; width: 60px; height: 60px; display: block; }
+  .h-ring-av svg { position: absolute; inset: 0; }
+  .h-ring-av .av { position: absolute; top: 10px; left: 10px; }
+  .prof-edit { margin-top: 14px; }
+  .prof-colors { display: flex; flex-wrap: wrap; gap: 10px; }
+  .prof-color { width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer; box-shadow: 0 0 0 2px var(--card), 0 0 0 3px transparent; }
+  .prof-color.on { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--text); }
+
+  .badge.manual { background: var(--cream); color: var(--orange); }
+  .cmt-badge { display: inline-flex; align-items: center; gap: 3px; margin-top: 5px; margin-left: 6px; font-size: .74rem; font-weight: 600; color: var(--muted); }
+  .cmt-box { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .cmt { display: flex; gap: 10px; padding: 8px 0; }
+  .cmt-body { flex: 1; min-width: 0; }
+  .cmt-top { display: flex; align-items: baseline; gap: 8px; font-size: .8rem; }
+  .cmt-top span { color: var(--muted); font-size: .74rem; }
+  .cmt-top .cart-x { margin-left: auto; }
+  .cmt-body p { margin: 2px 0 0; font-size: .9rem; overflow-wrap: anywhere; }
+
+  .tag-btn { margin-left: 6px; }
+  .tag-btn.has { background: var(--lavender); border-color: transparent; color: var(--lavender-text); }
+  .tag-chip { display: inline-block; margin: 0 4px 0 0; padding: 1px 8px; border-radius: 999px; background: var(--lavender); color: var(--lavender-text); font-size: .7rem; font-weight: 600; vertical-align: 1px; }
+  .tag-pick { margin-top: 10px; padding: 12px; border-radius: 16px; background: var(--surface-2); }
+  .tag-pick .inline-form input { min-height: 40px; }
+  .s-detail .tag-pick { margin: 6px 0 10px; }
+
+  .sv-who { display: inline-flex; align-items: center; gap: 8px; }
+  .sv-pay { flex-wrap: wrap; }
+  .sv-settle { flex-basis: 100%; margin-top: 6px; border: 1.5px solid var(--border); background: var(--card); color: var(--green-text); border-radius: 999px; min-height: 36px; font: 600 .82rem "Inter", sans-serif; cursor: pointer; }
+  .sf-row { padding: 6px 0; }
+  .sf-top { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; margin-bottom: 4px; }
+  .sf-top b { font-variant-numeric: tabular-nums; }
+  .sf-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .sf-bar i { display: block; height: 100%; border-radius: 999px; background: #2a78d6; }
+
+  /* resumo semanal (Início) */
+  .h-week-sum { cursor: default; background: var(--cream); }
+  .h-week-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .h-week-top .h-eyebrow { color: var(--orange); }
+  .h-week-top .icon-btn { width: 32px; height: 32px; font-size: .85rem; flex: 0 0 auto; }
+  .h-week-total { font-size: 1.4rem; display: block; margin: 2px 0; }
+  .h-week-sum small { font-size: .82rem; color: var(--muted); }
+  .h-week-ahead { margin: 8px 0 0; font-size: .85rem; }
+  .h-week-sum .btn-row .btn { background: var(--card); }
+
+  /* várias notas seguidas */
+  .batch-toggle { margin: 12px 0 0; }
+  .batch-box { margin: 12px 0 4px; padding: 12px 14px; border-radius: 18px; background: var(--surface-2); }
+  .batch-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .batch-head b { font-size: .9rem; }
+  .batch-head .btn { width: auto; min-height: 36px; padding: 0 14px; font-size: .82rem; }
+  .batch-list { list-style: none; margin: 8px 0 0; padding: 0; }
+  .batch-list li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .batch-list li div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .batch-list b { font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .batch-list small { font-size: .76rem; color: var(--muted); }
+  .b-dot { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 800; background: var(--card); color: var(--muted); }
+  .b-dot .spinner { margin: 0; width: 14px; height: 14px; }
+  .b-ok .b-dot { background: var(--green-soft); color: var(--green-text); }
+  .b-err .b-dot { background: #fdecec; color: var(--danger); }
+  .b-err small { color: var(--danger); }
+
+  /* lista de compras */
+  .lp-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+  .lp-bar i { display: block; height: 100%; background: var(--green-btn); border-radius: 999px; transition: width .4s ease; }
+  .lp-txt { display: flex; justify-content: space-between; margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+  #listItems { padding-top: 8px; padding-bottom: 8px; }
+  .li-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid var(--border); }
+  .li-row:first-child { border-top: 0; }
+  .li-check { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--green-btn); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; color: #fff; }
+  .li-check svg { width: 16px; height: 16px; stroke: currentColor; }
+  .li-row.done .li-check { background: var(--green-btn); }
+  .li-info { flex: 1; min-width: 0; cursor: pointer; }
+  .li-name { font-weight: 600; font-size: .95rem; overflow-wrap: anywhere; }
+  .li-row.done .li-name { text-decoration: line-through; color: var(--muted); font-weight: 500; }
+  .li-meta { font-size: .74rem; color: var(--muted); margin-top: 1px; }
+  .li-fixed { display: inline-block; padding: 0 7px; border-radius: 999px; background: var(--green-soft); color: var(--green-text); font-size: .68rem; font-weight: 700; white-space: nowrap; }
+  .li-step button { width: 28px; height: 28px; }
+  .li-step span { min-width: 26px; font-size: .8rem; }
+  .li-icon { flex: 0 0 30px; width: 30px; height: 30px; border: 0; background: none; border-radius: 50%; cursor: pointer; color: var(--muted); font-size: .9rem; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .li-icon svg { width: 17px; height: 17px; stroke: currentColor; }
+  .li-icon.on { color: var(--green-text); background: var(--green-soft); }
+  .li-icon.on svg { fill: currentColor; }
+  .li-done-head { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--border); color: var(--muted); }
+  #listActions .btn-row .btn[disabled], #listActions > .btn[disabled] { opacity: .45; cursor: default; }
+  #listActions > .btn { margin-top: 0; }
+
+  /* conferência da nota com a lista */
+  .rec-box { margin: 0 0 14px; padding: 12px 14px; border-radius: 16px; background: var(--green-soft); font-size: .88rem; }
+  .rec-box p { margin: 0 0 4px; }
+  .rec-title { font-weight: 700; }
+  .rec-ok { color: var(--green-text); }
+  .rec-miss { color: var(--orange); }
+  .rec-extra { color: var(--muted); font-size: .8rem; }
+  .rec-box .link-btn { margin-top: 4px; }
+
+  /* busca */
+  .sr-prod { border-top: 1px solid var(--border); }
+  .sr-prod:first-of-type { border-top: 0; }
+  .sr-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+  .sr-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .sr-txt b { color: var(--green-dark); }
+  .sr-txt small { font-size: .78rem; color: var(--muted); }
+  .sr-txt .tag-chip { align-self: flex-start; }
+  .sr-head i { font-style: normal; font-weight: 700; color: var(--muted); width: 22px; text-align: center; }
+  .sr-buys { padding: 0 0 10px; }
+  .sr-buy { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; margin-top: 4px; border: 0; border-radius: 12px; background: var(--surface-2); font: inherit; font-size: .8rem; color: inherit; cursor: pointer; text-align: left; }
+  .sr-buy span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  html[data-theme="dark"] .sv-settle { background: var(--card); }
+  html[data-theme="dark"] .b-err .b-dot { background: #3A1F1E; }
+  html[data-theme="dark"] .sf-bar i { background: #3987e5; }
+  html[data-theme="dark"] .h-week-sum { background: var(--cream); }
 </style>
 </head>
 <body>
@@ -941,6 +1067,9 @@
         <p class="header-sub" id="headerSub">Suas compras, sem susto.</p>
       </div>
       <div class="header-icons">
+        <button id="btnHeaderSearch" class="hidden" aria-label="Buscar produtos, lojas e notas">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
         <button id="btnHeaderUser" aria-label="Minha conta">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
         </button>
@@ -1063,10 +1192,17 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
         <span>Escanear QR Code</span>
       </button>
+      <label class="check-row batch-toggle"><input type="checkbox" id="batchMode">
+        <span><b>Várias notas seguidas</b> · a câmera continua aberta e cada nota lida já é salva</span></label>
+      <div class="batch-box hidden" id="batchBox">
+        <div class="batch-head"><b id="batchTitle"></b><button class="btn small ghost" id="btnBatchDone">Concluir</button></div>
+        <ul class="batch-list" id="batchList"></ul>
+      </div>
       <label class="btn small ghost photo-btn">
-        <input type="file" accept="image/*" id="photoInput" hidden>
-        Ler de uma foto
+        <input type="file" accept="image/*" id="photoInput" multiple hidden>
+        Ler de fotos ou prints da galeria
       </label>
+      <button class="btn small ghost" id="btnManualExpense" style="margin-top:8px">Adicionar gasto sem nota</button>
 
       <button class="link-btn" id="btnToggleManual">
         Inserir URL manualmente
@@ -1118,6 +1254,7 @@
       </div>
     </section>
     <section class="card" id="saveSummary"></section>
+    <section class="card" id="saveExtra"></section>
     <section class="card hidden" id="saveSplit"></section>
     <section class="card" id="saveAlerts"></section>
     <section class="card" id="saveCompare"></section>
@@ -1145,6 +1282,37 @@
     <section class="card" id="cartExtras"></section>
     <section class="card" id="cartDelivery"></section>
     <section class="card hidden" id="cartOrders"></section>
+  </div>
+
+  <!-- Aba Lista: lista de compras (sua ou do grupo, em tempo real), riscada no mercado -->
+  <div id="tabList" class="hidden">
+    <section class="card list-card">
+      <h2>Lista de compras</h2>
+      <p class="lead" id="listLead"></p>
+      <div class="seg small hidden" id="listSrc">
+        <button data-lsrc="group">Do grupo</button>
+        <button data-lsrc="mine">Só minha</button>
+      </div>
+      <div class="inline-form" style="margin-bottom:6px">
+        <input id="listNew" placeholder="Adicionar item (ex.: Leite)" autocomplete="off" enterkeyhint="done">
+        <input id="listNewQty" inputmode="decimal" value="1" style="flex:0 0 54px" aria-label="Quantidade">
+        <button class="btn small" id="btnListAdd" aria-label="Adicionar à lista">+</button>
+      </div>
+      <div id="listProgress"></div>
+    </section>
+    <section class="card" id="listItems"></section>
+    <section class="card" id="listSuggest"></section>
+    <section class="card" id="listActions"></section>
+  </div>
+
+  <!-- Busca: produtos, lojas, notas e comentários -->
+  <div id="tabSearch" class="hidden">
+    <section class="card list-card">
+      <h2>Buscar</h2>
+      <p class="lead" id="searchLead">Produtos, lojas, etiquetas e comentários das suas notas.</p>
+      <input type="search" class="filter" id="searchInput" placeholder="Ex.: café, Condor, lanche, churrasco" autocomplete="off" enterkeyhint="search" style="margin-bottom:0">
+    </section>
+    <div id="searchResults"></div>
   </div>
 
   <!-- Aba Histórico (antiga Estoque): soma os produtos de todos os cupons -->
@@ -1190,6 +1358,7 @@
       </div>
       <div class="chips" id="mineChips"></div>
       <input type="search" class="filter" id="mineFilter" placeholder="Buscar loja...">
+      <button class="btn small ghost" data-manual-open="1">Adicionar gasto sem nota</button>
     </section>
     <ul class="history" id="mineList"></ul>
     <p class="empty-history hidden" id="mineEmpty"></p>
@@ -1299,7 +1468,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
         <span class="more-txt"><b>Instalar o app</b><small id="installHint">Ícone na tela inicial, abre como um app</small></span></button></li>
     </ul>
-    <section class="card" style="margin-top:14px">
+    <section class="card" style="margin-top:14px" id="notifCard"></section>
+    <section class="card">
       <h3 class="card-title">Aparência</h3>
       <p class="muted">"Automático" segue o modo claro ou escuro do seu celular.</p>
       <div class="seg small" id="themeSeg" role="radiogroup" aria-label="Tema do app" style="margin-bottom:0">
@@ -1382,6 +1552,26 @@
       <div style="display:grid;gap:8px;margin-top:16px">
         <button class="btn small" id="btnDupKeep">Salvar nas minhas notas</button>
         <button class="btn small ghost" id="btnDupSkip">Não salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gasto sem nota fiscal (feira, aluguel, conta de luz...) -->
+  <div class="modal hidden" id="manualModal">
+    <div class="modal-card">
+      <h3>Gasto sem nota</h3>
+      <p>Para o que não tem QR Code: feira, aluguel, conta de luz, diarista... Entra nos gastos, no orçamento e na divisão do grupo.</p>
+      <label class="field" style="margin-top:14px"><span>O que foi</span><input id="mxDesc" maxlength="60" placeholder="Ex.: Feira de sábado"></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label class="field"><span>Valor (R$)</span><input id="mxValue" inputmode="decimal" placeholder="0,00"></label>
+        <label class="field"><span>Data</span><input id="mxDate" type="date"></label>
+      </div>
+      <label class="field"><span>Categoria</span><select class="cat-select" id="mxCat" style="width:100%;padding:11px 30px 11px 12px"></select></label>
+      <label class="check-row hidden" id="mxShareRow"><input type="checkbox" id="mxShare" checked><span>Dividir com o grupo (aparece em Itens do grupo e na divisão)</span></label>
+      <p class="form-error hidden" id="mxError"></p>
+      <div class="btn-row">
+        <button class="btn small ghost" id="btnMxCancel">Cancelar</button>
+        <button class="btn small" id="btnMxSave">Salvar gasto</button>
       </div>
     </div>
   </div>
@@ -1529,6 +1719,7 @@
   // A chave de acesso da NFC-e (44 dígitos) é a mesma em qualquer formato do link (http/https, parâmetros).
   // Sem chave (nota colada como texto), compara loja + total + data e hora da compra.
   function noteKey(h) {
+    if (/^manual:/.test(h.url || '')) return 'link:' + h.url; // gasto sem nota: cada um é único
     const m = String(h.url || '').match(/\d{44}/);
     if (m) return 'chave:' + m[0];
     if (h.issuedAt) return 'nota:' + normName(h.store) + '|' + Math.round((h.total || 0) * 100) + '|' + Math.round(h.issuedAt / 60000);
@@ -1661,12 +1852,12 @@
       const mineTwin = cloudCupons.find(c => c.url !== url && sameNote(c, probe));
       if (mineTwin) {
         toast('Você já tinha escaneado essa nota em ' + fmtDay(spendDate(mineTwin)) + '. Ela não foi duplicada.', 4500);
-        return;
+        return Promise.resolve('repetida');
       }
       // alguém do grupo já escaneou a mesma compra: não sobe de novo e só fica nas minhas notas se eu confirmar
       const twin = groupTwin(probe);
       if (twin && !cloudCupons.some(c => c.url === url)) {
-        askDuplicate(twin, probe).then(async (keep) => {
+        return askDuplicate(twin, probe).then(async (keep) => {
           if (!keep) {
             toast('Nota não salva. Ela continua no grupo, escaneada por ' + firstName(twin.addedByName) + '.', 4500);
             return;
@@ -1674,9 +1865,8 @@
           await cloudSaveCupom(url, { ...data, keepPersonal: true });
           toast('Nota salva nas suas notas pessoais. Ela não sobe de novo para o grupo.', 4500);
         }).catch(cloudError);
-        return;
       }
-      cloudSaveCupom(url, data).then(async (saved) => {
+      return cloudSaveCupom(url, data).then(async (saved) => {
         if (!inGroup()) return;
         const other = groupDoc(url);
         if (other && other.addedBy !== me.uid) {
@@ -1695,12 +1885,12 @@
         }
         await syncToGroup([saved]); // nota já decidida antes: só atualiza
       }).catch(cloudError);
-      return;
     }
     const list = localHistory().filter(h => h.url !== url);
     list.unshift({ url, scannedAt: Date.now(), ...data });
     saveHistory(list.slice(0, 100));
     renderHistory();
+    return Promise.resolve();
   }
 
   // Remove das notas da pessoa; se foi ela quem mandou para o grupo, sai do grupo também
@@ -1810,7 +2000,8 @@
   let authResolved = false;
   function onUser(user) {
     authResolved = true;
-    unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback', 'orders');
+    unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback', 'orders', ...EXTRA_SUBS);
+    resetExtras();
     feedbackList = null;
     cartOrders = null;
     spaceKey = undefined;
@@ -1841,6 +2032,7 @@
       me.budgetMax = d.budgetMax || {};
       me.delivery = d.delivery || {};
       me.storePhones = d.storePhones || {};
+      me.profile = d.profile || {};
       subscribeSpace();
       refreshViews();
       renderHeaderSpace();
@@ -1854,8 +2046,11 @@
     if (!unsubs.cupons) {
       unsubs.cupons = fb.onSnapshot(cuponsQuery('users', me.uid), snap => {
         cloudCupons = snap.docs.map(d => d.data());
+        dataReady = true;
         refreshViews();
+        handleShared(); // algo compartilhado com o app (link ou print da nota) espera os dados carregarem
       }, cloudError);
+      subscribePersonalExtras();
       unsubs.meta = fb.onSnapshot(metaRef(), snap => {
         const o = snap.data() || {};
         catOv = { stores: o.stores || {}, products: o.products || {} };
@@ -1867,11 +2062,13 @@
     const gid = me.groupId || null;
     if (gid === spaceKey) return;
     spaceKey = gid;
-    unsub('group', 'groupCupons');
+    unsub('group', 'groupCupons', ...GROUP_EXTRA_SUBS);
     group = null;
     groupCupons = [];
+    resetGroupExtras();
     refreshViews();
     if (!gid) return;
+    subscribeGroupExtras(gid);
 
     unsubs.group = fb.onSnapshot(fb.doc(db, 'groups', gid), snap => {
       group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
@@ -1890,7 +2087,9 @@
         snap.docChanges().forEach(ch => {
           const c = ch.doc.data();
           if (ch.type === 'added' && c.addedBy && c.addedBy !== me.uid) {
-            toast(firstName(c.addedByName) + ' escaneou uma nota: ' + titleCase(c.store || 'Loja') + ' · ' + brl(c.total || 0), 5000);
+            const msg = firstName(c.addedByName) + (c.manual ? ' adicionou um gasto: ' : ' subiu uma nota: ') + titleCase(c.store || 'Loja') + ' · ' + brl(c.total || 0);
+            toast(msg, 5000);
+            if (document.hidden && notifWants('group')) notify('Nota nova no grupo', msg, 'grupo-' + noteKey(c));
           }
         });
       }
@@ -1911,10 +2110,14 @@
     if (currentTab === 'budget') renderBudget();
     if (currentTab === 'save') renderSave();
     if (currentTab === 'cart') renderCart();
+    if (currentTab === 'list') renderList();
+    if (currentTab === 'search') renderSearch();
     renderAccount();
     if (currentTab === 'scan') renderHome();
     renderSubNav();
     renderHeaderGreeting();
+    renderHeaderUser();
+    scheduleAlerts();
   }
 
   // JSON ida e volta: NaN vira null e some o undefined (o Firestore recusa undefined)
@@ -2053,7 +2256,7 @@
   // ---------- Telas de login / app ----------
   function showAuth() {
     stopScanner();
-    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabSave', 'tabCart', 'tabMore', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback', 'subNav'].forEach(id => $(id).classList.add('hidden'));
+    ['tabScan', 'tabStock', 'tabMine', 'tabGroup', 'tabSpend', 'tabBudget', 'tabSave', 'tabCart', 'tabList', 'tabSearch', 'tabMore', 'tabAccount', 'resultCard', 'headerSpace', 'btnFeedback', 'btnHeaderSearch', 'subNav'].forEach(id => $(id).classList.add('hidden'));
     renderHeaderGreeting();
     document.querySelector('.tabbar').classList.add('hidden');
     $('codeModal').classList.add('hidden');
@@ -2067,6 +2270,7 @@
     $('authView').classList.add('hidden');
     document.querySelector('.tabbar').classList.remove('hidden');
     $('btnFeedback').classList.remove('hidden');
+    $('btnHeaderSearch').classList.remove('hidden');
     showTab('scan');
     renderHeaderSpace();
   }
@@ -2188,7 +2392,7 @@
     });
   }
 
-  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', save: 'Economia', cart: 'Compras', stock: 'Histórico', more: 'Mais', account: 'Minha conta' };
+  const TAB_NAMES = { scan: 'Escanear', mine: 'Minhas notas', group: 'Itens do grupo', spend: 'Gastos', budget: 'Orçamento', save: 'Economia', cart: 'Compras', list: 'Lista de compras', search: 'Buscar', stock: 'Histórico', more: 'Mais', account: 'Minha conta' };
   let fbType = 'bug';
 
   function openFeedback() {
@@ -2299,8 +2503,8 @@
     const keepCats = $('accCats') ? pickedCats('accCats') : DEFAULT_SHARED;
 
     let html = '<section class="card account-card"><h2>Minha conta</h2>' +
-      '<div class="account-head"><div class="avatar">' + initial(me.name) + '</div>' +
-      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div></div>';
+      '<div class="account-head">' + avatar(me.uid, me.name, 48) +
+      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div></div>' + profileEditor();
 
     html += '<hr class="divider">';
     if (me.groupId && group) {
@@ -2314,7 +2518,7 @@
         '<p class="field-label">Participantes (' + members.length + ')</p><ul class="members">' +
         members.map(uid => {
           const n = (group.memberNames || {})[uid] || 'Participante';
-          return '<li><div class="avatar">' + initial(n) + '</div>' + escapeHtml(n) + (uid === me.uid ? ' (você)' : '') +
+          return '<li>' + avatar(uid, n, 32) + escapeHtml(n) + (uid === me.uid ? ' (você)' : '') +
             (uid === group.ownerUid ? '<span class="tag-owner">criador</span>' : '') + '</li>';
         }).join('') + '</ul>' +
         '<button class="btn small stop" data-action="leave">Sair do grupo</button>';
@@ -2419,6 +2623,7 @@
 
   // Cada pessoa escolhe as categorias das notas dela que vão para o grupo
   function onAccountChange(e) {
+    if (e.target.id === 'profPhoto') { onProfilePhoto(e.target.files[0]); e.target.value = ''; return; }
     if (!e.target.closest('#myCats') || !inGroup()) return;
     applyMyPrefs({ shareCats: pickedCats('myCats') }, 'Escolha salva.');
   }
@@ -2428,6 +2633,7 @@
   const unhideTerm = (term) => applyMyPrefs({ hiddenItems: hiddenTerms().filter(t => t !== term) }, '"' + term + '" voltou a aparecer para o grupo.');
 
   async function onAccountAction(e) {
+    if (await onProfileClick(e)) return;
     const fbf = e.target.closest('[data-fbf]');
     if (fbf) { fbFilter = fbf.dataset.fbf; return renderAccount(); }
     const unhide = e.target.closest('[data-unhide]');
@@ -2623,7 +2829,7 @@
   }
 
   function cupomCat(h) {
-    return catById(catOv.stores[h.url] || detectStoreCat(h.store));
+    return catById(catOv.stores[h.url] || h.cat || detectStoreCat(h.store));
   }
 
   function kwMatchAt(tokens, i, k) {
@@ -2681,29 +2887,32 @@
   function scannedBy(h) {
     const who = byWho(h);
     if (!who) return '';
-    return '<span class="by"><span class="by-av' + (who === 'você' ? ' me' : '') + '">' + initial(h.addedByName) + '</span>' +
-      'Escaneado por ' + escapeHtml(who) + '</span>';
+    return '<span class="by">' + avatar(h.addedBy, h.addedByName, 22) +
+      (h.manual ? 'Adicionado por ' : 'Escaneado por ') + escapeHtml(who) + '</span>';
   }
   const sharedBadge = (h) => inGroup() && groupDoc(h.url) ? '<span class="shared-badge">' + ICON_GROUP + 'No grupo</span>' : '';
 
   // Lista de notas (histórico, Minhas notas, Itens do grupo). ctx 'group' mostra quem escaneou.
   function renderCupomList(ul, list, ctx) {
+    // na busca, cada nota abre como "minha" ou "do grupo", conforme quem escaneou
+    const ctxOf = (h) => ctx === 'search' ? noteCtx(h) : ctx;
     ul.innerHTML = list.map((h, idx) => {
       const cat = cupomCat(h);
+      const ctx = ctxOf(h);
       return '<li data-idx="' + idx + '">' +
         '<div class="h-icon" style="background:' + cat.soft + ';color:' + cat.color + '">' + cat.icon + '</div>' +
         '<div class="h-info"><div class="h-name">' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</div>' +
-        '<div class="h-date">' + cat.name + ' · ' + fmtDate(h.scannedAt) + '</div>' +
-        (ctx === 'group' ? scannedBy(h) : sharedBadge(h)) + '</div>' +
+        '<div class="h-date">' + cat.name + ' · ' + (h.manual ? fmtDay(spendDate(h)) : fmtDate(h.scannedAt)) + '</div>' +
+        (ctx === 'group' ? scannedBy(h) : sharedBadge(h)) + cmtBadge(h) + '</div>' +
         '<div class="h-right"><div class="h-total">' + brl(h.total || 0) + '</div>' +
-        '<span class="badge">' + ICON_CHECK + 'Validado</span></div></li>';
+        (h.manual ? '<span class="badge manual">Sem nota</span>' : '<span class="badge">' + ICON_CHECK + 'Validado</span>') + '</div></li>';
     }).join('');
     ul.onclick = (e) => {
       const li = e.target.closest('li[data-idx]');
       if (!li) return;
       const h = list[+li.dataset.idx];
       setStatus('');
-      renderNota(h, h.url, ctx);
+      renderNota(h, h.url, ctxOf(h));
       openResultCard();
     };
   }
@@ -2853,6 +3062,7 @@
     if (spendFromGroup()) dims.push(['who', 'Pessoa']);
     else if (inGroup()) dims.push(['shared', 'Pessoal × grupo']);
     dims.push(['store', 'Loja']);
+    dims.push(['tag', 'Etiqueta']);
     return dims;
   }
 
@@ -2873,6 +3083,12 @@
         items.forEach(i => {
           const sub = itemSub(cat, i.name);
           add(cat.id + '|' + sub, cat.name + ' › ' + sub, 'var(--chart-1)', itemValue(i), h, [i]);
+        });
+      } else if (spendDim === 'tag') {
+        // um produto com duas etiquetas conta nas duas
+        items.forEach(i => {
+          const tags = tagsOf(i.name);
+          (tags.length ? tags : ['']).forEach(t => add('tag|' + t, t ? tagLabel(t) : 'Sem etiqueta', 'var(--chart-1)', itemValue(i), h, [i]));
         });
       } else if (spendDim === 'cat') {
         add(cat.id, cat.name, CHART_CAT[cat.id] || CHART_CAT.outros, h.total || 0, h, items);
@@ -2973,10 +3189,12 @@
             '<div class="sb-bar"><i style="width:' + (s.value / max * 100) + '%;background:' + s.color + '"></i></div></button>';
         }).join('') +
         (slices.length > LIMIT ? '<button class="link-btn" data-showall="1">' + (spendShowAll ? 'Mostrar menos' : 'Mostrar todas (' + slices.length + ')') + '</button>' : '');
-    $('spendHint').classList.toggle('hidden', !slices.length || !!spendSel);
+    $('spendHint').classList.toggle('hidden', (!slices.length && spendDim !== 'tag') || !!spendSel);
     $('spendHint').textContent = spendDim === 'sub'
       ? 'Por subcategoria soma o valor de cada produto. Toque numa barra para ver os detalhes.'
-      : 'Toque numa barra para ver todos os detalhes.';
+      : spendDim === 'tag'
+        ? 'Etiquetas são suas: ponha nos produtos tocando em "Etiqueta" no detalhe da nota ou na aba Histórico. Um produto com duas etiquetas conta nas duas.'
+        : 'Toque numa barra para ver todos os detalhes.';
     renderSpendDetail(slices.find(s => s.key === spendSel));
   }
 
@@ -3082,7 +3300,7 @@
     const map = new Map();
     list.forEach(h => {
       const t = spendDate(h);
-      if (!t) return;
+      if (!t || h.manual) return; // gasto sem nota (aluguel, feira...) não vira produto do carrinho
       const cat = cupomCat(h);
       (h.items || []).forEach(i => {
         const un = (i.un || 'un').toLowerCase().trim();
@@ -3483,7 +3701,7 @@
     const map = new Map();
     list.forEach(h => {
       const t = spendDate(h);
-      if (!t) return;
+      if (!t || h.manual) return;
       const store = titleCase(h.store || 'Loja');
       const mine = mineKeys.has(noteKey(h));
       (h.items || []).forEach(i => {
@@ -3579,6 +3797,7 @@
           topProds.map(x => '<div class="sv-line"><span>' + escapeHtml(titleCase(x.name)) + '</span><b>' + brl(x.v) + '</b></div>').join('') : '');
     }
     $('saveSummary').innerHTML = s;
+    $('saveExtra').innerHTML = renderSuperfluous(source, saveMonth, mEnd, prevStart, monthName);
 
     // ----- divisão de gastos do grupo (no mês escolhido) -----
     const split = $('saveSplit');
@@ -3622,10 +3841,15 @@
       '<p class="muted">Pelas notas que foram para o grupo, dividindo o total igualmente entre as ' + members.length + ' pessoas.</p>';
     if (!total || members.length < 2) return html + '<p class="muted" style="margin:0">' + (members.length < 2 ? 'O grupo só tem uma pessoa.' : 'Nenhuma nota do grupo neste mês.') + '</p>';
     const share = total / members.length;
-    const rows = members.map(m => ({ ...m, paid: sumTotal(notes.filter(h => h.addedBy === m.uid)) })).map(m => ({ ...m, bal: m.paid - share }));
+    // acertos já feitos neste mês: quem pagou fica com saldo maior, quem recebeu com saldo menor
+    const done = groupSettles.filter(a => a.month === start);
+    const sent = (uid) => done.filter(a => a.from === uid).reduce((s, a) => s + (a.amount || 0), 0);
+    const got = (uid) => done.filter(a => a.to === uid).reduce((s, a) => s + (a.amount || 0), 0);
+    const rows = members.map(m => ({ ...m, paid: sumTotal(notes.filter(h => h.addedBy === m.uid)) }))
+      .map(m => ({ ...m, bal: m.paid - share + sent(m.uid) - got(m.uid) }));
     html += '<div class="sv-split-head"><span>Total do grupo <b>' + brl(total) + '</b></span><span>Parte de cada um <b>' + brl(share) + '</b></span></div>' +
-      rows.sort((a, b) => b.paid - a.paid).map(m => '<div class="sv-line"><span>' + escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name)) +
-        ' <small>pagou ' + brl(m.paid) + '</small></span><b class="' + (m.bal >= 0 ? 'sv-pos' : 'sv-neg') + '">' +
+      rows.sort((a, b) => b.paid - a.paid).map(m => '<div class="sv-line"><span class="sv-who">' + avatar(m.uid, m.name, 24) + escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name)) +
+        ' <small>pagou ' + brl(m.paid) + '</small></span><b class="' + (m.bal >= -0.009 ? 'sv-pos' : 'sv-neg') + '">' +
         (Math.abs(m.bal) < 0.01 ? 'quite' : m.bal > 0 ? 'recebe ' + brl(m.bal) : 'deve ' + brl(-m.bal)) + '</b></div>').join('');
     // acertos: quem deve paga para quem tem a receber (o mínimo de transferências)
     const debt = rows.filter(m => m.bal < -0.009).map(m => ({ ...m, v: -m.bal }));
@@ -3640,13 +3864,21 @@
       if (cred[j].v < 0.01) j++;
     }
     const who = (m) => escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name));
+    const nameOf = (uid) => { const m = members.find(x => x.uid === uid); return m ? who(m) : 'Ex-participante'; };
     if (pays.length) html += '<p class="field-label" style="margin-top:12px">Para acertar as contas</p>' +
-      pays.map(p => '<div class="sv-pay">' + who(p.from) + ' <span aria-hidden="true">→</span><span class="sr-only">paga para</span> ' + who(p.to) + '<b>' + brl(p.v) + '</b></div>').join('');
+      pays.map(p => '<div class="sv-pay">' + who(p.from) + ' <span aria-hidden="true">→</span><span class="sr-only">paga para</span> ' + who(p.to) + '<b>' + brl(p.v) + '</b>' +
+        '<button class="sv-settle" data-settle="' + escapeHtml(p.from.uid + '|' + p.to.uid + '|' + (Math.round(p.v * 100) / 100)) + '">Marcar como pago</button></div>').join('');
+    else if (done.length) html += '<p class="sv-delta good" style="margin-top:12px">✓ Contas de ' + monthName + ' acertadas.</p>';
+    if (done.length) html += '<p class="field-label" style="margin-top:12px">Acertos feitos</p>' +
+      done.sort((a, b) => (a.at || 0) - (b.at || 0)).map(a => '<div class="sv-line"><span>' + nameOf(a.from) + ' pagou ' + nameOf(a.to).replace(/^Você$/, 'você') +
+        ' <small>' + fmtDay(a.at || Date.now()) + (a.byName ? ' · marcado por ' + escapeHtml(firstName(a.byName)) : '') + '</small></span>' +
+        '<span><b>' + brl(a.amount || 0) + '</b> <button class="cart-x" data-unsettle="' + escapeHtml(a.id) + '">desfazer</button></span></div>').join('');
     return html;
   }
 
   function onSaveClick(e) {
     const t = e.target;
+    if (t.closest('[data-settle],[data-unsettle]')) return onSettleClick(t);
     const src = t.closest('[data-svsrc]');
     if (src) saveSrc = src.dataset.svsrc;
     else if (t.closest('#savePrev')) saveMonth = shiftPeriod(saveMonth, 'month', -1);
@@ -4064,12 +4296,12 @@
         '<span class="s-qty">' + fmtQtd(g.qty) + ' <small>' + escapeHtml(g.unit) + '</small></span></div>' +
         '<div class="s-meta"><span class="s-tag" style="background:' + g.cat.soft + ';color:' + g.cat.color + '">' +
         escapeHtml(g.cat.name) + ' › ' + escapeHtml(g.sub) + '</span>' +
-        n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
+        tagChips(g.name) + n + ' ' + (n === 1 ? 'cupom' : 'cupons') + ' · Gasto ' + brl(g.spent) +
         (g.qty > 0 ? ' · Média ' + brl(g.spent / g.qty) + '/' + escapeHtml(g.unit) : '') + '</div>';
       if (openStockKey === g.key) {
         html += '<div class="s-detail">' +
           '<label class="s-sub">Subcategoria <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
-          subOptions(g.cat, g.sub) + '</select></label>' +
+          subOptions(g.cat, g.sub) + '</select></label>' + tagPicker(g.name) +
           g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
           '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') +
           (p.who ? ' · ' + escapeHtml(p.who) : '') + '</span>' +
@@ -4160,7 +4392,7 @@
     const spent = sumTotal(mine.filter(h => inRange(h, mStart, mEnd)));
     const products = buildProducts(mine);
     const max = +budMaxAll().mine_month || 0;
-    let html = '<div class="home-grid">';
+    let html = '<div class="home-grid">' + weeklyCard(mine, products);
 
     // orçamento do mês (ou gasto x previsão, se não houver gasto máximo definido)
     if (max) {
@@ -4214,7 +4446,7 @@
           const pct = total ? p.v / total : 0;
           const ini = (p.name || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
           return '<button class="h-person h-card" data-home="group" aria-label="' + escapeHtml(firstName(p.name)) + ': ' + Math.round(pct * 100) + '% dos gastos do grupo">' +
-            ringSvg(pct, ini, 60, 25, 5, 'var(--ring-soft)', fills[i % fills.length], 15) +
+            '<span class="h-ring-av">' + ringSvg(pct, '', 60, 25, 5, 'var(--ring-soft)', 'none', 15) + avatar(p.uid, p.name, 40) + '</span>' +
             '<span>' + escapeHtml(p.uid === me.uid ? 'Você' : firstName(p.name)) + '<b>' + Math.round(pct * 100) + '%</b></span></button>';
         }).join('') + '</div>';
     }
@@ -4222,12 +4454,18 @@
   }
 
   function onHomeClick(e) {
+    if (e.target.closest('[data-weekly-close]')) {
+      try { localStorage.setItem('resumo_fechado', String(weeklyRange().start)); } catch (_) {}
+      return renderHome();
+    }
     const b = e.target.closest('[data-home]');
     if (!b) return;
     const what = b.dataset.home;
     if (what === 'budget') { budGran = 'month'; budSrc = 'mine'; budAnchor = null; return showTab('budget'); }
     if (what === 'week') { spendGran = 'week'; spendSrc = 'mine'; spendAnchor = null; spendSel = null; return showTab('spend'); }
     if (what === 'cart') { cartMode = 'out'; cartSrc = 'mine'; return showTab('cart'); }
+    if (what === 'list') return showTab('list');
+    if (what === 'lastweek') { spendGran = 'week'; spendSrc = 'mine'; spendAnchor = weeklyRange().start; spendSel = null; return showTab('spend'); }
     if (what === 'group') { spendGran = 'month'; spendSrc = 'group'; spendDim = 'who'; spendAnchor = null; spendSel = null; return showTab('spend'); }
     if (what === 'last') {
       const h = personalHistory()[0];
@@ -4239,13 +4477,14 @@
   }
 
   // ---------- Navegação: 5 seções na barra; Notas e Análises com sub-abas ----------
-  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', save: 'tabSave', cart: 'tabCart', stock: 'tabStock', more: 'tabMore', account: 'tabAccount' };
-  const NAV_OF = { scan: 'home', mine: 'notes', group: 'notes', spend: 'analytics', budget: 'analytics', save: 'analytics', stock: 'analytics', cart: 'cart', more: 'more', account: 'more' };
+  const TAB_IDS = { scan: 'tabScan', mine: 'tabMine', group: 'tabGroup', spend: 'tabSpend', budget: 'tabBudget', save: 'tabSave', cart: 'tabCart', list: 'tabList', stock: 'tabStock', more: 'tabMore', account: 'tabAccount', search: 'tabSearch' };
+  const NAV_OF = { scan: 'home', mine: 'notes', group: 'notes', spend: 'analytics', budget: 'analytics', save: 'analytics', stock: 'analytics', cart: 'cart', list: 'cart', more: 'more', account: 'more', search: 'search' };
   const SUB_TABS = {
     notes: [['mine', 'Minhas notas'], ['group', 'Do grupo']],
-    analytics: [['spend', 'Gastos'], ['budget', 'Orçamento'], ['save', 'Economia'], ['stock', 'Histórico']]
+    analytics: [['spend', 'Gastos'], ['budget', 'Orçamento'], ['save', 'Economia'], ['stock', 'Histórico']],
+    cart: [['list', 'Lista'], ['cart', 'Carrinho']]
   };
-  const lastSub = { notes: 'mine', analytics: 'spend' }; // volta para a última sub-aba usada
+  const lastSub = { notes: 'mine', analytics: 'spend', cart: 'list' }; // volta para a última sub-aba usada
   let currentTab = 'scan';
 
   function goNav(nav) {
@@ -4320,6 +4559,10 @@
     if (tab === 'budget') renderBudget();
     if (tab === 'save') renderSave();
     if (tab === 'cart') renderCart();
+    if (tab === 'list') renderList();
+    if (tab === 'search') renderSearch();
+    if (tab === 'more') renderNotifCard();
+    $('btnHeaderSearch').classList.toggle('active', tab === 'search');
     $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
@@ -4329,7 +4572,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-08.9';
+  const APP_VERSION = '2026-11-15.1';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4523,6 +4766,14 @@
       setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR da NFC-e.', true);
       return;
     }
+    // várias notas seguidas: guarda na fila e a câmera continua aberta
+    if (batchOn()) {
+      if (batch.seen.has(url)) { setHint('Essa nota já foi lida. Aponte para a próxima.'); return; }
+      if (navigator.vibrate) navigator.vibrate(100);
+      enqueueBatch(url);
+      setHint('Nota lida! (' + batch.items.length + ') Aponte para a próxima.');
+      return;
+    }
     busy = true;
     if (navigator.vibrate) navigator.vibrate(100);
     await stopScanner();
@@ -4545,6 +4796,21 @@
     } catch (_) { return null; }
   }
 
+  // Acha o link da nota no QR de uma foto: tenta a foto reduzida e a original, com cada leitor disponível
+  async function decodePhoto(file) {
+    await nativeCheck;
+    const files = [await downscale(file), file].filter(Boolean);
+    const engines = nativeOk ? [true, false] : [false];
+    for (const f of files) {
+      for (const native of engines) {
+        let url = null;
+        try { url = nfceUrl(await getScanner(native).scanFile(f, false)); } catch (_) {}
+        if (url) return url;
+      }
+    }
+    return null;
+  }
+
   // Lê o QR a partir de uma foto (câmera nativa foca melhor em cupons amassados/pequenos)
   async function scanFromPhoto(file) {
     if (!file) return;
@@ -4552,20 +4818,7 @@
     resultEl.innerHTML = '';
     setStatus('Lendo QR Code da foto...', { loading: true });
     openResultCard();
-    await nativeCheck;
-
-    // tenta foto reduzida e original, com cada leitor disponível
-    const files = [await downscale(file), file].filter(Boolean);
-    const engines = nativeOk ? [true, false] : [false];
-    let url = null;
-    for (const f of files) {
-      for (const native of engines) {
-        try { url = nfceUrl(await getScanner(native).scanFile(f, false)); } catch (_) {}
-        if (url) break;
-      }
-      if (url) break;
-    }
-
+    const url = await decodePhoto(file);
     if (!url) {
       setStatus('Não encontrei um QR Code de cupom nessa foto. Tire outra mais de perto, com o QR nítido e sem reflexo.' + diag(), { error: true });
       return;
@@ -4629,6 +4882,7 @@
         return;
       }
       setStatus('');
+      lastReconcile = reconcileWithList(url, data);
       addToHistory(url, data);
       renderNota(data, url);
     } catch (err) {
@@ -4667,6 +4921,7 @@
     }
     const id = /^https?:\/\//i.test(url || '') ? url : 'manual:' + Date.now();
     setStatus('');
+    lastReconcile = reconcileWithList(id, data);
     addToHistory(id, data);
     renderNota(data, id);
   }
@@ -4785,8 +5040,10 @@
     (data.storeInfo || []).forEach(line => { html += '<p class="store-info">' + escapeHtml(line) + '</p>'; });
     if (data.scannedAt) html += '<p class="store-info">Escaneado em ' + fmtDate(data.scannedAt) + '</p>';
     html += (ctx === 'group' ? scannedBy(data) : sharedBadge({ url })) + '</div>';
+    openNote = { data, url, ctx };
+    if (lastReconcile && lastReconcile.url === url) html += lastReconcile.html;
 
-    const cat = cupomCat({ url, store: data.store });
+    const cat = cupomCat({ url, store: data.store, cat: data.cat });
     html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
 
     // nas notas da própria pessoa, dentro de um grupo: cada produto pode ser escondido do grupo
@@ -4816,7 +5073,10 @@
         '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div>' +
         '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select>' +
         (canHide ? '<button class="hide-btn' + (hidden ? ' on' : '') + '" data-hide="' + escapeHtml(i.name) + '">' +
-          (hidden ? ICON_EYE_OFF + 'Oculto do grupo · mostrar' : ICON_EYE + 'Ocultar do grupo') + '</button>' : '') + '</li>';
+          (hidden ? ICON_EYE_OFF + 'Oculto do grupo · mostrar' : ICON_EYE + 'Ocultar do grupo') + '</button>' : '') +
+        '<button class="hide-btn tag-btn' + (tagsOf(i.name).length ? ' has' : '') + '" data-tagopen="' + escapeHtml(i.name) + '">🏷 ' +
+          (tagsOf(i.name).length ? tagsOf(i.name).map(tagLabel).map(escapeHtml).join(', ') : 'Etiqueta') + '</button>' +
+        (openTagItem === i.name ? tagPicker(i.name) : '') + '</li>';
     });
     html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
 
@@ -4842,8 +5102,10 @@
       (/^https?:\/\//i.test(url) ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener"><span class="btn small ghost">Nota original</span></a>' : '') +
       groupBtn +
       (ctx === 'group' ? '' : '<button class="btn small stop" id="btnRemove">Remover</button>') + '</div>';
+    if (CLOUD && me) html += '<div class="cmt-box" id="cmtBox"></div>';
 
     resultEl.innerHTML = html;
+    renderComments();
 
     $('filterItems').addEventListener('input', (e) => {
       const q = e.target.value.trim().toLowerCase();
@@ -4868,7 +5130,13 @@
     });
 
     // esconder/mostrar um produto para o grupo (vale para todas as notas da pessoa)
+    $('itemList').addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter' && e.target.matches('[data-tagnew-input]')) { e.preventDefault(); if (await addTagFromInput(e.target)) renderNota(data, url, ctx); }
+    });
     $('itemList').addEventListener('click', async (e) => {
+      const open = e.target.closest('[data-tagopen]');
+      if (open) { openTagItem = openTagItem === open.dataset.tagopen ? null : open.dataset.tagopen; return renderNota(data, url, ctx); }
+      if (await onTagClick(e)) return renderNota(data, url, ctx);
       const b = e.target.closest('[data-hide]');
       if (!b) return;
       const name = b.dataset.hide;
@@ -4913,6 +5181,945 @@
     });
   }
 
+  // =====================================================================
+  // Novidades: lista de compras, busca, várias notas seguidas, compartilhar com o app,
+  // avisos, perfis (cor/foto), comentários, gastos sem nota, acertos, etiquetas e supérfluos
+  // =====================================================================
+  let dataReady = !CLOUD;      // notas da conta já carregaram (avisos e compartilhamento esperam isso)
+  let openNote = null;         // nota aberta no detalhe { data, url, ctx }
+  let lastReconcile = null;    // conferência com a lista da última nota escaneada
+  let openTagItem = null;      // produto com o seletor de etiquetas aberto no detalhe da nota
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const errIgnore = (err) => { if (err.code !== 'permission-denied') cloudError(err); };
+
+  // ---------- Assinaturas extras no Firestore ----------
+  // users/{uid}/meta/lista · users/{uid}/meta/etiquetas · users/{uid}/comentarios
+  // groups/{gid}/meta/lista · groups/{gid}/meta/perfis · groups/{gid}/comentarios · groups/{gid}/acertos
+  const EXTRA_SUBS = ['listMine', 'cmtMine', 'tags'];
+  const GROUP_EXTRA_SUBS = ['listGroup', 'cmtGroup', 'settles', 'profiles'];
+  let listMine = {}, listGroup = {}, myComments = [], groupComments = [], groupSettles = [], profiles = {};
+  let tagData = { products: {}, names: [] };
+
+  function resetExtras() {
+    dataReady = !CLOUD; listMine = {}; myComments = []; tagData = { products: {}, names: [] };
+    resetGroupExtras();
+  }
+  function resetGroupExtras() { listGroup = {}; groupComments = []; groupSettles = []; profiles = {}; }
+
+  const listRef = (fromGroup) => fromGroup ? fb.doc(db, 'groups', me.groupId, 'meta', 'lista') : fb.doc(db, 'users', me.uid, 'meta', 'lista');
+  const tagRef = () => fb.doc(db, 'users', me.uid, 'meta', 'etiquetas');
+  const cmtCol = (fromGroup) => fromGroup ? fb.collection(db, 'groups', me.groupId, 'comentarios') : fb.collection(db, 'users', me.uid, 'comentarios');
+
+  function subscribePersonalExtras() {
+    unsubs.listMine = fb.onSnapshot(fb.doc(db, 'users', me.uid, 'meta', 'lista'), snap => {
+      listMine = (snap.data() || {}).items || {};
+      if (currentTab === 'list') renderList();
+    }, cloudError);
+    unsubs.tags = fb.onSnapshot(tagRef(), snap => {
+      const d = snap.data() || {};
+      tagData = { products: d.products || {}, names: d.names || [] };
+      if (['spend', 'stock', 'save', 'search'].includes(currentTab)) refreshViews();
+    }, cloudError);
+    unsubs.cmtMine = fb.onSnapshot(fb.query(cmtCol(false), fb.orderBy('at', 'desc'), fb.limit(300)), snap => {
+      myComments = snap.docs.map(d => ({ id: d.id, ...d.data(), group: false }));
+      onCommentsChanged();
+    }, cloudError);
+  }
+
+  function subscribeGroupExtras(gid) {
+    unsubs.listGroup = fb.onSnapshot(fb.doc(db, 'groups', gid, 'meta', 'lista'), snap => {
+      listGroup = (snap.data() || {}).items || {};
+      if (currentTab === 'list') renderList();
+    }, errIgnore);
+    let first = true;
+    unsubs.cmtGroup = fb.onSnapshot(fb.query(fb.collection(db, 'groups', gid, 'comentarios'), fb.orderBy('at', 'desc'), fb.limit(300)), snap => {
+      groupComments = snap.docs.map(d => ({ id: d.id, ...d.data(), group: true }));
+      if (!first) snap.docChanges().forEach(ch => {
+        const c = ch.doc.data();
+        if (ch.type !== 'added' || c.uid === me.uid) return;
+        const note = groupCupons.find(h => noteKey(h) === c.note);
+        const msg = firstName(c.name) + ' comentou' + (note ? ' em ' + titleCase(note.store || 'uma nota') : '') + ': "' + c.text + '"';
+        toast(msg, 5000);
+        if (document.hidden && notifWants('group')) notify('Comentário no grupo', msg, 'cmt-' + ch.doc.id);
+      });
+      first = false;
+      onCommentsChanged();
+    }, errIgnore);
+    unsubs.settles = fb.onSnapshot(fb.collection(db, 'groups', gid, 'acertos'), snap => {
+      groupSettles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (currentTab === 'save') renderSave();
+    }, errIgnore);
+    unsubs.profiles = fb.onSnapshot(fb.doc(db, 'groups', gid, 'meta', 'perfis'), snap => {
+      profiles = snap.data() || {};
+      // acabei de entrar no grupo (ou mudei a foto em outro aparelho): leva meu perfil para o grupo
+      const mine = me.profile || {}, there = profiles[me.uid] || {};
+      if ((mine.color || mine.photo) && ((mine.color || null) !== (there.color || null) || (mine.photo || null) !== (there.photo || null))) {
+        fb.setDoc(fb.doc(db, 'groups', gid, 'meta', 'perfis'), { [me.uid]: { color: mine.color || null, photo: mine.photo || null } }, { merge: true }).catch(() => {});
+      }
+      refreshViews();
+    }, errIgnore);
+  }
+
+  // ---------- Perfis: cor e foto de cada pessoa ----------
+  const PROFILE_COLORS = ['#2F6B4F', '#1F5FAE', '#B4501D', '#A83B6F', '#5443B8', '#7A5A00', '#0F7D57', '#A32A2A'];
+  const safePhoto = (p) => typeof p === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(p) ? p : '';
+  function profileOf(uid) { return (me && uid === me.uid ? me.profile : profiles[uid]) || {}; }
+  function colorOf(uid, name) {
+    const p = profileOf(uid);
+    if (p.color && PROFILE_COLORS.includes(p.color)) return p.color;
+    // sem cor escolhida: no grupo, cada pessoa ganha uma cor que ninguém está usando
+    const members = inGroup() ? group.members || [] : [];
+    if (members.includes(uid)) {
+      const taken = new Set(members.filter(m => m !== uid).map(m => profileOf(m).color).filter(Boolean));
+      const free = PROFILE_COLORS.filter(c => !taken.has(c));
+      if (free.length) return free[members.indexOf(uid) % free.length];
+    }
+    let h = 0;
+    for (const ch of String(uid || name || '?')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return PROFILE_COLORS[h % PROFILE_COLORS.length];
+  }
+  function avatar(uid, name, size = 28) {
+    const photo = safePhoto(profileOf(uid).photo);
+    return '<span class="av" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * .42) + 'px;background:' + colorOf(uid, name) + '" aria-hidden="true">' +
+      (photo ? '<img src="' + photo + '" alt="">' : initial(name)) + '</span>';
+  }
+
+  const HEADER_USER_SVG = $('btnHeaderUser').innerHTML;
+  function renderHeaderUser() {
+    const b = $('btnHeaderUser');
+    const photo = me && me.profile ? safePhoto(me.profile.photo) : '';
+    const mode = photo ? 'foto:' + photo.length + ':' + photo.slice(-24) : 'icone';
+    if (b.dataset.mode === mode) return;
+    b.dataset.mode = mode;
+    b.innerHTML = photo ? avatar(me.uid, me.name, 44) : HEADER_USER_SVG;
+    b.classList.toggle('has-photo', !!photo);
+  }
+
+  function profileEditor() {
+    const p = me.profile || {};
+    const cur = colorOf(me.uid, me.name);
+    return '<div class="prof-edit"><p class="field-label">Minha cor e foto <span class="muted-inline">· aparecem para o grupo nas suas notas</span></p>' +
+      '<div class="prof-colors" role="radiogroup" aria-label="Cor do perfil">' + PROFILE_COLORS.map((c, i) =>
+        '<button class="prof-color' + (c === cur ? ' on' : '') + '" style="background:' + c + '" data-pcolor="' + c + '" role="radio" aria-checked="' + (c === cur) + '" aria-label="Cor ' + (i + 1) + '"></button>').join('') + '</div>' +
+      '<div class="btn-row" style="margin:10px 0 0"><label class="btn small ghost">' + (safePhoto(p.photo) ? 'Trocar foto' : 'Pôr foto') +
+      '<input type="file" accept="image/*" id="profPhoto" hidden></label>' +
+      (safePhoto(p.photo) ? '<button class="btn small ghost" data-pphoto-rm="1">Tirar foto</button>' : '') + '</div></div>';
+  }
+
+  async function saveProfile(partial) {
+    const next = { color: null, photo: null, ...(me.profile || {}), ...partial };
+    try {
+      await saveMyPrefs({ profile: next });
+      if (inGroup()) await fb.setDoc(fb.doc(db, 'groups', me.groupId, 'meta', 'perfis'), { [me.uid]: next }, { merge: true });
+      toast('Perfil atualizado.');
+    } catch (err) { cloudError(err); }
+    refreshViews();
+  }
+  async function onProfileClick(e) {
+    const c = e.target.closest('[data-pcolor]');
+    if (c) { await saveProfile({ color: c.dataset.pcolor }); return true; }
+    if (e.target.closest('[data-pphoto-rm]')) { await saveProfile({ photo: null }); return true; }
+    return false;
+  }
+  // foto quadrada pequena (96 px): cabe no banco de dados sem precisar de outro serviço
+  async function onProfilePhoto(file) {
+    if (!file) return;
+    try {
+      const bmp = await createImageBitmap(file);
+      const s = Math.min(bmp.width, bmp.height);
+      const c = document.createElement('canvas');
+      c.width = c.height = 96;
+      c.getContext('2d').drawImage(bmp, (bmp.width - s) / 2, (bmp.height - s) / 2, s, s, 0, 0, 96, 96);
+      await saveProfile({ photo: c.toDataURL('image/jpeg', 0.8) });
+    } catch (_) { toast('Não consegui abrir essa foto. Tente outra.'); }
+  }
+
+  // ---------- Comentários nas notas ----------
+  // Nota que está no grupo: comentários que o grupo vê. Nota só pessoal: anotações que só a pessoa vê.
+  function noteInGroup(h, ctx) { return !!inGroup() && (ctx === 'group' || !!groupDoc(h.url) || !!groupTwin(h)); }
+  function commentsOf(h) {
+    const k = noteKey(h);
+    return groupComments.concat(myComments).filter(c => c.note === k).sort((a, b) => (a.at || 0) - (b.at || 0));
+  }
+  function cmtBadge(h) {
+    if (!CLOUD || !me) return '';
+    const n = commentsOf(h).length;
+    return n ? '<span class="cmt-badge">💬 ' + n + '<span class="sr-only">' + (n === 1 ? ' comentário' : ' comentários') + '</span></span>' : '';
+  }
+  function renderComments() {
+    const box = $('cmtBox');
+    if (!box || !openNote) return;
+    const h = { ...openNote.data, url: openNote.url };
+    const shared = noteInGroup(h, openNote.ctx);
+    const list = commentsOf(h);
+    const typing = $('cmtText')?.value || '';
+    const focused = document.activeElement?.id === 'cmtText';
+    box.innerHTML = '<p class="field-label">' + (shared ? 'Comentários <span class="muted-inline">· o grupo vê</span>' : 'Anotações <span class="muted-inline">· só você vê</span>') + '</p>' +
+      (list.length ? list.map(c => '<div class="cmt">' + avatar(c.uid, c.name, 28) + '<div class="cmt-body"><div class="cmt-top"><b>' +
+        escapeHtml(c.uid === me.uid ? 'Você' : firstName(c.name)) + '</b><span>' + fmtDate(c.at || Date.now()) + '</span>' +
+        (c.uid === me.uid ? '<button class="cart-x" data-cmtdel="' + escapeHtml(c.id) + '" data-cmtg="' + (c.group ? 1 : 0) + '">apagar</button>' : '') +
+        '</div><p>' + escapeHtml(c.text || '') + '</p></div></div>').join('')
+        : '<p class="muted" style="margin-bottom:10px">' + (shared ? 'Nenhum comentário ainda. Ex.: "essa foi a compra do churrasco".' : 'Escreva algo para lembrar desta compra.') + '</p>') +
+      '<div class="inline-form" style="margin:0"><input id="cmtText" maxlength="500" enterkeyhint="send" placeholder="' + (shared ? 'Comentar para o grupo...' : 'Escrever uma anotação...') + '">' +
+      '<button class="btn small" id="btnCmtSend">Enviar</button></div>';
+    $('cmtText').value = typing;
+    if (focused) $('cmtText').focus();
+  }
+  async function sendComment() {
+    const input = $('cmtText');
+    const text = (input?.value || '').trim();
+    if (!text || !openNote) return;
+    const h = { ...openNote.data, url: openNote.url };
+    input.value = '';
+    try {
+      await fb.addDoc(cmtCol(noteInGroup(h, openNote.ctx)), { note: noteKey(h), uid: me.uid, name: me.name, text: text.slice(0, 500), at: Date.now() });
+    } catch (err) { input.value = text; cloudError(err); }
+  }
+  function onCommentsChanged() {
+    renderComments();
+    renderHistory();
+    if (currentTab === 'mine') renderMine();
+    if (currentTab === 'group') renderGroupTab();
+    if (currentTab === 'search') renderSearch();
+  }
+
+  // ---------- Gasto sem nota (feira, aluguel, conta de luz...) ----------
+  function openManualExpense() {
+    if (CLOUD && !me) return;
+    $('mxDesc').value = '';
+    $('mxValue').value = '';
+    const d = new Date();
+    $('mxDate').value = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    $('mxCat').innerHTML = catOptions('outros');
+    $('mxShareRow').classList.toggle('hidden', !inGroup());
+    $('mxShare').checked = true;
+    $('mxError').classList.add('hidden');
+    $('manualModal').classList.remove('hidden');
+    setTimeout(() => $('mxDesc').focus(), 60);
+  }
+  async function saveManualExpense() {
+    const desc = $('mxDesc').value.trim().replace(/\s+/g, ' ');
+    const value = parseMoney($('mxValue').value);
+    const fail = (m) => { $('mxError').textContent = m; $('mxError').classList.remove('hidden'); };
+    if (!desc) return fail('Escreva o que foi o gasto.');
+    if (!(value > 0)) return fail('Digite o valor, por exemplo 45,90.');
+    const [y, mo, da] = ($('mxDate').value || '').split('-').map(Number);
+    const now = new Date();
+    const when = y ? new Date(y, mo - 1, da, now.getHours(), now.getMinutes()).getTime() : Date.now();
+    if (when > Date.now() + DAY) return fail('A data não pode ser no futuro.');
+    const v = Math.round(value * 100) / 100;
+    const url = 'manual:' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    const data = {
+      store: desc, storeInfo: ['Gasto adicionado à mão, sem nota fiscal'], total: v, issuedAt: when, manual: true, cat: $('mxCat').value,
+      items: [{ name: desc.toUpperCase(), code: '', qtd: 1, un: 'un', unit: v, total: v }]
+    };
+    const share = !!inGroup() && $('mxShare').checked;
+    await withBusy($('btnMxSave'), async () => {
+      if (CLOUD) {
+        try {
+          const saved = await cloudSaveCupom(url, data);
+          if (inGroup()) await setShareOv(saved, share);
+        } catch (err) { cloudError(err); return; }
+      } else {
+        const list = localHistory();
+        list.unshift({ url, scannedAt: Date.now(), ...data });
+        saveHistory(list.slice(0, 100));
+        refreshViews();
+      }
+      $('manualModal').classList.add('hidden');
+      toast('Gasto de ' + brl(v) + ' salvo' + (share ? ' e dividido com o grupo.' : '.'), 3500);
+    });
+  }
+
+  // ---------- Acertos da divisão do grupo ----------
+  async function onSettleClick(t) {
+    if (!inGroup()) return;
+    const nm = (uid) => uid === me.uid ? 'você' : firstName((group.memberNames || {})[uid] || 'Participante');
+    const s = t.closest('[data-settle]');
+    if (s) {
+      const [from, to, amount] = s.dataset.settle.split('|');
+      const who = nm(from);
+      if (!confirm('Confirmar que ' + who.charAt(0).toUpperCase() + who.slice(1) + ' pagou ' + brl(+amount) + ' para ' + nm(to) + '?')) return;
+      try {
+        await fb.addDoc(fb.collection(db, 'groups', me.groupId, 'acertos'), { month: saveMonth, from, to, amount: +amount, at: Date.now(), by: me.uid, byName: me.name });
+        toast('Pagamento registrado. O saldo foi atualizado para todos.');
+      } catch (err) { cloudError(err); }
+      return;
+    }
+    const u = t.closest('[data-unsettle]');
+    if (u && confirm('Desfazer este acerto? O valor volta a aparecer como devido.')) {
+      try { await fb.deleteDoc(fb.doc(db, 'groups', me.groupId, 'acertos', u.dataset.unsettle)); } catch (err) { cloudError(err); }
+    }
+  }
+
+  // ---------- Etiquetas personalizadas nos produtos ----------
+  // Ficam na conta da pessoa (users/{uid}/meta/etiquetas), por nome de produto: valem em todas as notas.
+  const DEFAULT_TAGS = ['lanche', 'limpeza', 'higiene', 'bebê', 'pet', 'supérfluo', 'essencial'];
+  const TAG_LOCAL = 'etiquetas';
+  if (!CLOUD) { try { tagData = { products: {}, names: [], ...JSON.parse(localStorage.getItem(TAG_LOCAL) || '{}') }; } catch (_) {} }
+  const normTag = (t) => String(t || '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 24);
+  const tagLabel = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  const tagsOf = (name) => tagData.products[normName(name)] || [];
+  function allTags() {
+    return [...new Set([...DEFAULT_TAGS, ...tagData.names, ...Object.values(tagData.products).flat()])];
+  }
+  const tagChips = (name) => tagsOf(name).map(t => '<span class="tag-chip">' + escapeHtml(tagLabel(t)) + '</span>').join('');
+  function tagPicker(name) {
+    const cur = tagsOf(name);
+    return '<div class="tag-pick" data-tagname="' + escapeHtml(name) + '"><div class="cat-picker" style="margin-bottom:8px">' +
+      allTags().map(t => '<button class="chip sub' + (cur.includes(t) ? ' active' : '') + '" data-tag="' + escapeHtml(t) + '" aria-pressed="' + cur.includes(t) + '">' +
+        escapeHtml(tagLabel(t)) + '</button>').join('') + '</div>' +
+      '<div class="inline-form" style="margin:0"><input data-tagnew-input="1" maxlength="24" placeholder="Nova etiqueta (ex.: churrasco)">' +
+      '<button class="btn small" data-tagnew="1">Criar</button></div></div>';
+  }
+  async function setProductTags(name, tags, newName) {
+    const k = normName(name);
+    if (!k) return;
+    tagData.products = { ...tagData.products, [k]: tags };
+    if (newName && !tagData.names.includes(newName)) tagData.names = [...tagData.names, newName];
+    if (CLOUD) {
+      try { await fb.setDoc(tagRef(), { products: { [k]: tags }, names: tagData.names }, { merge: true }); } catch (err) { cloudError(err); }
+    } else {
+      try { localStorage.setItem(TAG_LOCAL, JSON.stringify(tagData)); } catch (_) {}
+    }
+  }
+  async function onTagClick(e) {
+    const box = e.target.closest('[data-tagname]');
+    if (!box) return false;
+    const name = box.dataset.tagname;
+    const b = e.target.closest('[data-tag]');
+    if (b) {
+      const t = b.dataset.tag, cur = tagsOf(name);
+      await setProductTags(name, cur.includes(t) ? cur.filter(x => x !== t) : [...cur, t]);
+      return true;
+    }
+    if (e.target.closest('[data-tagnew]')) return addTagFromInput(box.querySelector('[data-tagnew-input]'));
+    return false;
+  }
+  async function addTagFromInput(input) {
+    const box = input.closest('[data-tagname]');
+    const t = normTag(input.value);
+    if (!t) { toast('Escreva o nome da etiqueta.'); return false; }
+    const name = box.dataset.tagname, cur = tagsOf(name);
+    await setProductTags(name, cur.includes(t) ? cur : [...cur, t], t);
+    toast('Etiqueta "' + tagLabel(t) + '" em ' + titleCase(name) + '.');
+    return true;
+  }
+
+  // ---------- Gasto com supérfluos ----------
+  // Pelo nome do produto (doces, refrigerantes, bebidas alcoólicas, salgadinhos). A etiqueta da
+  // pessoa manda: "supérfluo" inclui qualquer produto e "essencial" tira.
+  const SUPERFLUO = [
+    ['Doces', ['CHOCOLAT', 'CHOC', 'BOMBOM', 'BALA$', 'BALAS', 'PIRULITO', 'CHICLE', 'WAFER', 'SORVETE', 'PICOLE', 'MARSHMALLOW', 'NUTELLA', 'KINDER',
+      'BRIGADEIRO', 'PACOCA', 'RECH', 'TRENTO', 'BIS$', 'DOCE$', 'DOCES', 'JUJUBA', 'CONFEITO', 'COOKIE', 'DONUT', 'COCADA', 'SONHO$']],
+    ['Refrigerantes e energéticos', ['REFRIG', 'REFRI$', 'COCA', 'GUARANA', 'FANTA', 'SPRITE', 'PEPSI', 'SCHWEPPES', 'SUKITA', 'ENERGET', 'REDBULL', 'MONSTER', 'TANG$']],
+    ['Bebidas alcoólicas', ['CERV', 'CHOPP', 'VINHO', 'VODKA', 'WHISK', 'CACHACA', 'GIN$', 'RUM$', 'TEQUILA', 'LICOR', 'ESPUMANTE', 'SKOL', 'BRAHMA',
+      'HEINEKEN', 'ITAIPAVA', 'AMSTEL', 'BUDWEISER', 'STELLA', 'SPATEN', 'CORONA', 'IMPERIO', 'ANTARCTICA', 'BOHEMIA', 'SMIRNOFF']],
+    ['Salgadinhos', ['SALGADINHO', 'SALG$', 'CHIPS', 'DORITOS', 'RUFFLES', 'CHEETOS', 'FANDANGOS', 'PRINGLES', 'TORCIDA', 'BACONZITOS', 'ELMA', 'STAX']]
+  ];
+  const SUPERFLUO_NOT_FIRST = new Set(['ACHOCOLATADO', 'LEITE', 'IOGURTE', 'CAFE', 'FARINHA', 'AGUA', 'COCO', 'CREME']);
+  const SUPERFLUO_NOT_ANY = new Set(['BATATA', 'VINAGRE', 'MOLHO', 'TEMPERO', 'FERMENTO', 'TAPIOCA', 'SABAO', 'DETERGENTE']);
+  function superfluousGroup(name) {
+    const tags = tagsOf(name);
+    if (tags.includes('essencial')) return null;
+    const tokens = normName(name).split(' ').filter(Boolean);
+    if (tokens.length && !SUPERFLUO_NOT_FIRST.has(tokens[0]) && !tokens.some(t => SUPERFLUO_NOT_ANY.has(t))) {
+      for (let i = 0; i < tokens.length; i++) {
+        for (const [g, kws] of SUPERFLUO) if (kws.some(k => kwMatchAt(tokens, i, k))) return g;
+      }
+    }
+    return tags.includes('supérfluo') ? 'Marcados por você' : null;
+  }
+  function renderSuperfluous(source, start, end, prevStart, monthName) {
+    const calc = (a, b) => {
+      const groups = new Map(), items = new Map();
+      let total = 0, all = 0;
+      source.forEach(h => {
+        const t = spendDate(h);
+        if (t < a || t >= b || h.manual) return;
+        (h.items || []).forEach(i => {
+          const v = itemValue(i);
+          all += v;
+          const g = superfluousGroup(i.name);
+          if (!g) return;
+          total += v;
+          groups.set(g, (groups.get(g) || 0) + v);
+          const k = normName(i.name);
+          const x = items.get(k) || { name: i.name, v: 0, n: 0 };
+          x.v += v; x.n++;
+          items.set(k, x);
+        });
+      });
+      return { total, all, groups, items };
+    };
+    const cur = calc(start, end), prev = calc(prevStart, start);
+    let html = '<h3 class="card-title">Gasto com supérfluos</h3><p class="muted">Doces, refrigerantes, bebidas alcoólicas e salgadinhos das notas de ' + monthName(start) +
+      '. Para ajustar, ponha a etiqueta <b>supérfluo</b> ou <b>essencial</b> no produto.</p>';
+    if (!cur.total) return html + '<p class="muted" style="margin:0">' + (cur.all ? 'Nenhum supérfluo neste mês. 👏' : 'Nenhuma nota neste mês.') + '</p>';
+    const diff = cur.total - prev.total;
+    html += '<div class="sv-hero"><span>' + brl(cur.total) + '</span><small>' + Math.round(cur.total / (cur.all || 1) * 100) + '% do que foi gasto em produtos no mês</small></div>' +
+      (prev.total > 0 ? '<p class="sv-delta ' + (diff <= 0 ? 'good' : 'bad') + '">' + (diff <= 0 ? '▼ ' + brl(-diff) + ' a menos' : '▲ ' + brl(diff) + ' a mais') +
+        ' que em ' + monthName(prevStart) + '</p>' : '');
+    const max = Math.max(...cur.groups.values());
+    html += [...cur.groups].sort((a, b) => b[1] - a[1]).map(([g, v]) => '<div class="sf-row"><div class="sf-top"><span>' + escapeHtml(g) + '</span><b>' + brl(v) + '</b></div>' +
+      '<div class="sf-bar"><i style="width:' + (v / max * 100) + '%"></i></div></div>').join('');
+    const top = [...cur.items.values()].sort((a, b) => b.v - a.v).slice(0, 5);
+    html += '<p class="field-label" style="margin-top:12px">Onde foi mais</p>' + top.map(x => '<div class="sv-line"><span>' + escapeHtml(titleCase(x.name)) +
+      ' <small>' + x.n + (x.n === 1 ? ' compra' : ' compras') + '</small></span><b>' + brl(x.v) + '</b></div>').join('');
+    return html;
+  }
+
+  // ---------- Avisos no celular ----------
+  // Avisos locais: saem quando o app está aberto ou em segundo plano (sem servidor de envio).
+  const NOTIF_KEY = 'avisos';
+  const notifSupported = () => 'Notification' in window;
+  function notifPrefs() {
+    const def = { on: false, out: true, meta: true, group: true, weekly: true };
+    try { return { ...def, ...JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') }; } catch (_) { return def; }
+  }
+  function saveNotifPrefs(p) { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(p)); } catch (_) {} }
+  const notifWants = (kind) => { const p = notifPrefs(); return p.on && p[kind] && notifSupported() && Notification.permission === 'granted'; };
+  async function notify(title, body, tag) {
+    try {
+      const reg = await navigator.serviceWorker?.getRegistration?.();
+      if (reg && reg.showNotification) { await reg.showNotification(title, { body, tag, icon: 'icon-192.png', badge: 'icon-192.png' }); return; }
+    } catch (_) {}
+    try { new Notification(title, { body, tag, icon: 'icon-192.png' }); } catch (_) {}
+  }
+  // cada aviso sai uma vez só (fica marcado neste aparelho)
+  function sentOnce(key) {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('avisos_enviados') || '{}'); } catch (_) { return false; }
+    if (s[key]) return false;
+    const cut = Date.now() - 90 * DAY;
+    Object.keys(s).forEach(k => { if (s[k] < cut) delete s[k]; });
+    s[key] = Date.now();
+    try { localStorage.setItem('avisos_enviados', JSON.stringify(s)); } catch (_) { return false; }
+    return true;
+  }
+
+  let alertTimer = null;
+  function scheduleAlerts() { clearTimeout(alertTimer); alertTimer = setTimeout(checkAlerts, 4000); }
+  function checkAlerts() {
+    if (!dataReady || (CLOUD && !me)) return;
+    const p = notifPrefs();
+    if (!p.on || !notifSupported() || Notification.permission !== 'granted') return;
+    const now = Date.now(), today = dayStart(now), mine = personalHistory(), uid = me?.uid || 'local';
+    if (p.out) {
+      const soon = buildProducts(mine).filter(x => x.cycle && !x.inactive && x.next >= today && x.next < today + 3 * DAY).sort((a, b) => a.next - b.next);
+      if (soon.length && sentOnce(uid + ':acabando:' + today)) {
+        const d = Math.max(0, Math.round((dayStart(soon[0].next) - today) / DAY));
+        const when = d === 0 ? 'hoje' : d === 1 ? 'amanhã' : 'em ' + d + ' dias';
+        notify('Está acabando', soon.length === 1
+          ? titleCase(soon[0].name) + ' deve acabar ' + when + '. Já pôs na lista?'
+          : titleCase(soon[0].name) + ', ' + titleCase(soon[1].name) + (soon.length > 2 ? ' e mais ' + (soon.length - 2) : '') + ' devem acabar nos próximos dias.', 'acabando');
+      }
+    }
+    if (p.meta) {
+      const m0 = periodStart(now, 'month'), m1 = shiftPeriod(m0, 'month', 1), ym = new Date(m0).getFullYear() + '-' + (new Date(m0).getMonth() + 1);
+      const inM = mine.filter(h => { const t = spendDate(h); return t >= m0 && t < m1; });
+      const all = budMaxAll();
+      const checks = [['total', 'do mês', +all.mine_month || 0, sumTotal(inM)]]
+        .concat(CATEGORIES.map(c => [c.id, 'de ' + c.name, +all['mine_month_cat_' + c.id] || 0, sumTotal(inM.filter(h => cupomCat(h).id === c.id))]));
+      checks.forEach(([id, label, max, spent]) => {
+        if (!max) return;
+        const lvl = spent >= max ? 100 : spent >= max * .8 ? 80 : 0;
+        if (!lvl || !sentOnce(uid + ':meta:' + ym + ':' + id + ':' + lvl)) return;
+        notify(lvl === 100 ? 'Você passou da meta ' + label : 'Você chegou a 80% da meta ' + label,
+          'Já foram ' + brl(spent) + ' de ' + brl(max) + ' (' + Math.round(spent / max * 100) + '%).', 'meta-' + id);
+      });
+    }
+    if (p.weekly && new Date(now).getDay() === 0) {
+      const s = weeklyStats(mine);
+      if (s.count && sentOnce(uid + ':semana:' + s.start)) {
+        notify('Resumo da semana', 'Você gastou ' + brl(s.total) + ' em ' + s.count + (s.count === 1 ? ' nota' : ' notas') +
+          '. Próximos 7 dias: ' + brl(s.ahead) + ' previstos.', 'semana');
+      }
+    }
+  }
+
+  function renderNotifCard() {
+    const box = $('notifCard');
+    const p = notifPrefs();
+    const sup = notifSupported();
+    const perm = sup ? Notification.permission : 'unsupported';
+    const on = p.on && perm === 'granted';
+    let html = '<h3 class="card-title">Avisos no celular</h3>';
+    if (!sup) {
+      html += '<p class="muted" style="margin:0">Este navegador não mostra avisos. No Android, use o Chrome; no iPhone, instale o app na Tela de Início (iOS 16.4 ou mais novo).</p>';
+    } else {
+      html += '<p class="muted">' + (on ? 'Ligados neste aparelho.'
+        : perm === 'denied' ? 'Os avisos estão bloqueados para este site. Libere tocando no cadeado ao lado do endereço → Permissões → Notificações.'
+        : 'Receba um aviso quando algo estiver acabando, quando chegar perto da meta e quando o grupo mexer nas notas.') + '</p>';
+      if (!on && perm !== 'denied') html += '<button class="btn small" data-notif="enable">Ligar avisos</button>';
+      if (on) {
+        html += [['out', 'Produto acabando', '"Café Pilão deve acabar em 2 dias"'], ['meta', 'Metas de gasto', 'ao chegar em 80% e ao passar da meta'],
+          ['group', 'Grupo', 'notas novas e comentários, com o app em segundo plano'], ['weekly', 'Resumo semanal', 'no domingo: quanto gastou e o que vem pela frente']]
+          .map(([k, t, d]) => '<label class="check-row"><input type="checkbox" data-notif-kind="' + k + '"' + (p[k] ? ' checked' : '') + '><span><b>' + t + '</b> · ' + d + '</span></label>').join('') +
+          '<div class="btn-row" style="margin-bottom:0"><button class="btn small ghost" data-notif="test">Testar aviso</button><button class="btn small ghost" data-notif="off">Desligar</button></div>';
+      }
+      html += '<p class="muted" style="margin:12px 0 0;font-size:.75rem">Os avisos saem quando o app está aberto ou em segundo plano. Com o app totalmente fechado o celular não recebe: isso precisaria de um servidor de envio, que o app ainda não tem.</p>';
+    }
+    box.innerHTML = html;
+  }
+  async function onNotifClick(e) {
+    const b = e.target.closest('[data-notif]');
+    if (!b) return;
+    const p = notifPrefs();
+    if (b.dataset.notif === 'enable') {
+      let perm = 'default';
+      try { perm = await Notification.requestPermission(); } catch (_) {}
+      if (perm === 'granted') {
+        p.on = true; saveNotifPrefs(p);
+        notify('Avisos ligados', 'Você vai ser avisado quando algo estiver acabando e quando chegar perto da meta.', 'teste');
+        scheduleAlerts();
+      } else toast('O celular não deu permissão para os avisos.');
+    } else if (b.dataset.notif === 'off') { p.on = false; saveNotifPrefs(p); }
+    else if (b.dataset.notif === 'test') notify('Teste de aviso', 'Está funcionando! 🎉', 'teste');
+    renderNotifCard();
+  }
+
+  // ---------- Resumo semanal (Início, domingo e segunda) ----------
+  // No domingo mostra a semana atual (segunda a hoje); na segunda, a semana que acabou.
+  function weeklyRange() {
+    const now = Date.now(), wStart = periodStart(now, 'week');
+    const start = new Date(now).getDay() === 0 ? wStart : shiftPeriod(wStart, 'week', -1);
+    return { start, end: shiftPeriod(start, 'week', 1) };
+  }
+  function weeklyStats(mine, products) {
+    const { start, end } = weeklyRange();
+    const inR = (a, b) => mine.filter(h => { const t = spendDate(h); return t >= a && t < b; });
+    const notes = inR(start, end), prev = inR(shiftPeriod(start, 'week', -1), start);
+    const byCat = new Map();
+    notes.forEach(h => { const c = cupomCat(h).name; byCat.set(c, (byCat.get(c) || 0) + (h.total || 0)); });
+    const today = dayStart(Date.now()), until = today + 7 * DAY;
+    const due = (products || buildProducts(mine)).map(p => ({ p, n: plannedIn(p, today, until).length })).filter(x => x.n);
+    return {
+      start, end, total: sumTotal(notes), count: notes.length, prevTotal: sumTotal(prev),
+      top: [...byCat].sort((a, b) => b[1] - a[1])[0], due: due.length, ahead: due.reduce((s, x) => s + x.n * x.p.avgValue, 0)
+    };
+  }
+  function weeklyCard(mine, products) {
+    const day = new Date().getDay();
+    if ((day !== 0 && day !== 1) || !mine.length) return '';
+    const r = weeklyRange();
+    let closed = '';
+    try { closed = localStorage.getItem('resumo_fechado') || ''; } catch (_) {}
+    if (closed === String(r.start)) return '';
+    const s = weeklyStats(mine, products);
+    const diff = s.total - s.prevTotal;
+    return '<div class="h-card h-week-sum"><div class="h-week-top"><span class="h-eyebrow">Resumo da semana · ' + periodLabel(s.start, 'week') + '</span>' +
+      '<button class="icon-btn" data-weekly-close="1" aria-label="Fechar o resumo da semana">✕</button></div>' +
+      '<span class="h-serif h-week-total">' + brl(s.total) + '</span>' +
+      '<small>' + s.count + (s.count === 1 ? ' nota' : ' notas') +
+      (s.prevTotal > 0 ? ' · ' + (diff <= 0 ? '▼ ' + brl(-diff) + ' a menos' : '▲ ' + brl(diff) + ' a mais') + ' que na semana anterior' : '') +
+      (s.top ? ' · mais em ' + escapeHtml(s.top[0]) : '') + '</small>' +
+      '<p class="h-week-ahead"><b>Pela frente (7 dias):</b> ' + (s.due ? brl(s.ahead) + ' previstos · ' + s.due + (s.due === 1 ? ' item deve acabar' : ' itens devem acabar') : 'nada previsto') + '</p>' +
+      '<div class="btn-row" style="margin:10px 0 0"><button class="btn small ghost" data-home="lastweek">Ver gastos</button><button class="btn small ghost" data-home="list">Lista de compras</button></div></div>';
+  }
+
+  // ---------- Lista de compras (pessoal ou do grupo, em tempo real) ----------
+  let listSrc = null; // 'group' | 'mine' · null = a do grupo, se houver
+  const listFromGroup = () => !!inGroup() && (listSrc || 'group') === 'group';
+  const LIST_LOCAL = 'lista_compras';
+  function listItemsMap(fromGroup) {
+    if (!CLOUD) { try { return JSON.parse(localStorage.getItem(LIST_LOCAL)) || {}; } catch (_) { return {}; } }
+    return fromGroup ? listGroup : listMine;
+  }
+  const listArray = (fromGroup = listFromGroup()) => Object.entries(listItemsMap(fromGroup)).filter(([, x]) => x && x.name).map(([id, x]) => ({ id, ...x }));
+  // grava só os campos que mudaram de cada item (merge): duas pessoas riscando ao mesmo tempo não se atrapalham
+  async function listWrite(changes, fromGroup = listFromGroup()) {
+    const entries = Object.entries(changes);
+    if (!entries.length) return;
+    if (!CLOUD) {
+      const m = listItemsMap(false);
+      entries.forEach(([id, v]) => { if (v === null) delete m[id]; else m[id] = { ...(m[id] || {}), ...v }; });
+      try { localStorage.setItem(LIST_LOCAL, JSON.stringify(m)); } catch (_) {}
+      if (currentTab === 'list') renderList();
+      return;
+    }
+    const ref = listRef(fromGroup);
+    const sets = entries.filter(([, v]) => v !== null), dels = entries.filter(([, v]) => v === null);
+    try {
+      if (sets.length) await fb.setDoc(ref, { items: Object.fromEntries(sets) }, { merge: true });
+      if (dels.length) await fb.updateDoc(ref, Object.fromEntries(dels.map(([id]) => ['items.' + id, fb.deleteField()])));
+    } catch (err) { cloudError(err); }
+  }
+  const newListId = () => 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const undone = { done: false, doneBy: null, doneByName: null, doneAt: null, doneVia: null };
+  async function addListItems(entries) {
+    const arr = listArray();
+    const changes = {};
+    let added = 0;
+    entries.forEach(e => {
+      const ex = arr.find(x => normName(x.name) === normName(e.name));
+      if (ex) { if (ex.done) changes[ex.id] = undone; return; }
+      const id = newListId();
+      const item = { name: e.name, qty: e.qty || 1, un: e.un || 'un', key: e.key || null, fixed: false, at: Date.now(), addedBy: me?.uid || null, addedByName: me?.name || null, ...undone };
+      changes[id] = item;
+      arr.push({ id, ...item });
+      added++;
+    });
+    await listWrite(changes);
+    return added;
+  }
+
+  // preço estimado: o último pago pelo mesmo produto (notas suas e do grupo)
+  function listPriceMap() {
+    const m = new Map();
+    buildProducts(priceSource()).forEach(p => { const k = normName(p.name); if (!m.has(k) || m.get(k).last < p.last) m.set(k, p); });
+    return m;
+  }
+  function listSuggestions(fromGroup) {
+    const products = buildProducts(fromGroup ? groupCupons : personalHistory());
+    const today = dayStart(Date.now());
+    const inList = new Set(listArray(fromGroup).filter(x => !x.done).map(x => normName(x.name)));
+    const fresh = products.filter(p => !inList.has(normName(p.name)) && !p.inactive);
+    const out = fresh.filter(p => p.cycle && p.next < today + DAY).sort((a, b) => a.next - b.next);
+    const outKeys = new Set(out.map(p => p.key));
+    const frequent = fresh.filter(p => !outKeys.has(p.key)).sort((a, b) => b.count - a.count || b.last - a.last).slice(0, 12);
+    return { out, frequent };
+  }
+
+  const ICON_PIN = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>';
+  function renderList() {
+    if (!inGroup()) listSrc = null;
+    const g = listFromGroup();
+    $('listSrc').classList.toggle('hidden', !inGroup());
+    $('listSrc').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lsrc === (g ? 'group' : 'mine')));
+    $('listLead').innerHTML = g
+      ? 'Lista do grupo <b>' + escapeHtml(group.name) + '</b>: todos veem e riscam em tempo real.'
+      : 'Toque no item para riscar enquanto compra. Quando escanear a nota, o app confere o que foi comprado.';
+    const arr = listArray(g);
+    const pending = arr.filter(x => !x.done).sort((a, b) => (b.fixed ? 1 : 0) - (a.fixed ? 1 : 0) || (a.at || 0) - (b.at || 0));
+    const done = arr.filter(x => x.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+    const prices = listPriceMap();
+    const est = (x) => { const p = prices.get(normName(x.name)); return p ? lastUnitPrice(p) * (x.qty || 1) : 0; };
+    const estTotal = pending.reduce((s, x) => s + est(x), 0);
+    $('listProgress').innerHTML = arr.length
+      ? '<div class="lp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + arr.length + '" aria-valuenow="' + done.length + '"><i style="width:' + (done.length / arr.length * 100) + '%"></i></div>' +
+        '<p class="lp-txt"><span>' + done.length + ' de ' + arr.length + ' no carrinho</span>' + (estTotal ? '<span>falta ~' + brl(estTotal) + '</span>' : '') + '</p>'
+      : '';
+    const time = (t) => { const d = new Date(t); return (dayStart(t) === dayStart(Date.now()) ? 'hoje' : fmtDay(t)) + ' às ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+    const row = (x) => {
+      const meta = [];
+      if (x.fixed) meta.push('<span class="li-fixed">fixo</span>');
+      if (x.done) meta.push(x.doneVia === 'nota' ? 'conferido na nota' + (x.doneByName && x.doneBy !== me?.uid ? ' de ' + escapeHtml(firstName(x.doneByName)) : '')
+        : 'riscado' + (g && x.doneByName ? ' por ' + escapeHtml(x.doneBy === me?.uid ? 'você' : firstName(x.doneByName)) : '') + (x.doneAt ? ' ' + time(x.doneAt) : ''));
+      else {
+        const v = est(x);
+        if (v) meta.push('~' + brl(v));
+        if (g && x.addedByName && x.addedBy !== me?.uid) meta.push('pedido por ' + escapeHtml(firstName(x.addedByName)));
+      }
+      return '<div class="li-row' + (x.done ? ' done' : '') + '">' +
+        '<button class="li-check" data-ltoggle="' + x.id + '" role="checkbox" aria-checked="' + !!x.done + '" aria-label="' + (x.done ? 'Desmarcar ' : 'Riscar ') + escapeHtml(titleCase(x.name)) + '">' +
+        (x.done ? '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>' : '') + '</button>' +
+        '<div class="li-info" data-ltoggle="' + x.id + '"><div class="li-name">' + escapeHtml(titleCase(x.name)) + '</div>' +
+        (meta.length ? '<div class="li-meta">' + meta.join(' · ') + '</div>' : '') + '</div>' +
+        (x.done ? '' : '<span class="stepper li-step"><button data-lq="-1" data-id="' + x.id + '" aria-label="Menos">−</button><span>' + fmtQtd(x.qty || 1) +
+          (x.un && x.un !== 'un' ? ' ' + escapeHtml(x.un) : '') + '</span><button data-lq="1" data-id="' + x.id + '" aria-label="Mais">+</button></span>') +
+        '<button class="li-icon' + (x.fixed ? ' on' : '') + '" data-lfix="' + x.id + '" aria-pressed="' + !!x.fixed + '" aria-label="' + (x.fixed ? 'Deixar de ser item fixo' : 'Marcar como item fixo') + '" title="Item fixo">' + ICON_PIN + '</button>' +
+        '<button class="li-icon" data-ldel="' + x.id + '" aria-label="Tirar ' + escapeHtml(titleCase(x.name)) + ' da lista">✕</button></div>';
+    };
+    $('listItems').innerHTML = !arr.length
+      ? '<p class="empty" style="padding:6px 0">Lista vazia. Adicione itens acima ou use as sugestões do app logo abaixo.</p>'
+      : (pending.length ? pending.map(row).join('') : '<p class="muted" style="margin:0 0 6px">Tudo no carrinho! 🎉</p>') +
+        (done.length ? '<p class="field-label li-done-head">No carrinho (' + done.length + ')</p>' + done.map(row).join('') : '');
+
+    const sug = listSuggestions(g);
+    $('listSuggest').innerHTML = '<h3 class="card-title">Sugestões do app</h3>' +
+      (sug.out.length ? '<p class="muted">Pelo ritmo de compra, ' + (sug.out.length === 1 ? 'este item provavelmente acabou:' : 'estes ' + sug.out.length + ' itens provavelmente acabaram:') + '</p>' +
+        '<div class="cat-picker">' + sug.out.slice(0, 16).map(p => '<button class="chip cart-chip-add" data-ladd="' + escapeHtml(p.key) + '">+ ' + escapeHtml(titleCase(p.name)) + '</button>').join('') + '</div>' +
+        '<button class="btn small" data-laddall="1">Pôr ' + (sug.out.length === 1 ? 'na lista' : 'os ' + sug.out.length + ' na lista') + '</button>'
+        : '<p class="muted">Nada parece ter acabado agora.</p>') +
+      (sug.frequent.length ? '<p class="muted" style="margin-top:14px;margin-bottom:8px">Você também costuma comprar:</p><div class="cat-picker" style="margin:0">' +
+        sug.frequent.map(p => '<button class="chip cart-chip-add" data-ladd="' + escapeHtml(p.key) + '">+ ' + escapeHtml(titleCase(p.name)) + '</button>').join('') + '</div>' : '');
+
+    $('listActions').innerHTML = '<h3 class="card-title">Enviar e recomeçar</h3>' +
+      '<div class="btn-row"><button class="btn small" data-lwa="1"' + (pending.length ? '' : ' disabled') + '>Enviar pelo WhatsApp</button>' +
+      '<button class="btn small ghost" data-lcopy="1"' + (pending.length ? '' : ' disabled') + '>Copiar lista</button></div>' +
+      '<button class="btn small ghost" data-lclear="1"' + (done.length ? '' : ' disabled') + '>Nova compra: limpar os riscados</button>' +
+      '<p class="muted" style="margin:12px 0 0;font-size:.78rem"><b>Itens fixos</b> (toque no alfinete) entram em toda compra: ao limpar os riscados, eles voltam para a lista em vez de sair.</p>';
+  }
+
+  function listText(fromGroup) {
+    const pending = listArray(fromGroup).filter(x => !x.done).sort((a, b) => (a.at || 0) - (b.at || 0));
+    return '🛒 Lista de compras' + (fromGroup ? ' (' + group.name + ')' : '') + '\n\n' +
+      pending.map(x => '• ' + fmtQtd(x.qty || 1) + ' ' + (x.un || 'un') + ' ' + titleCase(x.name)).join('\n') +
+      '\n\nEnviada pelo Leitor de Cupom';
+  }
+
+  async function onListClick(e) {
+    const t = e.target;
+    const g = (attr) => t.closest('[' + attr + ']')?.getAttribute(attr);
+    const fromGroup = listFromGroup();
+    const items = listItemsMap(fromGroup);
+    if (g('data-lsrc')) { listSrc = g('data-lsrc'); return renderList(); }
+    if (t.closest('#btnListAdd')) return addFromInput();
+    const tog = g('data-ltoggle');
+    if (tog && items[tog]) {
+      const x = items[tog];
+      return listWrite({ [tog]: x.done ? undone : { done: true, doneBy: me?.uid || null, doneByName: me?.name || null, doneAt: Date.now(), doneVia: null } });
+    }
+    const q = g('data-lq');
+    if (q) {
+      const id = t.closest('[data-id]').dataset.id, x = items[id];
+      if (!x) return;
+      const step = isBulk(x.un || '') ? 0.5 : 1;
+      return listWrite({ [id]: { qty: Math.max(step, Math.round(((x.qty || 1) + step * +q) * 10) / 10) } });
+    }
+    if (g('data-lfix')) { const id = g('data-lfix'); return listWrite({ [id]: { fixed: !items[id]?.fixed } }); }
+    if (g('data-ldel')) return listWrite({ [g('data-ldel')]: null });
+    if (g('data-ladd') || g('data-laddall')) {
+      const sug = listSuggestions(fromGroup);
+      const pick = g('data-laddall') ? sug.out : sug.out.concat(sug.frequent).filter(p => p.key === g('data-ladd'));
+      const n = await addListItems(pick.map(p => ({ name: titleCase(p.name), qty: roundQty(p.avgQty, p.un), un: p.un, key: p.key })));
+      if (n) toast(n === 1 ? titleCase(pick[0].name) + ' está na lista.' : n + ' itens postos na lista.');
+      return;
+    }
+    if (g('data-lwa')) {
+      const url = 'https://wa.me/?text=' + encodeURIComponent(listText(fromGroup));
+      if (!window.open(url, '_blank')) location.href = url;
+      return;
+    }
+    if (g('data-lcopy')) return copyText(listText(fromGroup), 'Lista copiada.');
+    if (g('data-lclear')) {
+      const done = Object.entries(items).filter(([, x]) => x && x.done);
+      const fixed = done.filter(([, x]) => x.fixed).length;
+      if (!confirm('Começar uma nova compra? Os ' + done.length + ' itens riscados saem da lista' + (fixed ? ' (os ' + fixed + ' fixos voltam desmarcados)' : '') + '.')) return;
+      return listWrite(Object.fromEntries(done.map(([id, x]) => [id, x.fixed ? undone : null])));
+    }
+  }
+  async function addFromInput() {
+    const name = $('listNew').value.trim().replace(/\s+/g, ' ');
+    if (!name) { $('listNew').focus(); return; }
+    const qty = parseMoney($('listNewQty').value) || 1;
+    const known = buildProducts(priceSource()).find(p => normName(p.name) === normName(name));
+    const n = await addListItems([{ name: name.charAt(0).toUpperCase() + name.slice(1), qty, un: known?.un || 'un', key: known?.key }]);
+    if (!n) toast('Esse item já está na lista.');
+    $('listNew').value = '';
+    $('listNewQty').value = '1';
+    $('listNew').focus();
+  }
+
+  // Ao escanear uma nota: risca da lista o que aparece nela e mostra o que ficou faltando
+  const LIST_STOP = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'COM', 'SEM', 'PARA', 'TIPO', 'UND', 'PCT', 'LATA', 'GARRAFA']);
+  const sigTokens = (s) => normName(s).split(' ').filter(t => t.length >= 3 && !/^\d/.test(t) && !LIST_STOP.has(t));
+  function listMatches(listName, itemName) {
+    if (normName(listName) === normName(itemName)) return true;
+    const a = sigTokens(listName).slice(0, 3), b = sigTokens(itemName);
+    return a.length > 0 && a.every(t => b.some(u => u.startsWith(t) || (u.length >= 4 && t.startsWith(u))));
+  }
+  function reconcileWithList(url, data) {
+    if (CLOUD && !me) return null;
+    const items = data.items || [];
+    const bought = [], missing = [], extra = [];
+    let any = false, newly = 0;
+    (inGroup() ? [true, false] : [false]).forEach(g => {
+      const arr = listArray(g);
+      if (!arr.length) return;
+      any = true;
+      const changes = {};
+      arr.forEach(x => {
+        if (items.some(i => listMatches(x.name, i.name))) {
+          bought.push(x.name);
+          if (!x.done) changes[x.id] = { done: true, doneBy: me?.uid || null, doneByName: me?.name || null, doneAt: Date.now(), doneVia: 'nota' };
+        } else if (!x.done) missing.push(x.name);
+        else extra.push(x.name);
+      });
+      newly += Object.keys(changes).length;
+      listWrite(changes, g);
+    });
+    if (!any) return null;
+    const names = (arr) => [...new Set(arr.map(n => titleCase(n)))].map(escapeHtml).join(', ');
+    return {
+      url, bought: bought.length, missing: missing.length, newly,
+      html: '<div class="rec-box"><p class="rec-title">Conferi com a lista de compras</p>' +
+        (bought.length ? '<p><b class="rec-ok">✓ Comprou:</b> ' + names(bought) + '</p>' : '<p>Nenhum item da lista aparece nesta nota.</p>') +
+        (missing.length ? '<p><b class="rec-miss">Ficou faltando:</b> ' + names(missing) + '</p>' : (bought.length ? '<p>Nada ficou faltando. 🎉</p>' : '')) +
+        (extra.length ? '<p class="rec-extra">Riscados na lista, mas não estão nesta nota: ' + names(extra) + '</p>' : '') +
+        '<button class="link-btn" data-goto-list="1">Abrir a lista</button></div>'
+    };
+  }
+
+  // ---------- Várias notas seguidas (câmera ou várias fotos da galeria) ----------
+  const batch = { items: [], seen: new Set(), running: false };
+  const batchOn = () => $('batchMode').checked;
+  function enqueueBatch(url, label) {
+    batch.seen.add(url);
+    const k = noteKey({ url });
+    const known = loadHistory().find(h => h.url === url || (k.startsWith('chave:') && noteKey(h) === k));
+    batch.items.push({ url, label, status: known ? 'repetida' : 'fila', store: known?.store, total: known?.total });
+    resultCard.classList.add('hidden');
+    renderBatch();
+    runBatch();
+  }
+  async function runBatch() {
+    if (batch.running) return;
+    batch.running = true;
+    let it;
+    while ((it = batch.items.find(x => x.status === 'fila'))) {
+      it.status = 'lendo';
+      renderBatch();
+      try {
+        const data = parseNota(await fetchViaProxies(it.url));
+        if (!data.items.length) throw new Error('a SEFAZ não mostrou os produtos');
+        const rec = reconcileWithList(it.url, data);
+        const r = await addToHistory(it.url, data);
+        it.status = r === 'repetida' ? 'repetida' : 'ok';
+        it.store = data.store;
+        it.total = data.total;
+        if (rec && rec.newly) it.rec = rec.newly;
+      } catch (err) {
+        it.status = 'erro';
+        it.msg = String(err?.message || err).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90);
+      }
+      renderBatch();
+    }
+    batch.running = false;
+  }
+  function renderBatch() {
+    const box = $('batchBox');
+    box.classList.toggle('hidden', !batch.items.length && !batchOn());
+    const ok = batch.items.filter(x => x.status === 'ok').length;
+    const pend = batch.items.filter(x => x.status === 'fila' || x.status === 'lendo').length;
+    $('batchTitle').textContent = !batch.items.length ? 'Toque em "Escanear QR Code" e vá apontando para as notas'
+      : ok + (ok === 1 ? ' nota salva' : ' notas salvas') + (pend ? ' · ' + pend + ' na fila' : '');
+    $('btnBatchDone').classList.toggle('hidden', !batch.items.length);
+    const ST = { fila: ['Na fila', 'wait', ''], lendo: ['Buscando na SEFAZ…', 'busy', ''], ok: ['Salva', 'ok', '✓'], repetida: ['Já estava salva', 'rep', '='], erro: ['Não deu', 'err', '!'] };
+    $('batchList').innerHTML = batch.items.map((x, i) => {
+      const [txt, cls, mark] = ST[x.status];
+      return '<li class="b-' + cls + '"><span class="b-dot" aria-hidden="true">' + (x.status === 'lendo' ? '<span class="spinner"></span>' : mark) + '</span>' +
+        '<div><b>' + escapeHtml(x.store ? titleCase(x.store) : (x.label || 'Nota ' + (i + 1))) + '</b>' +
+        '<small>' + txt + (x.total ? ' · ' + brl(x.total) : '') + (x.rec ? ' · ' + x.rec + ' da lista riscados' : '') + (x.msg ? ' · ' + escapeHtml(x.msg) : '') + '</small></div>' +
+        (x.status === 'erro' && x.url ? '<button class="cart-x" data-bretry="' + i + '">tentar de novo</button>' : '') + '</li>';
+    }).join('');
+  }
+  async function scanPhotosBatch(files) {
+    await stopScanner();
+    resultCard.classList.add('hidden');
+    $('batchBox').classList.remove('hidden');
+    toast('Lendo ' + files.length + ' fotos...');
+    for (let i = 0; i < files.length; i++) {
+      const label = 'Foto ' + (i + 1);
+      const url = await decodePhoto(files[i]);
+      if (!url) { batch.items.push({ url: '', label, status: 'erro', msg: 'não achei o QR Code da nota nesta foto' }); renderBatch(); continue; }
+      if (!batch.seen.has(url)) enqueueBatch(url, label);
+    }
+  }
+  async function finishBatch() {
+    await stopScanner();
+    const ok = batch.items.filter(x => x.status === 'ok').length;
+    const pend = batch.items.some(x => x.status === 'fila' || x.status === 'lendo');
+    if (pend && !confirm('Ainda há notas sendo buscadas. Concluir assim mesmo? As que estão na fila continuam sendo salvas.')) return;
+    if (!pend) { batch.items = []; batch.seen.clear(); }
+    renderBatch();
+    if (ok) toast(ok + (ok === 1 ? ' nota salva.' : ' notas salvas.') + ' Elas estão em Minhas notas.', 3500);
+  }
+
+  // ---------- Compartilhar com o app (link ou print da nota, pelo menu "Compartilhar" do celular) ----------
+  // O sw.js recebe o que foi compartilhado e guarda em um cache; aqui o app lê e processa.
+  const SHARE_CACHE = 'leitor-cupom-share';
+  let shareHandled = false;
+  async function handleShared() {
+    if (shareHandled) return;
+    shareHandled = true;
+    const params = new URLSearchParams(location.search);
+    if (!params.has('compartilhado') && !params.has('text') && !params.has('url')) return;
+    history.replaceState(null, '', location.pathname + location.hash);
+    let text = [params.get('title'), params.get('text'), params.get('url')].filter(Boolean).join(' ');
+    const files = [];
+    // o que o celular mandou (guardado pelo sw.js); com limite de tempo, para nunca travar a abertura
+    const readInbox = async () => {
+      const cache = await caches.open(SHARE_CACHE);
+      for (const req of await cache.keys()) {
+        const res = await cache.match(req);
+        if (/\/__share\/text$/.test(req.url)) text += ' ' + await res.text();
+        else { const blob = await res.blob(); files.push(new File([blob], 'compartilhado.jpg', { type: blob.type || 'image/jpeg' })); }
+        await cache.delete(req);
+      }
+    };
+    if (params.has('compartilhado') && 'caches' in window) {
+      try { await Promise.race([readInbox(), new Promise(r => setTimeout(r, 4000))]); } catch (_) {}
+    }
+    showTab('scan');
+    const urls = text.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+    const url = urls.find(u => /sefaz|fazenda|nfce|nfe|\.gov\.br/i.test(u)) || urls[0] ||
+      nfceUrl((text.match(/(?:www\.|[\w.-]+\.gov\.br\/)[^\s"'<>]+/i) || [])[0]);
+    if (url) { toast('Lendo a nota compartilhada...'); return processUrl(url); }
+    if (files.length > 1) return scanPhotosBatch(files);
+    if (files.length === 1) return scanFromPhoto(files[0]);
+    toast('Não encontrei o link ou o QR Code de uma nota no que foi compartilhado.', 4500);
+  }
+
+  // ---------- Busca: produtos, lojas, etiquetas e comentários ----------
+  let searchTimer = null, searchOpenProd = null;
+  const noteCtx = (h) => personalHistory().some(x => sameNote(x, h)) ? 'mine' : 'group';
+  function searchNotes() { return priceSource(); } // suas notas + as do grupo, sem repetir a mesma compra
+  function renderSearch() {
+    const raw = $('searchInput').value.trim();
+    const q = normName(raw);
+    const box = $('searchResults');
+    $('searchLead').textContent = 'Produtos, lojas, etiquetas e comentários das notas ' + (inGroup() ? 'suas e do grupo.' : 'que você escaneou.');
+    if (q.length < 2) {
+      box.innerHTML = '<section class="card"><p class="muted" style="margin:0">Digite pelo menos 2 letras. Dá para buscar um produto (café), uma loja (Condor), uma etiqueta (lanche) ou algo escrito nos comentários (churrasco).</p></section>';
+      return;
+    }
+    const toks = q.split(' ');
+    const has = (s) => { const n = normName(s); return toks.every(t => n.includes(t)); };
+    const notes = searchNotes();
+    const mineKeys = new Set(personalHistory().map(noteKey));
+    const prods = new Map();
+    notes.forEach(h => {
+      if (h.manual) return;
+      const t = spendDate(h);
+      (h.items || []).forEach(i => {
+        if (!has(i.name) && !tagsOf(i.name).some(has)) return;
+        const un = (i.un || 'un').toLowerCase().trim();
+        const k = normName(i.name) + '|' + un;
+        const p = prods.get(k) || { key: k, name: i.name, un, buys: [] };
+        const qn = Number.isFinite(i.qtd) && i.qtd > 0 ? i.qtd : 1;
+        p.buys.push({ h, t, store: titleCase(h.store || 'Loja'), qty: qn, unit: itemValue(i) / qn,
+          who: !mineKeys.has(noteKey(h)) && h.addedByName ? firstName(h.addedByName) : '' });
+        prods.set(k, p);
+      });
+    });
+    const cmts = groupComments.concat(myComments);
+    const noteHits = notes.filter(h => has(h.store || '') || cmts.some(c => c.note === noteKey(h) && has(c.text || '')));
+    const plist = [...prods.values()].sort((a, b) => b.buys.length - a.buys.length).slice(0, 30);
+    let html = '';
+    if (plist.length) {
+      html += '<section class="card"><h3 class="card-title">Produtos <span class="muted-inline">· ' + plist.length + '</span></h3>' + plist.map(p => {
+        p.buys.sort((a, b) => b.t - a.t);
+        const last = p.buys[0];
+        const cheapest = p.buys.reduce((m, b) => b.unit < m.unit ? b : m, last);
+        const open = searchOpenProd === p.key;
+        return '<div class="sr-prod"><button class="sr-head" data-sprod="' + escapeHtml(p.key) + '" aria-expanded="' + open + '"><span class="sr-txt"><b>' + escapeHtml(titleCase(p.name)) + '</b>' + tagChips(p.name) +
+          '<small>' + p.buys.length + (p.buys.length === 1 ? ' compra' : ' compras') + ' · última: ' + fmtUnit(last.unit, p.un) + ' em ' + escapeHtml(last.store) + ', ' + fmtDay(last.t) +
+          (cheapest.unit < last.unit - 0.005 ? ' · menor: ' + fmtUnit(cheapest.unit, p.un) + ' (' + escapeHtml(cheapest.store) + ')' : '') + '</small></span>' +
+          '<i aria-hidden="true">' + (open ? '−' : '+') + '</i></button>' +
+          (open ? '<div class="sr-buys">' + p.buys.slice(0, 20).map(b => '<button class="sr-buy" data-snote="' + escapeHtml(noteKey(b.h)) + '"><span>' + fmtDay(b.t) + ' · ' + escapeHtml(b.store) +
+            (b.who ? ' · ' + escapeHtml(b.who) : '') + '</span><span>' + fmtQtd(b.qty) + ' ' + escapeHtml(p.un) + ' · ' + fmtUnit(b.unit, p.un) + '</span></button>').join('') + '</div>' : '') + '</div>';
+      }).join('') + '</section>';
+    }
+    if (noteHits.length) html += '<section class="card list-card"><h3 class="card-title">Notas e lojas <span class="muted-inline">· ' + noteHits.length + '</span></h3></section><ul class="history" id="searchNotes"></ul>';
+    if (!html) html = '<section class="card"><p class="empty">Nada encontrado para "' + escapeHtml(raw) + '".</p></section>';
+    box.innerHTML = html;
+    if (noteHits.length) renderCupomList($('searchNotes'), noteHits.slice(0, 40), 'search');
+  }
+  function onSearchClick(e) {
+    const p = e.target.closest('[data-sprod]');
+    if (p) { searchOpenProd = searchOpenProd === p.dataset.sprod ? null : p.dataset.sprod; return renderSearch(); }
+    const n = e.target.closest('[data-snote]');
+    if (n) {
+      const h = searchNotes().find(x => noteKey(x) === n.dataset.snote);
+      if (!h) return;
+      setStatus('');
+      renderNota(h, h.url, noteCtx(h));
+      openResultCard();
+    }
+  }
+
   // ---------- Eventos ----------
   btnScan.addEventListener('click', () => {
     if (scanner && scanner.isScanning) stopScanner();
@@ -4942,12 +6149,16 @@
     const el = e.target.closest('[data-cat],[data-sub]');
     if (el) setStockFilter(el);
   }));
-  $('stockList').addEventListener('click', (e) => {
-    if (e.target.closest('select, label')) return; // mexer na subcategoria não fecha o item
+  $('stockList').addEventListener('click', async (e) => {
+    if (await onTagClick(e)) return renderStock();
+    if (e.target.closest('select, label, .tag-pick')) return; // mexer na subcategoria/etiquetas não fecha o item
     const li = e.target.closest('li');
     if (!li) return;
     openStockKey = openStockKey === li.dataset.key ? null : li.dataset.key;
     renderStock();
+  });
+  $('stockList').addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter' && e.target.matches('[data-tagnew-input]')) { e.preventDefault(); if (await addTagFromInput(e.target)) renderStock(); }
   });
   $('stockList').addEventListener('change', (e) => {
     const sel = e.target.closest('select[data-cat]');
@@ -4958,7 +6169,9 @@
     renderStock();
   });
   $('photoInput').addEventListener('change', (e) => {
-    scanFromPhoto(e.target.files[0]);
+    const files = [...e.target.files];
+    if (files.length > 1) scanPhotosBatch(files);
+    else scanFromPhoto(files[0]);
     e.target.value = '';
   });
   $('appVersion').textContent = browserInfo();
@@ -5038,6 +6251,55 @@
     stockCat = ''; stockSub = ''; openStockKey = null;
     renderStock();
   });
+
+  // ---------- Novidades: eventos ----------
+  $('btnHeaderSearch').addEventListener('click', () => {
+    if (CLOUD && !me) return;
+    if (currentTab === 'search') return showTab('scan');
+    showTab('search');
+    setTimeout(() => $('searchInput').focus(), 80);
+  });
+  $('searchInput').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(renderSearch, 200); });
+  $('searchResults').addEventListener('click', onSearchClick);
+  $('tabList').addEventListener('click', onListClick);
+  $('listNew').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addFromInput(); } });
+  $('listNewQty').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addFromInput(); } });
+  $('notifCard').addEventListener('click', onNotifClick);
+  $('notifCard').addEventListener('change', (e) => {
+    const k = e.target.dataset.notifKind;
+    if (!k) return;
+    const p = notifPrefs();
+    p[k] = e.target.checked;
+    saveNotifPrefs(p);
+  });
+  $('btnManualExpense').addEventListener('click', openManualExpense);
+  $('tabMine').addEventListener('click', (e) => { if (e.target.closest('[data-manual-open]')) openManualExpense(); });
+  $('btnMxCancel').addEventListener('click', () => $('manualModal').classList.add('hidden'));
+  $('btnMxSave').addEventListener('click', saveManualExpense);
+  $('manualModal').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') saveManualExpense(); });
+  $('batchMode').addEventListener('change', renderBatch);
+  $('btnBatchDone').addEventListener('click', finishBatch);
+  $('batchList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-bretry]');
+    if (!b) return;
+    const it = batch.items[+b.dataset.bretry];
+    if (!it || !it.url) return;
+    it.status = 'fila';
+    it.msg = '';
+    renderBatch();
+    runBatch();
+  });
+  // detalhe da nota: comentários e conferência com a lista
+  resultEl.addEventListener('click', async (e) => {
+    if (e.target.closest('#btnCmtSend')) return sendComment();
+    if (e.target.closest('[data-goto-list]')) return showTab('list');
+    const d = e.target.closest('[data-cmtdel]');
+    if (d) {
+      if (!confirm('Apagar este comentário?')) return;
+      try { await fb.deleteDoc(fb.doc(cmtCol(d.dataset.cmtg === '1'), d.dataset.cmtdel)); } catch (err) { cloudError(err); }
+    }
+  });
+  resultEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'cmtText') { e.preventDefault(); sendComment(); } });
 
   // ---------- Contas: eventos e inicialização ----------
   $('authSeg').addEventListener('click', (e) => {
@@ -5186,8 +6448,10 @@
     initCloud();
   } else {
     $('btnFeedback').classList.remove('hidden');
+    $('btnHeaderSearch').classList.remove('hidden');
     renderHistory();
     renderHome();
+    handleShared();
   }
 </script>
 </body>
