@@ -1052,7 +1052,7 @@
   .sr-buy { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; margin-top: 4px; border: 0; border-radius: 12px; background: var(--surface-2); font: inherit; font-size: .8rem; color: inherit; cursor: pointer; text-align: left; }
   .sr-buy span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-  /* Início sem notas e funções que liberam com 5 notas */
+  /* Início sem notas e funções que liberam com 3 notas */
   .h-start { cursor: default; background: var(--green-soft); display: flex; flex-direction: column; gap: 6px; }
   .h-start .h-serif { font-size: 1.25rem; }
   .h-start small { font-size: .85rem; color: var(--text); opacity: .8; line-height: 1.45; }
@@ -4663,7 +4663,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-16.2';
+  const APP_VERSION = '2026-11-16.3';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -5808,7 +5808,7 @@
     const base = { max, spent, remDays, suggest };
     if (!max) return { ...base, state: 'nobudget' };
     if (spent > max) return { ...base, state: 'over' };
-    if (mine.length < 4 || !products.length) return { ...base, state: 'learning' };
+    if (mine.length < MIN_NOTES || !products.length) return { ...base, state: 'learning' };
 
     // gasto que não segue um ritmo (compras avulsas, gastos sem nota): média por dia nos últimos 90 dias
     const firstT = Math.min(...mine.map(spendDate).filter(Boolean));
@@ -5928,8 +5928,8 @@
 
   // ---------- Funções liberadas aos poucos ----------
   // O que depende de histórico (assistente, metas por categoria, preços, supérfluos) só aparece
-  // a partir de 5 notas: antes disso os números ainda não dizem muito e só confundem.
-  const MIN_NOTES = 5;
+  // a partir de 3 notas: antes disso os números ainda não dizem muito e só confundem.
+  const MIN_NOTES = 3;
   const unlocked = () => personalHistory().length >= MIN_NOTES;
   function lockedHtml(what, home) {
     const n = personalHistory().length, left = Math.max(0, MIN_NOTES - n);
