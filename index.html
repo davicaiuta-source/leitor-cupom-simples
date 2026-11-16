@@ -1052,6 +1052,59 @@
   .sr-buy { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; margin-top: 4px; border: 0; border-radius: 12px; background: var(--surface-2); font: inherit; font-size: .8rem; color: inherit; cursor: pointer; text-align: left; }
   .sr-buy span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
+  /* vários grupos */
+  .groups-list li { gap: 10px; }
+  .grp-dot { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border); }
+  .grp-dot.on { background: var(--green-btn); border-color: var(--green-btn); }
+  .grp-use { width: auto; min-height: 34px; margin-left: auto; padding: 0 12px; font-size: .8rem; }
+  .grp-more { margin: 4px 0 14px; }
+  .grp-more summary { cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--green-text); padding: 6px 0; }
+
+  /* nomes dos produtos (Histórico) */
+  .name-edit { margin: 8px 0 4px; }
+  .name-edit .inline-form { margin-bottom: 8px; }
+  .name-edit .inline-form input { min-height: 40px; }
+  .merge-box { margin: 14px 0 4px; padding: 12px 14px; border-radius: 18px; background: var(--lavender); }
+  .merge-box .muted { color: var(--text); opacity: .8; }
+  .merge-row { padding: 10px 0 0; border-top: 1px solid rgba(0, 0, 0, .06); margin-top: 8px; font-size: .88rem; }
+  .merge-row .btn-row { margin: 8px 0 0; }
+  .merge-row .btn { min-height: 38px; font-size: .85rem; }
+
+  /* teto da lista */
+  .lim-link { margin-top: 10px; font-size: .85rem; }
+  .lim-form { margin: 12px 0 0; }
+  .lim-box { margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); font-size: .85rem; }
+  .lim-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .lim-bar { margin: 8px 0 0; background: var(--card); }
+  .lim-box.warn .lim-bar i { background: #C98A12; }
+  .lim-box.bad .lim-bar i { background: var(--danger); }
+  .lim-txt { margin: 6px 0 0; }
+  .lim-box.bad .lim-txt b { color: var(--danger); }
+  .lim-note { margin: 6px 0 0; font-size: .72rem; color: var(--muted); }
+
+  /* CPF e garantias */
+  .cpf-ok { margin: 0 0 12px; font-size: .82rem; font-weight: 600; color: var(--green-text); text-align: center; }
+  .sv-cpf { margin: 12px 0 0; font-size: .85rem; }
+  .tag-btn.warr-on { background: var(--green-soft); border-color: transparent; color: var(--green-text); }
+  .warr-row { padding: 12px 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
+  .warr-top { display: flex; justify-content: space-between; gap: 10px; }
+  .warr-top span { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
+  .warr-row small { font-size: .78rem; color: var(--muted); }
+  .warr-st { font-size: .82rem; font-weight: 600; color: var(--green-text); }
+  .warr-st.soon { color: var(--orange); }
+  .warr-st.off { color: var(--muted); }
+  .warr-troca { margin-top: 2px; }
+  .warr-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 6px; font-size: .8rem; color: var(--muted); }
+  .warr-actions .cat-select { font-size: .78rem; padding: 4px 26px 4px 10px; }
+
+  /* conta: nome, dados e exclusão */
+  .account-head .acc-edit-name { margin: 0 0 0 auto; font-size: .8rem; white-space: nowrap; align-self: center; }
+  .danger-link { color: var(--danger); border-bottom-color: transparent; }
+  .del-box { margin-top: 12px; padding: 14px; border-radius: 16px; border: 1.5px solid #F2C4BF; background: #FDF3F2; font-size: .88rem; }
+  .del-box p { margin: 0; }
+  html[data-theme="dark"] .del-box { background: #2A1918; border-color: #5E2F2C; }
+  html[data-theme="dark"] .merge-row { border-top-color: rgba(255, 255, 255, .08); }
+
   /* Início sem notas e funções que liberam com 3 notas */
   .h-start { cursor: default; background: var(--green-soft); display: flex; flex-direction: column; gap: 6px; }
   .h-start .h-serif { font-size: 1.25rem; }
@@ -1392,6 +1445,7 @@
       </div>
       <ul class="stock-list" id="stockList"></ul>
       <p class="empty hidden" id="stockEmpty"></p>
+      <div id="stockMerge"></div>
       <p class="stock-note">Toque num produto para ver em quais notas ele aparece e para trocar o tipo de produto. A categoria vem da loja: dá para trocar no detalhe da nota. Os produtos são agrupados pelo nome; se cada loja escreve o nome de um jeito, eles aparecem separados.</p>
     </section>
   </div>
@@ -1520,7 +1574,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
         <span class="more-txt"><b>Instalar o app</b><small id="installHint">Ícone na tela inicial, abre como um app</small></span></button></li>
     </ul>
-    <section class="card" style="margin-top:14px" id="notifCard"></section>
+    <section class="card" style="margin-top:14px" id="warrCard"></section>
+    <section class="card" id="notifCard"></section>
+    <section class="card" id="cpfCard"></section>
     <section class="card">
       <h3 class="card-title">Aparência</h3>
       <p class="muted">"Automático" segue o modo claro ou escuro do seu celular.</p>
@@ -1643,6 +1699,8 @@
       <h3>Enviar para o grupo?</h3>
       <p id="shareModalInfo"></p>
       <p style="margin-top:10px">Você quer subir essa nota para o grupo ou quer que essa nota fique apenas armazenada nas suas notas pessoais?</p>
+      <label class="field hidden" id="shareGroupRow" style="margin:14px 0 0"><span>Para qual grupo?</span>
+        <select class="cat-select" id="shareGroupSel" style="width:100%;padding:11px 30px 11px 12px"></select></label>
       <div style="display:grid;gap:8px;margin-top:16px">
         <button class="btn small" id="btnShareYes">Subir para o grupo</button>
         <button class="btn small ghost" id="btnShareNo">Só nas minhas notas</button>
@@ -1818,17 +1876,27 @@
   const isHiddenItem = (name) => { const n = normName(name); return hiddenTerms().some(t => n.includes(t)); };
 
   function wantsShare(h, id) {
+    // nota já mandada para um grupo específico (ou para nenhum: 'none')
+    const to = (me.shareTo || {})[id];
+    if (to) return to === me.groupId;
+    // grupos extras só recebem o que a pessoa escolhe mandar
+    if (me.groupId !== primaryGroup()) return false;
     const ov = (me.shareOv || {})[id];
     return ov !== undefined ? ov : myShareCats().includes(cupomCat(h).id);
   }
+  const catWants = (h) => myShareCats().includes(cupomCat(h).id);
 
   // Versão da nota que o grupo vê: sem os produtos escondidos (e o total sem eles)
   function groupVersion(h) {
     const all = h.items || [];
-    const items = all.filter(i => !isHiddenItem(i.name));
-    const hiddenSum = all.filter(i => isHiddenItem(i.name)).reduce((s, i) => s + (Number.isFinite(i.total) ? i.total : 0), 0);
+    // confere o nome escolhido e o original da nota (um produto renomeado continua escondido)
+    const hid = (i) => isHiddenItem(i.name) || (!!i.rawName && isHiddenItem(i.rawName));
+    const items = all.filter(i => !hid(i));
+    const hiddenSum = all.filter(hid).reduce((s, i) => s + (Number.isFinite(i.total) ? i.total : 0), 0);
     return cleanDoc({
-      ...notaData(h), items, total: Math.max(0, (h.total || 0) - hiddenSum), hiddenCount: all.length - items.length,
+      // no grupo vai o nome original (cada pessoa vê os nomes que ela mesma escolheu)
+      ...notaData(h), items: items.map(i => i.rawName ? { ...i, name: i.rawName, rawName: undefined } : i),
+      total: Math.max(0, (h.total || 0) - hiddenSum), hiddenCount: all.length - items.length,
       url: h.url, scannedAt: h.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name
     });
   }
@@ -1842,7 +1910,7 @@
     for (const h of list) {
       const id = await hashId(h.url);
       const ref = fb.doc(db, 'groups', gid, 'cupons', id);
-      const cur = groupDoc(h.url);
+      const cur = groupCuponsRaw.find(c => c.url === h.url) || groupDoc(h.url); // como está no banco (nomes originais)
       if (cur && cur.addedBy && cur.addedBy !== me.uid) continue; // nota de outra pessoa
       if (!cur && groupTwin(h)) continue; // a mesma compra já está no grupo (outra pessoa escaneou)
       if (wantsShare(h, id)) {
@@ -1867,22 +1935,36 @@
   // Enviar / não enviar uma nota específica (vale mais que a regra da categoria)
   async function setShareOv(h, value) {
     const id = await hashId(h.url);
+    const to = value ? me.groupId : 'none';
     me.shareOv = { ...(me.shareOv || {}), [id]: value };
-    await fb.setDoc(fb.doc(db, 'users', me.uid), { shareOv: { [id]: value } }, { merge: true });
+    me.shareTo = { ...(me.shareTo || {}), [id]: to };
+    await fb.setDoc(fb.doc(db, 'users', me.uid), { shareOv: { [id]: value }, shareTo: { [id]: to } }, { merge: true });
     return syncToGroup([h]);
   }
 
-  // Pergunta se a nota vai para o grupo; resolve com true (subir) ou false (só pessoal)
+  // Manda a nota para um grupo que não é o aberto agora
+  async function shareToGroup(h, gid) {
+    const id = await hashId(h.url);
+    me.shareTo = { ...(me.shareTo || {}), [id]: gid };
+    await fb.setDoc(fb.doc(db, 'groups', gid, 'cupons', id), groupVersion(h));
+    await fb.setDoc(fb.doc(db, 'users', me.uid), { shareTo: { [id]: gid } }, { merge: true });
+  }
+
+  // Pergunta se a nota vai para o grupo; resolve com o id do grupo escolhido ou false (só pessoal)
   function askShare(h) {
+    const many = (me.groupIds || []).length > 1;
     $('shareModalInfo').innerHTML = '<b>' + escapeHtml(titleCase(h.store || 'Estabelecimento')) + '</b> · ' + brl(h.total || 0) +
-      '<br>Esta nota é de <b>' + escapeHtml(cupomCat(h).name) + '</b>, uma categoria que você mostra para o grupo <b>' +
-      escapeHtml(group.name) + '</b>.';
+      '<br>Esta nota é de <b>' + escapeHtml(cupomCat(h).name) + '</b>, uma categoria que você mostra para ' +
+      (many ? 'os seus grupos.' : 'o grupo <b>' + escapeHtml(group.name) + '</b>.');
+    $('shareGroupRow').classList.toggle('hidden', !many);
+    $('shareGroupSel').innerHTML = (me.groupIds || []).map(g => '<option value="' + escapeHtml(g) + '"' + (g === me.groupId ? ' selected' : '') + '>' +
+      escapeHtml(groupNameOf(g)) + (g === me.groupId ? ' (aberto agora)' : '') + '</option>').join('');
     $('shareModal').classList.remove('hidden');
     return new Promise(resolve => {
       const done = (yes) => {
         $('shareModal').classList.add('hidden');
         $('btnShareYes').onclick = $('btnShareNo').onclick = null;
-        resolve(yes);
+        resolve(yes ? (many ? $('shareGroupSel').value : me.groupId) : false);
       };
       $('btnShareYes').onclick = () => done(true);
       $('btnShareNo').onclick = () => done(false);
@@ -1936,10 +2018,11 @@
         }
         const id = await hashId(url);
         // nota nova que se encaixa nas categorias do grupo: pergunta antes de subir
-        if (!other && (me.shareOv || {})[id] === undefined && wantsShare(saved, id)) {
-          const yes = await askShare(saved);
-          await setShareOv(saved, yes);
-          toast(yes ? 'Nota enviada para o grupo ' + group.name + '.' : 'Nota salva só nas suas notas.', 3500);
+        if (!other && (me.shareOv || {})[id] === undefined && !(me.shareTo || {})[id] && catWants(saved)) {
+          const choice = await askShare(saved);
+          if (choice && choice !== me.groupId) await shareToGroup(saved, choice);
+          else await setShareOv(saved, !!choice);
+          toast(choice ? 'Nota enviada para o grupo ' + groupNameOf(choice) + '.' : 'Nota salva só nas suas notas.', 3500);
           // atualiza o detalhe aberto (botão Enviar/Tirar do grupo)
           if (!resultCard.classList.contains('hidden') && $('btnRemove')) renderNota(saved, url);
           return;
@@ -2088,6 +2171,15 @@
       const d = snap.data() || {};
       if (d.name) me.name = d.name;
       me.groupId = d.groupId || null;
+      me.groupIds = d.groupIds || (d.groupId ? [d.groupId] : []);
+      if (me.groupId && !me.groupIds.includes(me.groupId)) me.groupIds = [me.groupId, ...me.groupIds];
+      me.groupNames = d.groupNames || {};
+      me.primaryGroup = d.primaryGroup;
+      me.shareTo = d.shareTo || {};
+      // conta de antes dos vários grupos: grava a lista com o grupo atual como principal
+      if (d.groupId && !d.groupIds) {
+        fb.setDoc(fb.doc(db, 'users', user.uid), { groupIds: [d.groupId], primaryGroup: d.groupId }, { merge: true }).catch(() => {});
+      }
       me.shareCats = d.shareCats || null;
       me.hiddenItems = d.hiddenItems || [];
       me.shareOv = d.shareOv || {};
@@ -2107,7 +2199,8 @@
     // notas da pessoa: assina uma vez por login
     if (!unsubs.cupons) {
       unsubs.cupons = fb.onSnapshot(cuponsQuery('users', me.uid), snap => {
-        cloudCupons = snap.docs.map(d => d.data());
+        cloudCuponsRaw = snap.docs.map(d => d.data());
+        cloudCupons = applyNames(cloudCuponsRaw);
         dataReady = true;
         refreshViews();
         handleShared(); // algo compartilhado com o app (link ou print da nota) espera os dados carregarem
@@ -2138,13 +2231,19 @@
       group = snap.exists() ? { id: snap.id, ...snap.data() } : null;
       // saiu do grupo ou o grupo sumiu: volta para o modo individual
       if (!group || !(group.members || []).includes(me.uid)) { detachGroup(); return; }
+      // guarda o nome atualizado (aparece na troca de grupo)
+      if (group.name && (me.groupNames || {})[gid] !== group.name) {
+        me.groupNames = { ...(me.groupNames || {}), [gid]: group.name };
+        fb.setDoc(fb.doc(db, 'users', me.uid), { groupNames: { [gid]: group.name } }, { merge: true }).catch(() => {});
+      }
       refreshViews();
       renderHeaderSpace();
     }, err => { if (err.code === 'permission-denied') detachGroup(); else cloudError(err); });
 
     let firstLoad = true;
     unsubs.groupCupons = fb.onSnapshot(cuponsQuery('groups', gid), snap => {
-      groupCupons = snap.docs.map(d => d.data());
+        groupCuponsRaw = snap.docs.map(d => d.data());
+        groupCupons = applyNames(groupCuponsRaw);
       refreshViews();
       // avisa quando outra pessoa do grupo escaneia uma nota (não na carga inicial)
       if (!firstLoad) {
@@ -2162,7 +2261,7 @@
   }
 
   function detachGroup() {
-    fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true }).catch(cloudError);
+    if (me.groupId) dropGroup(me.groupId).catch(cloudError);
   }
 
   function refreshViews() {
@@ -2192,7 +2291,10 @@
   async function cloudSaveCupom(url, data) {
     const prev = cloudCupons.find(c => c.url === url);
     const docData = cleanDoc({
-      ...notaData(data), url, scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name,
+      ...notaData(data), url,
+      // no banco fica sempre o nome original do produto (o nome escolhido pela pessoa é aplicado na tela)
+      items: (data.items || []).map(i => i.rawName ? { ...i, name: i.rawName, rawName: undefined } : i),
+      scannedAt: prev?.scannedAt || data.scannedAt || Date.now(), addedBy: me.uid, addedByName: me.name,
       // "fixada nas minhas notas" (mesma compra que outra pessoa já subiu ao grupo): não perde ao escanear de novo
       keepPersonal: data.keepPersonal || prev?.keepPersonal || undefined
     });
@@ -2217,6 +2319,14 @@
   }
   const normCode = (s) => (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 
+  // Vários grupos: users/{uid}.groupIds = todos os grupos da pessoa; groupId = o grupo aberto agora;
+  // primaryGroup = o primeiro grupo, o único que recebe notas automaticamente pela categoria.
+  // Nos outros grupos, só entra o que a pessoa escolhe mandar (shareTo[idDaNota] = idDoGrupo).
+  function groupJoinPatch(gid, name) {
+    const first = !(me && (me.groupIds || []).length);
+    return { groupId: gid, groupIds: fb.arrayUnion(gid), groupNames: { [gid]: name }, ...(first ? { primaryGroup: gid } : {}) };
+  }
+
   async function createGroup(groupName, userName, sharedCats) {
     const uid = auth.currentUser.uid;
     for (let attempt = 0; attempt < 5; attempt++) {
@@ -2230,7 +2340,7 @@
             name: groupName, code, ownerUid: uid, members: [uid], memberNames: { [uid]: userName }, sharedCats, createdAt: fb.serverTimestamp()
           });
           tx.set(codeRef, { groupId: groupRef.id, ownerUid: uid });
-          tx.set(fb.doc(db, 'users', uid), { groupId: groupRef.id }, { merge: true });
+          tx.set(fb.doc(db, 'users', uid), groupJoinPatch(groupRef.id, groupName), { merge: true });
         });
         return { code, gid: groupRef.id };
       } catch (err) {
@@ -2250,20 +2360,25 @@
     const gid = await findGroupByCode(code);
     const uid = auth.currentUser.uid;
     await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayUnion(uid), ['memberNames.' + uid]: userName });
-    await fb.setDoc(fb.doc(db, 'users', uid), { groupId: gid }, { merge: true });
+    let name = 'Grupo';
+    try { name = (await fb.getDoc(fb.doc(db, 'groups', gid))).data()?.name || name; } catch (_) {}
+    await fb.setDoc(fb.doc(db, 'users', uid), groupJoinPatch(gid, name), { merge: true });
     return gid;
   }
 
   // Ao criar/entrar num grupo: manda as notas que a pessoa já tinha (seguindo as escolhas dela),
   // ou marca todas como "não enviar" para só as próximas irem para o grupo
-  async function afterJoin(gid, bring) {
+  async function afterJoin(gid, bring, extra) {
+    // grupo extra (a pessoa já tinha outro): começa vazio, só recebe o que ela mandar
+    if (extra) return 0;
     const [gSnap, theirs] = await Promise.all([
       fb.getDoc(fb.doc(db, 'groups', gid)),
       fb.getDocs(fb.collection(db, 'groups', gid, 'cupons'))
     ]);
     me.groupId = gid;
     group = { id: gid, ...gSnap.data() };
-    groupCupons = theirs.docs.map(d => d.data());
+    groupCuponsRaw = theirs.docs.map(d => d.data());
+    groupCupons = applyNames(groupCuponsRaw);
     if (bring) return syncToGroup(cloudCupons);
     const ov = {};
     for (const h of cloudCupons) ov[await hashId(h.url)] = false;
@@ -2272,9 +2387,21 @@
   }
 
   async function leaveGroup() {
-    await fb.updateDoc(fb.doc(db, 'groups', me.groupId), { members: fb.arrayRemove(me.uid), ['memberNames.' + me.uid]: fb.deleteField() });
-    await fb.setDoc(fb.doc(db, 'users', me.uid), { groupId: null }, { merge: true });
+    const gid = me.groupId;
+    await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayRemove(me.uid), ['memberNames.' + me.uid]: fb.deleteField() });
+    await dropGroup(gid);
   }
+
+  // Tira o grupo da lista da pessoa e abre o próximo (se houver)
+  async function dropGroup(gid) {
+    const rest = (me.groupIds || []).filter(g => g !== gid);
+    const patch = { groupIds: rest, groupId: rest[0] || null, groupNames: { [gid]: fb.deleteField() } };
+    // saiu do grupo principal: nenhum outro passa a receber notas sozinho pela categoria
+    if (me.primaryGroup === gid) patch.primaryGroup = null;
+    await fb.setDoc(fb.doc(db, 'users', me.uid), patch, { merge: true });
+  }
+  const primaryGroup = () => me?.primaryGroup === undefined ? (me?.groupIds || [])[0] : me.primaryGroup;
+  const groupNameOf = (gid) => (gid === group?.id && group?.name) || (me.groupNames || {})[gid] || 'Grupo';
 
   // Envia para a conta/grupo os cupons que estavam salvos só neste aparelho
   async function importLocal() {
@@ -2505,7 +2632,8 @@
     el.classList.remove('hidden');
     if (me.groupId && group) {
       const n = (group.members || []).length;
-      el.innerHTML = ICON_GROUP + escapeHtml(group.name) + ' · ' + n + (n === 1 ? ' pessoa' : ' pessoas');
+      el.innerHTML = ICON_GROUP + escapeHtml(group.name) + ' · ' + n + (n === 1 ? ' pessoa' : ' pessoas') +
+        ((me.groupIds || []).length > 1 ? ' · <u>trocar</u>' : '');
     } else if (me.groupId) {
       el.innerHTML = ICON_GROUP + 'Carregando grupo...';
     } else {
@@ -2562,13 +2690,16 @@
     if (!me) return;
     // guarda o que a pessoa estava digitando (a tela é redesenhada a cada sincronização)
     const keep = {};
-    ['accGroupName', 'accCode', 'accHideTerm'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
+    ['accGroupName', 'accCode', 'accHideTerm', 'accNewName', 'accDelPass'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
     const keepBring = $('accBring') ? $('accBring').checked : true;
     const keepCats = $('accCats') ? pickedCats('accCats') : DEFAULT_SHARED;
 
     let html = '<section class="card account-card"><h2>Minha conta</h2>' +
       '<div class="account-head">' + avatar(me.uid, me.name, 48) +
-      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div></div>' + profileEditor();
+      '<div><b>' + escapeHtml(me.name) + '</b><span>' + escapeHtml(me.email || '') + '</span></div>' +
+      '<button class="link-btn acc-edit-name" data-acc="name-edit">Editar nome</button></div>' +
+      (accNameEditing ? '<div class="inline-form" style="margin-top:12px"><input id="accNewName" maxlength="40" value="' + escapeHtml(me.name) + '" aria-label="Seu nome" autocomplete="name">' +
+        '<button class="btn small" data-acc="name-save">Salvar</button></div>' : '') + profileEditor();
 
     html += '<hr class="divider">';
     if (me.groupId && group) {
@@ -2585,7 +2716,7 @@
           return '<li>' + avatar(uid, n, 32) + escapeHtml(n) + (uid === me.uid ? ' (você)' : '') +
             (uid === group.ownerUid ? '<span class="tag-owner">criador</span>' : '') + '</li>';
         }).join('') + '</ul>' +
-        '<button class="btn small stop" data-action="leave">Sair do grupo</button>';
+        '<button class="btn small stop" data-action="leave">Sair do grupo</button>' + otherGroupsHtml(keepCats);
     } else if (me.groupId) {
       html += '<p class="auth-loading"><span class="spinner"></span>Carregando grupo...</p>';
     } else {
@@ -2604,9 +2735,29 @@
     if (inGroup()) html += myShareCard();
     if (isAdminEmail()) html += adminCard();
 
+    html += dataCardHtml();
     html += '<button class="btn small ghost" data-action="logout">Sair da conta</button>';
     $('accountContent').innerHTML = html;
     Object.entries(keep).forEach(([id, v]) => { if ($(id)) $(id).value = v; });
+  }
+
+  // Vários grupos: lista para trocar o grupo aberto + criar/entrar em outro
+  function otherGroupsHtml(keepCats) {
+    const others = (me.groupIds || []).filter(g => g !== me.groupId);
+    return '<hr class="divider"><h3 class="card-title">Meus grupos</h3>' +
+      '<p class="muted">Você pode participar de mais de um grupo (por exemplo, "Casa" e "República"). O app mostra um grupo por vez; ' +
+      'ao escanear uma nota, você escolhe para qual grupo ela vai.' +
+      (primaryGroup() && primaryGroup() !== me.groupId ? ' Só o grupo <b>' + escapeHtml(groupNameOf(primaryGroup())) + '</b> recebe notas automaticamente pela categoria.' : '') + '</p>' +
+      '<ul class="members groups-list"><li><span class="grp-dot on" aria-hidden="true"></span><b>' + escapeHtml(group.name) + '</b><span class="tag-owner">aberto agora</span></li>' +
+      others.map(g => '<li><span class="grp-dot" aria-hidden="true"></span>' + escapeHtml(groupNameOf(g)) +
+        '<button class="btn small ghost grp-use" data-action="use-group" data-gid="' + escapeHtml(g) + '">Abrir este</button></li>').join('') + '</ul>' +
+      '<details class="grp-more"><summary>Criar ou entrar em outro grupo</summary>' +
+      '<p class="field-label" style="margin-top:12px">Criar um grupo</p>' +
+      '<div class="inline-form"><input id="accGroupName" placeholder="Ex.: República"><button class="btn small" data-action="create-group">Criar</button></div>' +
+      '<p class="muted" style="margin-bottom:8px">Categorias que vão para o novo grupo quando você escolher mandar:</p>' + catPicker('accCats', keepCats) +
+      '<p class="field-label">Entrar com um código</p>' +
+      '<div class="inline-form"><input id="accCode" class="code-input" maxlength="6" placeholder="CÓDIGO" autocomplete="off"><button class="btn small" data-action="join-group">Entrar</button></div>' +
+      '</details>';
   }
 
   // Aplica uma mudança nas escolhas da pessoa e atualiza as notas dela no grupo
@@ -2698,6 +2849,7 @@
 
   async function onAccountAction(e) {
     if (await onProfileClick(e)) return;
+    if (await onDataClick(e)) return;
     const fbf = e.target.closest('[data-fbf]');
     if (fbf) { fbFilter = fbf.dataset.fbf; return renderAccount(); }
     const unhide = e.target.closest('[data-unhide]');
@@ -2748,13 +2900,22 @@
         return;
       }
       if (action === 'leave') {
-        if (!confirm('Sair do grupo "' + group.name + '"? As notas continuam no grupo para os outros participantes e as suas continuam em Minhas notas.')) return;
+        const next = (me.groupIds || []).find(g => g !== me.groupId);
+        if (!confirm('Sair do grupo "' + group.name + '"? As notas continuam no grupo para os outros participantes e as suas continuam em Minhas notas.' +
+          (next ? ' O app passa a mostrar o grupo "' + groupNameOf(next) + '".' : ''))) return;
         await withBusy(btn, leaveGroup);
         toast('Você saiu do grupo.');
         return;
       }
+      if (action === 'use-group') {
+        const gid = btn.dataset.gid;
+        await withBusy(btn, () => saveMyPrefs({ groupId: gid }));
+        toast('Grupo aberto: ' + groupNameOf(gid) + '.');
+        return;
+      }
       if (action === 'create-group' || action === 'join-group') {
-        const bring = $('accBring').checked;
+        const extra = (me.groupIds || []).length > 0; // já está em outro grupo
+        const bring = !extra && !!$('accBring')?.checked;
         let moved = 0;
         if (action === 'create-group') {
           const name = $('accGroupName').value.trim();
@@ -2763,15 +2924,17 @@
           if (!cats.length) throw new Error('Escolha pelo menos uma categoria para o grupo.');
           await withBusy(btn, async () => {
             const { code, gid } = await createGroup(name, me.name, cats);
-            moved = await afterJoin(gid, bring);
+            moved = await afterJoin(gid, bring, extra);
             showCodeModal(code, name);
           });
         } else {
           const code = normCode($('accCode').value);
           if (code.length !== 6) throw new Error('O código do grupo tem 6 caracteres.');
           await withBusy(btn, async () => {
-            const gid = await joinGroup(code, me.name);
-            moved = await afterJoin(gid, bring);
+            const gid = await findGroupByCode(code);
+            if ((me.groupIds || []).includes(gid)) throw new Error('Você já participa desse grupo.');
+            await joinGroup(code, me.name);
+            moved = await afterJoin(gid, bring, extra);
           });
           toast('Você entrou no grupo!');
         }
@@ -3867,6 +4030,7 @@
         (topProds.length ? '<p class="field-label" style="margin-top:12px">Produtos em que mais gastou</p>' +
           topProds.map(x => '<div class="sv-line"><span>' + escapeHtml(titleCase(x.name)) + '</span><b>' + brl(x.v) + '</b></div>').join('') : '');
     }
+    if (!saveFromGroup()) s += cpfStat(notes);
     $('saveSummary').innerHTML = s;
     $('saveExtra').innerHTML = renderSuperfluous(source, saveMonth, mEnd, prevStart, monthName);
 
@@ -4357,6 +4521,7 @@
       : history.reduce((s, h) => s + (h.total || 0), 0));
 
     renderStockFilters(all, inCat);
+    renderMergeSuggestions();
 
     const sorters = {
       qty: (a, b) => b.qty - a.qty || b.spent - a.spent,
@@ -4382,7 +4547,7 @@
       if (openStockKey === g.key) {
         html += '<div class="s-detail">' +
           '<label class="s-sub">Tipo de produto <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
-          subOptions(g.cat, g.sub) + '</select></label>' + tagPicker(g.name) +
+          subOptions(g.cat, g.sub) + '</select></label>' + nameEditor(g.name, g.unit) + tagPicker(g.name) +
           g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
           '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') +
           (p.who ? ' · ' + escapeHtml(p.who) : '') + '</span>' +
@@ -4651,7 +4816,7 @@
     if (tab === 'cart') renderCart();
     if (tab === 'list') renderList();
     if (tab === 'search') renderSearch();
-    if (tab === 'more') renderNotifCard();
+    if (tab === 'more') { renderNotifCard(); renderWarrCard(); renderCpfCard(); }
     $('btnHeaderSearch').classList.toggle('active', tab === 'search');
     renderTip(tab);
     $('chartTip').classList.add('hidden');
@@ -4663,7 +4828,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-16.3';
+  const APP_VERSION = '2026-11-16.4';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -5059,10 +5224,18 @@
       || text.match(/Valor\s+total\s*R?\$?\s*:?\s*([\d.]*\d,\d{2})/i);
     data.total = totM ? toNumber(totM[1]) : data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
     data.issuedAt = parseIssued(text);
+    data.cpf = parseCpf(text);
     return data;
   }
 
   // Data da compra ("Emissão: 30/10/2026 18:22:10"); sem ela, os gastos usam a data do scan
+  // A nota diz se o consumidor informou CPF: "CONSUMIDOR NÃO IDENTIFICADO" ou "CPF: 123.***.***-00"
+  function parseCpf(text) {
+    if (/CONSUMIDOR\s+N[ÃA]O\s+IDENTIFICADO/i.test(text || '')) return false;
+    if (/\bCPF(\s+do\s+consumidor)?\s*:?\s*[\d*][\d.*\s-]{6,}/i.test(text || '')) return true;
+    return undefined; // a página não diz
+  }
+
   function parseIssued(text) {
     const m = (text || '').match(/Emiss[ãa]o\s*:?\s*(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?/i);
     if (!m) return undefined;
@@ -5115,7 +5288,9 @@
       || doc.querySelector('#totalNota .totalNumb.txtMax');
     data.total = toNumber(totalEl ? (totalEl.querySelector('.totalNumb')?.textContent || totalEl.textContent) : '');
     if (isNaN(data.total)) data.total = data.items.reduce((s, i) => s + (isNaN(i.total) ? 0 : i.total), 0);
-    data.issuedAt = parseIssued(doc.body ? doc.body.textContent.replace(/\s+/g, ' ') : '');
+    const bodyText = doc.body ? doc.body.textContent.replace(/\s+/g, ' ') : '';
+    data.issuedAt = parseIssued(bodyText);
+    data.cpf = parseCpf(bodyText);
 
     return data;
   }
@@ -5133,6 +5308,7 @@
     html += (ctx === 'group' ? scannedBy(data) : sharedBadge({ url })) + '</div>';
     openNote = { data, url, ctx };
     if (lastReconcile && lastReconcile.url === url) html += lastReconcile.html;
+    if (ctx !== 'group') html += cpfNotice(data, url);
 
     const cat = cupomCat({ url, store: data.store, cat: data.cat });
     html += '<div class="cat-row"><span>Categoria</span><select class="cat-select" id="cupomCat">' + catOptions(cat.id) + '</select></div>';
@@ -5167,6 +5343,8 @@
           (hidden ? ICON_EYE_OFF + 'Oculto do grupo · mostrar' : ICON_EYE + 'Ocultar do grupo') + '</button>' : '') +
         '<button class="hide-btn tag-btn' + (tagsOf(i.name).length ? ' has' : '') + '" data-tagopen="' + escapeHtml(i.name) + '">🏷 ' +
           (tagsOf(i.name).length ? tagsOf(i.name).map(tagLabel).map(escapeHtml).join(', ') : 'Etiqueta') + '</button>' +
+        (CLOUD && me && ctx !== 'group' ? '<button class="hide-btn tag-btn" data-rename="' + escapeHtml(i.name) + '">✎ Nome</button>' : '') +
+        warrButton({ ...data, url }, i, ctx) +
         (openTagItem === i.name ? tagPicker(i.name) : '') + '</li>';
     });
     html += '</ul><p class="empty hidden" id="noItems">Nenhum item encontrado.</p>';
@@ -5227,6 +5405,15 @@
     $('itemList').addEventListener('click', async (e) => {
       const open = e.target.closest('[data-tagopen]');
       if (open) { openTagItem = openTagItem === open.dataset.tagopen ? null : open.dataset.tagopen; return renderNota(data, url, ctx); }
+      const ren = e.target.closest('[data-rename]');
+      if (ren) {
+        const cur = ren.dataset.rename;
+        const v = prompt('Como você quer chamar este produto? O app usa esse nome em todas as notas.', titleCase(cur));
+        if (v && v.trim() && normName(v) !== normName(cur)) await renameProduct([cur], v.trim());
+        return renderNota(openNoteData(url, data), url, ctx);
+      }
+      const w = e.target.closest('[data-warr]');
+      if (w) { await toggleWarranty(w.dataset.warr, w.dataset.warrName); return renderNota(data, url, ctx); }
       if (await onTagClick(e)) return renderNota(data, url, ctx);
       const b = e.target.closest('[data-hide]');
       if (!b) return;
@@ -5286,13 +5473,19 @@
   // ---------- Assinaturas extras no Firestore ----------
   // users/{uid}/meta/lista · users/{uid}/meta/etiquetas · users/{uid}/comentarios
   // groups/{gid}/meta/lista · groups/{gid}/meta/perfis · groups/{gid}/comentarios · groups/{gid}/acertos
-  const EXTRA_SUBS = ['listMine', 'cmtMine', 'tags'];
+  const EXTRA_SUBS = ['listMine', 'cmtMine', 'tags', 'prodNames', 'warr'];
   const GROUP_EXTRA_SUBS = ['listGroup', 'cmtGroup', 'settles', 'profiles'];
   let listMine = {}, listGroup = {}, myComments = [], groupComments = [], groupSettles = [], profiles = {};
   let tagData = { products: {}, names: [] };
+  let prodNames = { names: {}, notSame: {} };     // nomes corrigidos/juntados: names[nome original] = nome escolhido
+  let warrData = { months: {}, hidden: {}, manual: {} };
+  let listLimits = { mine: 0, group: 0 };         // teto de gasto da lista (pessoal e do grupo)
+  let cloudCuponsRaw = [], groupCuponsRaw = [];   // notas como vieram do banco (antes de trocar os nomes)
 
   function resetExtras() {
     dataReady = !CLOUD; listMine = {}; myComments = []; tagData = { products: {}, names: [] };
+    prodNames = { names: {}, notSame: {} }; warrData = { months: {}, hidden: {}, manual: {} }; listLimits = { mine: 0, group: 0 };
+    cloudCuponsRaw = []; groupCuponsRaw = [];
     resetGroupExtras();
   }
   function resetGroupExtras() { listGroup = {}; groupComments = []; groupSettles = []; profiles = {}; }
@@ -5304,7 +5497,19 @@
   function subscribePersonalExtras() {
     unsubs.listMine = fb.onSnapshot(fb.doc(db, 'users', me.uid, 'meta', 'lista'), snap => {
       listMine = (snap.data() || {}).items || {};
+      listLimits.mine = +(snap.data() || {}).limit || 0;
       if (currentTab === 'list') renderList();
+    }, cloudError);
+    unsubs.prodNames = fb.onSnapshot(fb.doc(db, 'users', me.uid, 'meta', 'produtos'), snap => {
+      const d = snap.data() || {};
+      prodNames = { names: d.names || {}, notSame: d.notSame || {} };
+      remapNames();
+    }, cloudError);
+    unsubs.warr = fb.onSnapshot(fb.doc(db, 'users', me.uid, 'meta', 'garantias'), snap => {
+      const d = snap.data() || {};
+      warrData = { months: d.months || {}, hidden: d.hidden || {}, manual: d.manual || {} };
+      if (currentTab === 'more') renderWarrCard();
+      renderComments();
     }, cloudError);
     unsubs.tags = fb.onSnapshot(tagRef(), snap => {
       const d = snap.data() || {};
@@ -5320,6 +5525,7 @@
   function subscribeGroupExtras(gid) {
     unsubs.listGroup = fb.onSnapshot(fb.doc(db, 'groups', gid, 'meta', 'lista'), snap => {
       listGroup = (snap.data() || {}).items || {};
+      listLimits.group = +(snap.data() || {}).limit || 0;
       if (currentTab === 'list') renderList();
     }, errIgnore);
     let first = true;
@@ -5665,7 +5871,7 @@
   const NOTIF_KEY = 'avisos';
   const notifSupported = () => 'Notification' in window;
   function notifPrefs() {
-    const def = { on: false, assist: true, out: true, meta: true, group: true, weekly: true };
+    const def = { on: false, assist: true, warr: true, out: true, meta: true, group: true, weekly: true };
     try { return { ...def, ...JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') }; } catch (_) { return def; }
   }
   function saveNotifPrefs(p) { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(p)); } catch (_) {} }
@@ -5696,6 +5902,14 @@
     const p = notifPrefs();
     if (!p.on || !notifSupported() || Notification.permission !== 'granted') return;
     const now = Date.now(), today = dayStart(now), mine = personalHistory(), uid = me?.uid || 'local';
+    if (p.warr) {
+      warrantyList().forEach(w => {
+        const days = Math.ceil((w.end - today) / DAY);
+        const lvl = days <= 0 ? 0 : days <= 7 ? 7 : days <= 30 ? 30 : null;
+        if (lvl === null || days <= 0 || !sentOnce(uid + ':garantia:' + w.key + ':' + lvl)) return;
+        notify('Garantia acabando', 'A garantia de ' + titleCase(w.name) + ' (' + titleCase(w.store) + ') acaba em ' + days + (days === 1 ? ' dia' : ' dias') + ', em ' + fmtDay(w.end) + '.', 'garantia-' + w.key);
+      });
+    }
     if (p.assist) {
       const r = budgetRisk();
       if (r.state === 'risk' && r.p >= 0.5 && sentOnce(uid + ':risco:' + today)) notify('Orçamento em risco', assistText(r).replace(/<[^>]+>/g, ''), 'risco');
@@ -5748,7 +5962,8 @@
         : 'Receba um aviso quando algo estiver acabando, quando chegar perto da meta e quando o grupo mexer nas notas.') + '</p>';
       if (!on && perm !== 'denied') html += '<button class="btn small" data-notif="enable">Ligar avisos</button>';
       if (on) {
-        html += [['assist', 'Assistente do orçamento', 'quando a chance de estourar o orçamento passa de 50% (1 vez por dia)'], ['out', 'Produto acabando', '"Café Pilão deve acabar em 2 dias"'], ['meta', 'Metas de gasto', 'ao chegar em 80% e ao passar da meta'],
+        html += [['assist', 'Assistente do orçamento', 'quando a chance de estourar o orçamento passa de 50% (1 vez por dia)'],
+          ['warr', 'Garantia acabando', '30 e 7 dias antes de vencer'], ['out', 'Produto acabando', '"Café Pilão deve acabar em 2 dias"'], ['meta', 'Metas de gasto', 'ao chegar em 80% e ao passar da meta'],
           ['group', 'Grupo', 'notas novas e comentários, com o app em segundo plano'], ['weekly', 'Resumo semanal', 'no domingo: quanto gastou e o que vem pela frente']]
           .map(([k, t, d]) => '<label class="check-row"><input type="checkbox" data-notif-kind="' + k + '"' + (p[k] ? ' checked' : '') + '><span><b>' + t + '</b> · ' + d + '</span></label>').join('') +
           '<div class="btn-row" style="margin-bottom:0"><button class="btn small ghost" data-notif="test">Testar aviso</button><button class="btn small ghost" data-notif="off">Desligar</button></div>';
@@ -5923,6 +6138,446 @@
     toast('Orçamento do mês definido em ' + brl(+b.dataset.v) + '.');
     refreshViews();
     if (currentTab === 'budget') renderBudget();
+    return true;
+  }
+
+  // ---------- Nomes dos produtos: corrigir e juntar produtos iguais ----------
+  // users/{uid}/meta/produtos: names[nome original normalizado] = nome escolhido pela pessoa.
+  // No banco as notas ficam com o nome original; a troca é feita na tela (cada pessoa vê os nomes dela).
+  function applyNames(list) {
+    const map = prodNames.names;
+    const any = Object.keys(map).length > 0;
+    return list.map(h => {
+      if (!h.items || !h.items.length) return h;
+      let changed = false;
+      const items = h.items.map(i => {
+        const raw = i.rawName || i.name;
+        const to = any ? map[normName(raw)] : undefined;
+        if (to) {
+          if (i.name === to && i.rawName === raw) return i;
+          changed = true;
+          return { ...i, name: to, rawName: raw };
+        }
+        if (!i.rawName) return i;
+        changed = true;
+        const { rawName, ...rest } = i;
+        return { ...rest, name: raw };
+      });
+      return changed ? { ...h, items } : h;
+    });
+  }
+  function remapNames() {
+    if (cloudCuponsRaw.length || !cloudCupons.length) cloudCupons = applyNames(cloudCuponsRaw);
+    if (groupCuponsRaw.length || !groupCupons.length) groupCupons = applyNames(groupCuponsRaw);
+    refreshViews();
+  }
+  // a nota aberta, com os nomes já trocados
+  function openNoteData(url, data) {
+    return cloudCupons.find(c => c.url === url) || groupCupons.find(c => c.url === url) || applyNames([data])[0];
+  }
+  // nomes originais (normalizados) que aparecem na tela com este nome
+  function rawKeysFor(display) {
+    const n = normName(display);
+    const keys = Object.entries(prodNames.names).filter(([, v]) => normName(v) === n).map(([k]) => k);
+    if (!prodNames.names[n]) keys.push(n);
+    return [...new Set(keys)];
+  }
+  async function saveProdNames() {
+    if (CLOUD && me) {
+      try { await fb.setDoc(fb.doc(db, 'users', me.uid, 'meta', 'produtos'), { names: prodNames.names, notSame: prodNames.notSame }); }
+      catch (err) { cloudError(err); }
+    }
+    remapNames();
+  }
+  // renomeia (ou junta, se forem vários) produtos com um nome só; leva junto etiquetas e tipo de produto
+  async function renameProduct(names, newName) {
+    newName = newName.replace(/\s+/g, ' ').trim().slice(0, 60);
+    if (!newName) return;
+    const map = { ...prodNames.names };
+    names.forEach(n => rawKeysFor(n).forEach(k => { map[k] = newName; }));
+    const tags = [...new Set(names.flatMap(n => tagsOf(n)))];
+    if (tags.length) await setProductTags(newName, tags);
+    const nk = normName(newName);
+    const subPatch = {};
+    names.forEach(n => Object.entries(catOv.products).forEach(([k, v]) => {
+      const [cat, ...rest] = k.split('|');
+      if (rest.join('|') === normName(n) && !catOv.products[cat + '|' + nk]) subPatch[cat + '|' + nk] = v;
+    }));
+    if (Object.keys(subPatch).length) { Object.assign(catOv.products, subPatch); saveCatOv({ products: subPatch }); }
+    prodNames = { ...prodNames, names: map };
+    openStockKey = null;
+    await saveProdNames();
+    toast(names.length > 1 ? 'Produtos juntados como "' + newName + '".' : 'Nome trocado para "' + newName + '".');
+  }
+  async function separateProduct(display) {
+    const n = normName(display);
+    const map = { ...prodNames.names };
+    Object.keys(map).forEach(k => { if (normName(map[k]) === n) delete map[k]; });
+    prodNames = { ...prodNames, names: map };
+    openStockKey = null;
+    await saveProdNames();
+    toast('Os nomes voltaram a ser os da nota.');
+  }
+
+  // "Parecem o mesmo produto": mesmas medidas (500G, 2L...) e palavras que começam igual
+  const numTokens = (s) => normName(s).split(' ').filter(t => /^\d/.test(t)).sort().join(' ');
+  function likelySame(a, b) {
+    if (normName(a) === normName(b) || numTokens(a) !== numTokens(b)) return false;
+    const ta = sigTokens(a), tb = sigTokens(b);
+    if (ta.length < 2 || tb.length < 2) return false;
+    if (!(ta[0].startsWith(tb[0]) || tb[0].startsWith(ta[0]))) return false;
+    return listMatches(a, b) || listMatches(b, a);
+  }
+  const pairKey = (a, b) => [normName(a), normName(b)].sort().join('~');
+  function mergeSuggestions() {
+    const prods = buildProducts(priceSource());
+    const out = [];
+    for (let i = 0; i < prods.length && out.length < 6; i++) {
+      for (let j = i + 1; j < prods.length && out.length < 6; j++) {
+        const a = prods[i], b = prods[j];
+        if (a.un !== b.un || prodNames.notSame[pairKey(a.name, b.name)]) continue;
+        if (likelySame(a.name, b.name)) out.push({ a: a.name, b: b.name });
+      }
+    }
+    return out;
+  }
+  let mergeList = [];
+  function renderMergeSuggestions() {
+    const box = $('stockMerge');
+    mergeList = CLOUD && me ? mergeSuggestions() : [];
+    box.innerHTML = !mergeList.length ? '' : '<div class="merge-box"><p class="field-label">Parecem o mesmo produto</p>' +
+      '<p class="muted" style="margin-bottom:6px">Cada loja escreve o nome de um jeito. Juntando, a comparação de preços e as previsões ficam mais certas.</p>' +
+      mergeList.map((m, i) => '<div class="merge-row"><span><b>' + escapeHtml(titleCase(m.a)) + '</b> e <b>' + escapeHtml(titleCase(m.b)) + '</b></span>' +
+        '<div class="btn-row"><button class="btn small" data-mg-yes="' + i + '">Juntar</button><button class="btn small ghost" data-mg-no="' + i + '">São diferentes</button></div></div>').join('') + '</div>';
+  }
+  async function onMergeClick(e) {
+    const y = e.target.closest('[data-mg-yes]'), n = e.target.closest('[data-mg-no]');
+    const m = mergeList[+(y || n)?.dataset[y ? 'mgYes' : 'mgNo']];
+    if (!m) return;
+    if (y) {
+      // fica o nome mais completo
+      const final = titleCase(m.a.length >= m.b.length ? m.a : m.b);
+      return renameProduct([m.a, m.b], final);
+    }
+    prodNames = { ...prodNames, notSame: { ...prodNames.notSame, [pairKey(m.a, m.b)]: 1 } };
+    await saveProdNames();
+  }
+  // no detalhe do produto (aba Histórico): trocar o nome, juntar com outro, separar
+  function nameEditor(name, unit) {
+    if (!CLOUD || !me) return '';
+    const raws = rawKeysFor(name).filter(k => k !== normName(name));
+    const mine = sigTokens(name);
+    const others = buildProducts(priceSource())
+      .filter(p => p.un === unit && normName(p.name) !== normName(name))
+      .map(p => ({ p, s: sigTokens(p.name).filter(t => mine.some(u => u.startsWith(t) || t.startsWith(u))).length }))
+      .filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 10);
+    return '<div class="name-edit" data-nm="' + escapeHtml(name) + '"><p class="field-label">Nome do produto</p>' +
+      '<div class="inline-form"><input data-nm-input maxlength="60" value="' + escapeHtml(titleCase(name)) + '" aria-label="Nome do produto"><button class="btn small" data-nm-save="1">Salvar</button></div>' +
+      (others.length ? '<p class="field-label">É o mesmo produto que…</p><div class="inline-form"><select class="cat-select" data-nm-target aria-label="Produto para juntar" style="flex:1;min-width:0">' +
+        others.map(x => '<option value="' + escapeHtml(x.p.name) + '">' + escapeHtml(titleCase(x.p.name)) + '</option>').join('') +
+        '</select><button class="btn small ghost" data-nm-merge="1">Juntar</button></div>' : '') +
+      (raws.length ? '<p class="muted" style="margin:0 0 10px">Nas notas aparece como: ' + raws.map(r => escapeHtml(titleCase(r))).join(', ') +
+        ' · <button class="cart-x" data-nm-split="1">voltar aos nomes da nota</button></p>' : '') + '</div>';
+  }
+  async function onNameClick(e) {
+    const box = e.target.closest('[data-nm]');
+    if (!box) return false;
+    const name = box.dataset.nm;
+    if (e.target.closest('[data-nm-save]')) {
+      const v = box.querySelector('[data-nm-input]').value.trim();
+      if (!v) { toast('Digite o nome do produto.'); return true; }
+      if (v !== titleCase(name)) await renameProduct([name], v);
+      return true;
+    }
+    if (e.target.closest('[data-nm-merge]')) {
+      const target = box.querySelector('[data-nm-target]').value;
+      if (target && confirm('Juntar "' + titleCase(name) + '" com "' + titleCase(target) + '"? Os dois passam a ser um produto só.')) await renameProduct([name, target], titleCase(target));
+      return true;
+    }
+    if (e.target.closest('[data-nm-split]')) { await separateProduct(name); return true; }
+    return false;
+  }
+
+  // ---------- Teto de gasto da lista de compras ----------
+  let listLimitEditing = false;
+  if (!CLOUD) { try { listLimits.mine = +localStorage.getItem('lista_teto') || 0; } catch (_) {} }
+  function limitHtml(fromGroup, cartEst, pendingEst) {
+    const lim = fromGroup ? listLimits.group : listLimits.mine;
+    if (listLimitEditing) {
+      return '<div class="inline-form lim-form"><input id="listLimitInput" inputmode="decimal" placeholder="Teto em R$ (ex.: 200)" value="' + (lim ? fmtNum(lim) : '') + '" aria-label="Teto de gasto desta compra">' +
+        '<button class="btn small" data-llimit="save">Salvar</button>' + (lim ? '<button class="btn small ghost" data-llimit="clear">Tirar</button>' : '') + '</div>';
+    }
+    if (!lim) return '<button class="link-btn lim-link" data-llimit="edit">Definir um teto de gasto para esta compra</button>';
+    const total = cartEst + pendingEst;
+    const passed = cartEst > lim, willPass = total > lim;
+    return '<div class="lim-box' + (passed ? ' bad' : willPass ? ' warn' : '') + '"><div class="lim-top"><span>Teto desta compra <b>' + brl(lim) + '</b></span>' +
+      '<button class="cart-x" data-llimit="edit">mudar</button></div>' +
+      '<div class="lp-bar lim-bar"><i style="width:' + Math.min(100, cartEst / lim * 100) + '%"></i></div>' +
+      '<p class="lim-txt">No carrinho: ~' + brl(cartEst) + (passed ? ' · <b>passou ' + brl(cartEst - lim) + '</b>' : ' · sobram ~' + brl(lim - cartEst)) + '</p>' +
+      (willPass && !passed ? '<p class="lim-txt">Se comprar a lista toda (~' + brl(total) + '), passa do teto em ~' + brl(total - lim) + '.</p>' : '') +
+      '<p class="lim-note">Estimativa pelos últimos preços que você pagou; itens sem preço anterior não entram na conta.</p></div>';
+  }
+  async function onLimitAction(a, fromGroup) {
+    if (a === 'edit') { listLimitEditing = true; renderList(); setTimeout(() => $('listLimitInput')?.focus(), 30); return; }
+    const v = a === 'clear' ? 0 : parseMoney($('listLimitInput')?.value);
+    if (a === 'save' && !(v > 0)) { toast('Digite o valor do teto, por exemplo 200.'); return; }
+    listLimitEditing = false;
+    listLimits[fromGroup ? 'group' : 'mine'] = v || 0;
+    if (CLOUD) { try { await fb.setDoc(listRef(fromGroup), { limit: v || 0 }, { merge: true }); } catch (err) { cloudError(err); } }
+    else { try { localStorage.setItem('lista_teto', String(v || 0)); } catch (_) {} }
+    renderList();
+  }
+
+  // ---------- CPF na nota (programas de nota fiscal dos estados) ----------
+  // Os 2 primeiros dígitos da chave de acesso da nota dizem o estado.
+  const UF_BY_CODE = { 11: 'RO', 12: 'AC', 13: 'AM', 14: 'RR', 15: 'PA', 16: 'AP', 17: 'TO', 21: 'MA', 22: 'PI', 23: 'CE', 24: 'RN', 25: 'PB', 26: 'PE',
+    27: 'AL', 28: 'SE', 29: 'BA', 31: 'MG', 32: 'ES', 33: 'RJ', 35: 'SP', 41: 'PR', 42: 'SC', 43: 'RS', 50: 'MS', 51: 'MT', 52: 'GO', 53: 'DF' };
+  const STATE_PROGRAMS = { PR: 'Nota Paraná', SP: 'Nota Fiscal Paulista', RS: 'Nota Fiscal Gaúcha', DF: 'Nota Legal', GO: 'Nota Fiscal Goiana', BA: 'Nota Premiada Bahia', MS: 'Nota MS Premiada', RN: 'Nota Potiguar' };
+  const ufOf = (url) => { const m = String(url || '').match(/\d{44}/); return m ? UF_BY_CODE[+m[0].slice(0, 2)] || null : null; };
+  const cpfReminder = () => { try { return localStorage.getItem('cpf_lembrete') !== '0'; } catch (_) { return true; } };
+  function cpfNotice(data, url) {
+    if (data.manual) return '';
+    if (data.cpf === true) return '<p class="cpf-ok">✓ CPF informado nesta nota</p>';
+    if (data.cpf !== false || !cpfReminder()) return '';
+    const prog = STATE_PROGRAMS[ufOf(url)];
+    return '<p class="notice cpf-warn">Esta nota saiu <b>sem CPF</b>. ' +
+      (prog ? 'No programa <b>' + prog + '</b>, quem informa o CPF no caixa pode ganhar créditos e concorrer a sorteios.'
+        : 'Muitos estados têm programas que dão créditos ou sorteios para quem informa o CPF no caixa.') +
+      ' Na próxima compra, peça CPF na nota.</p>';
+  }
+  function cpfStat(notes) {
+    const known = notes.filter(h => !h.manual && (h.cpf === true || h.cpf === false));
+    if (!known.length) return '';
+    const yes = known.filter(h => h.cpf).length, no = known.length - yes;
+    return '<p class="sv-cpf">CPF na nota: <b>' + yes + ' de ' + known.length + '</b> notas do mês' + (no ? ' · ' + no + ' sem CPF' : ' 👍') + '</p>';
+  }
+  function renderCpfCard() {
+    const mine = personalHistory();
+    const since = Date.now() - 30 * DAY;
+    const known = mine.filter(h => spendDate(h) >= since && !h.manual && (h.cpf === true || h.cpf === false));
+    const ufs = [...new Set(mine.map(h => ufOf(h.url)).filter(Boolean))];
+    const progs = ufs.map(u => STATE_PROGRAMS[u]).filter(Boolean);
+    $('cpfCard').innerHTML = '<h3 class="card-title">CPF na nota</h3>' +
+      '<p class="muted">' + (progs.length ? 'Pelas suas notas, você compra onde existe o programa <b>' + escapeHtml(progs.join(', ')) + '</b>: quem informa o CPF no caixa pode ganhar créditos e concorrer a sorteios.'
+        : 'Muitos estados dão créditos ou sorteios para quem informa o CPF no caixa (como Nota Paraná e Nota Fiscal Paulista).') +
+      ' O app confere cada nota e avisa quando ela sai sem CPF.</p>' +
+      (known.length ? '<p class="sv-cpf" style="margin:0 0 12px">Últimos 30 dias: <b>' + known.filter(h => h.cpf).length + ' de ' + known.length + '</b> notas com CPF.</p>' : '') +
+      '<label class="check-row" style="margin:0"><input type="checkbox" data-cpf-toggle="1"' + (cpfReminder() ? ' checked' : '') + '><span>Avisar quando a nota sair sem CPF</span></label>';
+  }
+
+  // ---------- Garantia e troca ----------
+  // Eletrônicos e eletrodomésticos entram sozinhos; qualquer outro produto pode ser incluído na nota.
+  const WARR_KW = ['TV$', 'TELEVISOR', 'SMART TV', 'SMARTTV', 'CELULAR', 'SMARTPHONE', 'IPHONE', 'NOTEBOOK', 'TABLET', 'IPAD', 'MONITOR', 'IMPRESSORA',
+    'GELADEIRA', 'REFRIGERADOR', 'FREEZER', 'FOGAO', 'MICROONDAS', 'MICRO ONDAS', 'LAVADORA', 'LAVA E SECA', 'LAVA LOUCAS', 'AR CONDIC', 'VENTILADOR',
+    'LIQUIDIFICADOR', 'BATEDEIRA', 'CAFETEIRA', 'FRITADEIRA', 'AIR FRYER', 'AIRFRYER', 'ASPIRADOR', 'FERRO PASSAR', 'FERRO ELET', 'SECADOR', 'CHAPINHA',
+    'BARBEADOR', 'FONE', 'HEADSET', 'CAIXA SOM', 'CAIXA DE SOM', 'VIDEOGAME', 'VIDEO GAME', 'CONSOLE', 'PLAYSTATION', 'XBOX', 'NINTENDO', 'SMARTWATCH',
+    'RELOGIO', 'PROCESSADOR', 'MIXER', 'SANDUICHEIRA', 'PANELA ELET', 'FURADEIRA', 'PARAFUSADEIRA', 'ROTEADOR', 'HD EXTERNO', 'CAMERA DIGITAL'];
+  const WARR_NOT_FIRST = new Set(['CAPA', 'PELICULA', 'CABO', 'SUPORTE', 'PILHA', 'PILHAS', 'FILTRO', 'REFIL', 'ADESIVO']);
+  function isWarrantyItem(i) {
+    if (itemValue(i) < 30) return false;
+    const tokens = normName(i.rawName || i.name).split(' ').filter(Boolean);
+    if (!tokens.length || WARR_NOT_FIRST.has(tokens[0])) return false;
+    return tokens.some((_, k) => WARR_KW.some(kw => kwMatchAt(tokens, k, kw)));
+  }
+  const warrKey = (h, i) => noteKey(h) + '|' + normName(i.rawName || i.name);
+  function warrantyList() {
+    const out = [];
+    personalHistory().forEach(h => {
+      if (h.manual) return;
+      const t = spendDate(h);
+      (h.items || []).forEach(i => {
+        const k = warrKey(h, i);
+        if (warrData.hidden[k] || (!warrData.manual[k] && !isWarrantyItem(i))) return;
+        const months = +warrData.months[k] || 12;
+        const d = new Date(t);
+        d.setMonth(d.getMonth() + months);
+        out.push({ key: k, h, name: i.name, store: h.store || 'Loja', buyAt: t, months, end: d.getTime(), value: itemValue(i) });
+      });
+    });
+    return out.sort((a, b) => a.end - b.end);
+  }
+  function warrButton(h, i, ctx) {
+    if (ctx === 'group' || !CLOUD || !me || h.manual) return '';
+    const k = warrKey(h, i);
+    const w = warrantyList().find(x => x.key === k);
+    if (!w && itemValue(i) < 50) return ''; // produto barato: nem mostra o botão
+    return '<button class="hide-btn tag-btn' + (w ? ' warr-on' : '') + '" data-warr="' + escapeHtml(k) + '" data-warr-name="' + escapeHtml(i.name) + '">🛡 ' +
+      (w ? 'Garantia até ' + fmtDay(w.end) : 'Guardar garantia') + '</button>';
+  }
+  async function saveWarr() {
+    if (!CLOUD || !me) return;
+    try { await fb.setDoc(fb.doc(db, 'users', me.uid, 'meta', 'garantias'), warrData); } catch (err) { cloudError(err); }
+  }
+  async function toggleWarranty(k, name) {
+    const inList = warrantyList().some(w => w.key === k);
+    const d = { months: { ...warrData.months }, hidden: { ...warrData.hidden }, manual: { ...warrData.manual } };
+    if (inList) { if (d.manual[k]) delete d.manual[k]; else d.hidden[k] = true; }
+    else { delete d.hidden[k]; d.manual[k] = true; }
+    warrData = d;
+    await saveWarr();
+    toast(inList ? 'Garantia de ' + titleCase(name || '') + ' removida.' : 'Garantia guardada: o app avisa antes de acabar. Veja em Mais → Garantias.', 3500);
+  }
+  function renderWarrCard() {
+    const box = $('warrCard');
+    if (CLOUD && !me) { box.innerHTML = ''; return; }
+    const now = Date.now();
+    const list = warrantyList().filter(w => w.end > now - 60 * DAY);
+    box.innerHTML = '<h3 class="card-title">Garantias</h3>' +
+      '<p class="muted">O app guarda a nota de eletrônicos e eletrodomésticos e avisa antes de a garantia acabar. A garantia de fábrica costuma ser de 12 meses (já com os 90 dias da garantia legal); ajuste se for diferente.</p>' +
+      (!list.length ? '<p class="muted" style="margin:0">Nenhum produto com garantia nas suas notas. Para incluir um produto, abra a nota e toque em "🛡 Guardar garantia".</p>' :
+        list.map(w => {
+          const days = Math.ceil((w.end - now) / DAY);
+          const status = days < 0 ? '<span class="warr-st off">venceu em ' + fmtDay(w.end) + '</span>'
+            : '<span class="warr-st' + (days <= 30 ? ' soon' : '') + '">até ' + fmtDay(w.end) + ' · ' + (days === 0 ? 'acaba hoje' : 'faltam ' + days + (days === 1 ? ' dia' : ' dias')) + '</span>';
+          const troca = now - w.buyAt <= 30 * DAY
+            ? '<small class="warr-troca">Troca na loja: muitas lojas aceitam até 30 dias depois da compra (até ' + fmtDay(w.buyAt + 30 * DAY) + '). Confira a política da loja.</small>' : '';
+          return '<div class="warr-row"><div class="warr-top"><b>' + escapeHtml(titleCase(w.name)) + '</b><span>' + brl(w.value) + '</span></div>' +
+            '<small>' + escapeHtml(titleCase(w.store)) + ' · comprado em ' + fmtDay(w.buyAt) + '</small>' + status + troca +
+            '<div class="warr-actions"><label>Garantia de <select class="cat-select" data-wm="' + escapeHtml(w.key) + '">' +
+            [3, 6, 12, 18, 24, 36].map(m => '<option value="' + m + '"' + (m === w.months ? ' selected' : '') + '>' + m + ' meses</option>').join('') + '</select></label>' +
+            '<button class="cart-x" data-wnote="' + escapeHtml(w.key) + '">ver nota</button><button class="cart-x" data-wdel="' + escapeHtml(w.key) + '">tirar</button></div></div>';
+        }).join(''));
+  }
+  async function onWarrClick(e) {
+    const n = e.target.closest('[data-wnote]'), d = e.target.closest('[data-wdel]');
+    const w = warrantyList().find(x => x.key === (n || d)?.dataset[n ? 'wnote' : 'wdel']);
+    if (!w) return;
+    if (n) { setStatus(''); renderNota(w.h, w.h.url, 'mine'); openResultCard(); return; }
+    await toggleWarranty(w.key, w.name);
+    renderWarrCard();
+  }
+  async function onWarrChange(e) {
+    const s = e.target.closest('[data-wm]');
+    if (!s) return;
+    warrData = { ...warrData, months: { ...warrData.months, [s.dataset.wm]: +s.value } };
+    await saveWarr();
+    renderWarrCard();
+  }
+
+  // ---------- Seus dados: nome, planilhas e excluir a conta ----------
+  let accNameEditing = false, accDelOpen = false;
+  function dataCardHtml() {
+    return '<section class="card account-card"><h3 class="card-title">Seus dados</h3>' +
+      '<p class="muted">Baixe uma cópia das suas notas em planilha. O arquivo abre no Excel e no Google Planilhas.</p>' +
+      (inGroup() ? '<label class="check-row"><input type="checkbox" id="expGroup"><span>Incluir também as notas do grupo ' + escapeHtml(group.name) + '</span></label>' : '') +
+      '<div class="btn-row"><button class="btn small ghost" data-acc="export-notes">Notas (resumo)</button><button class="btn small ghost" data-acc="export-items">Produtos (item a item)</button></div>' +
+      '<hr class="divider"><button class="link-btn danger-link" data-acc="del-open">Excluir minha conta</button>' +
+      (accDelOpen ? '<div class="del-box"><p><b>Isto apaga para sempre</b> as suas notas, listas, etiquetas, comentários, garantias e preferências. ' +
+        'As suas notas saem dos grupos e você sai de todos eles. Não dá para desfazer.</p>' +
+        '<p class="muted" style="margin:8px 0 12px">Se quiser guardar uma cópia, baixe as planilhas acima antes.</p>' +
+        '<label class="field"><span>Digite sua senha para confirmar</span><input type="password" id="accDelPass" autocomplete="current-password"></label>' +
+        '<div class="btn-row" style="margin:0"><button class="btn small ghost" data-acc="del-cancel">Cancelar</button><button class="btn small stop" data-acc="del-confirm">Excluir conta</button></div></div>' : '') +
+      '</section>';
+  }
+  const csvCell = (v) => {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'number') return Number.isFinite(v) ? String(Math.round(v * 1000) / 1000).replace('.', ',') : '';
+    const s = String(v);
+    return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  function downloadCsv(name, rows) {
+    // ";" e BOM: o Excel em português abre direto, com acentos e vírgula decimal
+    const blob = new Blob(['﻿' + rows.map(r => r.map(csvCell).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+  function exportData(items) {
+    const mineKeys = new Set(personalHistory().map(noteKey));
+    const list = personalHistory().slice();
+    if ($('expGroup')?.checked) groupCupons.forEach(h => { if (!mineKeys.has(noteKey(h))) list.push(h); });
+    list.sort((a, b) => spendDate(b) - spendDate(a));
+    if (!list.length) { toast('Ainda não há notas para baixar.'); return; }
+    const day = (t) => { const d = new Date(t); return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear(); };
+    const who = (h) => h.addedByName || (me ? me.name : '');
+    let rows;
+    if (!items) {
+      rows = [['Data', 'Loja', 'Categoria', 'Total (R$)', 'Itens', 'Quem escaneou', 'No grupo', 'Sem nota fiscal', 'CPF na nota', 'Link da nota']]
+        .concat(list.map(h => [day(spendDate(h)), titleCase(h.store || 'Loja'), cupomCat(h).name, h.total || 0, (h.items || []).length, who(h),
+          inGroup() && groupDoc(h.url) ? 'sim' : 'não', h.manual ? 'sim' : '', h.cpf === true ? 'sim' : h.cpf === false ? 'não' : '', /^https?:/.test(h.url) ? h.url : '']));
+    } else {
+      rows = [['Data', 'Loja', 'Categoria', 'Produto', 'Nome na nota', 'Tipo de produto', 'Quantidade', 'Unidade', 'Preço unitário (R$)', 'Total do item (R$)', 'Etiquetas', 'Quem escaneou']];
+      list.forEach(h => {
+        const cat = cupomCat(h);
+        (h.items || []).forEach(i => {
+          const q = Number.isFinite(i.qtd) ? i.qtd : null;
+          rows.push([day(spendDate(h)), titleCase(h.store || 'Loja'), cat.name, titleCase(i.name), i.rawName || i.name, itemSub(cat, i.name), q, i.un || '',
+            Number.isFinite(i.unit) ? i.unit : (q ? itemValue(i) / q : null), itemValue(i), tagsOf(i.name).map(tagLabel).join(', '), who(h)]);
+        });
+      });
+    }
+    const d = new Date();
+    downloadCsv((items ? 'produtos' : 'notas') + '-' + d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + '.csv', rows);
+    toast('Planilha baixada: ' + (rows.length - 1) + (items ? ' produtos.' : ' notas.'));
+  }
+  async function saveName(v) {
+    const name = String(v || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    if (!name) { toast('Digite seu nome.'); return; }
+    try {
+      if (auth?.currentUser) await fb.updateProfile(auth.currentUser, { displayName: name }).catch(() => {});
+      await saveMyPrefs({ name });
+      for (const gid of me.groupIds || []) {
+        try { await fb.updateDoc(fb.doc(db, 'groups', gid), { ['memberNames.' + me.uid]: name }); } catch (_) {}
+      }
+      await syncToGroup().catch(() => {}); // as notas do grupo passam a mostrar o nome novo
+      accNameEditing = false;
+      toast('Nome atualizado.');
+    } catch (err) { cloudError(err); }
+    renderAccount();
+    renderHeaderGreeting();
+  }
+  async function deleteAccount(pass) {
+    const user = auth.currentUser;
+    // o Firebase só deixa excluir a conta com login recente: confirma a senha
+    await fb.reauthenticateWithCredential(user, fb.EmailAuthProvider.credential(user.email, pass));
+    const uid = me.uid, groups = (me.groupIds || []).slice();
+    Object.keys(unsubs).forEach(n => unsub(n));
+    const delAll = async (refs) => {
+      for (let i = 0; i < refs.length; i += 400) { const b = fb.writeBatch(db); refs.slice(i, i + 400).forEach(r => b.delete(r)); await b.commit(); }
+    };
+    for (const gid of groups) {
+      try {
+        const [notes, cmts] = await Promise.all([
+          fb.getDocs(fb.query(fb.collection(db, 'groups', gid, 'cupons'), fb.where('addedBy', '==', uid))),
+          fb.getDocs(fb.query(fb.collection(db, 'groups', gid, 'comentarios'), fb.where('uid', '==', uid)))
+        ]);
+        await delAll(notes.docs.concat(cmts.docs).map(d => d.ref));
+        await fb.setDoc(fb.doc(db, 'groups', gid, 'meta', 'perfis'), { [uid]: fb.deleteField() }, { merge: true }).catch(() => {});
+        await fb.updateDoc(fb.doc(db, 'groups', gid), { members: fb.arrayRemove(uid), ['memberNames.' + uid]: fb.deleteField() });
+      } catch (_) {}
+    }
+    for (const sub of ['cupons', 'meta', 'comentarios', 'orders']) {
+      const snap = await fb.getDocs(fb.collection(db, 'users', uid, sub));
+      await delAll(snap.docs.map(d => d.ref));
+    }
+    await fb.deleteDoc(fb.doc(db, 'users', uid));
+    await fb.deleteUser(user);
+    // limpa o que ficou neste aparelho (mantém só o tema)
+    try { Object.keys(localStorage).forEach(k => { if (k !== 'tema') localStorage.removeItem(k); }); } catch (_) {}
+  }
+  async function onDataClick(e) {
+    const b = e.target.closest('[data-acc]');
+    if (!b) return false;
+    const a = b.dataset.acc;
+    if (a === 'name-edit') { accNameEditing = !accNameEditing; renderAccount(); setTimeout(() => $('accNewName')?.focus(), 30); }
+    if (a === 'name-save') await saveName($('accNewName').value);
+    if (a === 'export-notes') exportData(false);
+    if (a === 'export-items') exportData(true);
+    if (a === 'del-open') { accDelOpen = !accDelOpen; renderAccount(); }
+    if (a === 'del-cancel') { accDelOpen = false; renderAccount(); }
+    if (a === 'del-confirm') {
+      const pass = $('accDelPass').value;
+      if (!pass) { toast('Digite sua senha.'); return true; }
+      if (!confirm('Excluir a conta e apagar todos os seus dados? Não dá para desfazer.')) return true;
+      try {
+        await withBusy(b, () => deleteAccount(pass));
+        accDelOpen = false;
+        alert('Sua conta e os seus dados foram apagados.');
+      } catch (err) { toast(authMsg(err), 5000); }
+    }
     return true;
   }
 
@@ -6148,7 +6803,8 @@
     const estTotal = pending.reduce((s, x) => s + est(x), 0);
     $('listProgress').innerHTML = arr.length
       ? '<div class="lp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + arr.length + '" aria-valuenow="' + done.length + '"><i style="width:' + (done.length / arr.length * 100) + '%"></i></div>' +
-        '<p class="lp-txt"><span>' + done.length + ' de ' + arr.length + ' no carrinho</span>' + (estTotal ? '<span>falta ~' + brl(estTotal) + '</span>' : '') + '</p>'
+        '<p class="lp-txt"><span>' + done.length + ' de ' + arr.length + ' no carrinho</span>' + (estTotal ? '<span>falta ~' + brl(estTotal) + '</span>' : '') + '</p>' +
+        limitHtml(g, done.reduce((s, x) => s + est(x), 0), estTotal)
       : '';
     const time = (t) => { const d = new Date(t); return (dayStart(t) === dayStart(Date.now()) ? 'hoje' : fmtDay(t)) + ' às ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
     const row = (x) => {
@@ -6206,6 +6862,7 @@
     const fromGroup = listFromGroup();
     const items = listItemsMap(fromGroup);
     if (g('data-lsrc')) { listSrc = g('data-lsrc'); return renderList(); }
+    if (g('data-llimit')) return onLimitAction(g('data-llimit'), fromGroup);
     if (t.closest('#btnListAdd')) return addFromInput();
     const tog = g('data-ltoggle');
     if (tog && items[tog]) {
@@ -6502,7 +7159,8 @@
   }));
   $('stockList').addEventListener('click', async (e) => {
     if (await onTagClick(e)) return renderStock();
-    if (e.target.closest('select, label, .tag-pick')) return; // mexer na subcategoria/etiquetas não fecha o item
+    if (await onNameClick(e)) return;
+    if (e.target.closest('select, label, .tag-pick, .name-edit')) return; // mexer na subcategoria/etiquetas/nome não fecha o item
     const li = e.target.closest('li');
     if (!li) return;
     openStockKey = openStockKey === li.dataset.key ? null : li.dataset.key;
@@ -6617,6 +7275,20 @@
   $('listNewQty').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addFromInput(); } });
   $('notifCard').addEventListener('click', onNotifClick);
   $('budAssist').addEventListener('click', onAssistClick);
+  $('stockMerge').addEventListener('click', onMergeClick);
+  $('warrCard').addEventListener('click', onWarrClick);
+  $('warrCard').addEventListener('change', onWarrChange);
+  $('cpfCard').addEventListener('change', (e) => {
+    if (!e.target.matches('[data-cpf-toggle]')) return;
+    try { localStorage.setItem('cpf_lembrete', e.target.checked ? '1' : '0'); } catch (_) {}
+  });
+  $('accountContent').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.id === 'accNewName') saveName(e.target.value);
+    if (e.key === 'Enter' && e.target.id === 'accDelPass') document.querySelector('[data-acc="del-confirm"]')?.click();
+  });
+  $('tabList').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.id === 'listLimitInput') { e.preventDefault(); onLimitAction('save', listFromGroup()); }
+  });
   $('welcomeModal').addEventListener('click', onWelcomeClick);
   $('welcomeModal').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'welcomeBudget') document.querySelector('[data-welcome="budget"]').click(); });
   $('notifCard').addEventListener('change', (e) => {
