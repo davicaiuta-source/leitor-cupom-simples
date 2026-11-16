@@ -1052,6 +1052,55 @@
   .sr-buy { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; margin-top: 4px; border: 0; border-radius: 12px; background: var(--surface-2); font: inherit; font-size: .8rem; color: inherit; cursor: pointer; text-align: left; }
   .sr-buy span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
+  /* Início sem notas e funções que liberam com 5 notas */
+  .h-start { cursor: default; background: var(--green-soft); display: flex; flex-direction: column; gap: 6px; }
+  .h-start .h-serif { font-size: 1.25rem; }
+  .h-start small { font-size: .85rem; color: var(--text); opacity: .8; line-height: 1.45; }
+  .locked-card { cursor: default; }
+  .card .locked-card, #saveAlerts .locked-card { padding: 0; }
+  .locked-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .locked-count { font-size: .78rem; font-weight: 700; color: var(--green-text); white-space: nowrap; }
+  .locked-card .lp-bar { margin: 8px 0 0; }
+  .locked-card p { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+
+  /* dica de cada aba (aparece uma vez) */
+  .tip-card { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border-radius: 18px; background: var(--lavender); color: var(--text); }
+  .tip-ic { flex: 0 0 auto; font-size: 1.05rem; line-height: 1.3; }
+  .tip-card p { flex: 1; margin: 0; font-size: .86rem; line-height: 1.45; }
+  .tip-ok { flex: 0 0 auto; align-self: center; border: 0; border-radius: 999px; padding: 8px 12px; min-height: 36px; background: var(--card); color: var(--lavender-text); font: 700 .8rem "Inter", sans-serif; cursor: pointer; }
+
+  /* primeiros passos */
+  .welcome-card { position: relative; text-align: center; padding-top: 26px; }
+  .welcome-skip { position: absolute; top: 14px; right: 18px; margin: 0; font-size: .82rem; }
+  .welcome-ic { width: 64px; height: 64px; margin: 4px auto 10px; border-radius: 22px; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-size: 1.9rem; }
+  .welcome-step { margin: 0 0 4px !important; font-size: .74rem !important; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--green-text) !important; }
+  .welcome-card h3 { margin-bottom: 8px; }
+  .welcome-card .field { text-align: left; }
+  .welcome-note { margin-top: 10px !important; font-size: .8rem !important; }
+  .welcome-btns { display: grid; gap: 8px; margin-top: 18px; }
+  .welcome-dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+  .welcome-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+  .welcome-dots i.on { width: 20px; border-radius: 999px; background: var(--green-btn); }
+
+  /* assistente do orçamento */
+  .assist { cursor: default; }
+  .h-card.assist { background: var(--card); border: 1.5px solid var(--border); }
+  .assist.bad { border-color: #E9B1AC; }
+  .assist.warn { border-color: #EBCB8B; }
+  .assist-card { padding-top: 16px; }
+  .assist-head { display: flex; align-items: center; gap: 10px; }
+  .assist-head > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .assist-head b { font-family: var(--serif); font-weight: 600; font-size: 1.02rem; }
+  .assist-head small { font-size: .72rem; color: var(--muted); }
+  .assist-ic { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--lavender); color: var(--lavender-text); font-size: 1rem; }
+  .assist-pct { flex: 0 0 auto; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: .9rem; font-variant-numeric: tabular-nums; background: var(--green-soft); color: var(--green-text); }
+  .assist.warn .assist-pct { background: #FBEFD5; color: #7A4A00; }
+  .assist.bad .assist-pct { background: #FBE3E1; color: #A1261B; }
+  .assist-msg { margin: 10px 0 0; font-size: .9rem; line-height: 1.5; }
+  html[data-theme="dark"] .assist.bad { border-color: #5E2F2C; }
+  html[data-theme="dark"] .assist.warn { border-color: #5C4A22; }
+  html[data-theme="dark"] .assist.warn .assist-pct { background: #2E2616; color: #F2C17A; }
+  html[data-theme="dark"] .assist.bad .assist-pct { background: #3A1F1E; color: #F4A39C; }
   html[data-theme="dark"] .sv-settle { background: var(--card); }
   html[data-theme="dark"] .b-err .b-dot { background: #3A1F1E; }
   html[data-theme="dark"] .sf-bar i { background: #3987e5; }
@@ -1132,13 +1181,10 @@
   <div class="subnav hidden" id="subNav" role="tablist"></div>
 
   <div id="tabScan">
-    <!-- Resumo da tela inicial: orçamento, semana, compras, última nota, gastos do grupo -->
-    <div id="homeSummary"></div>
-
-    <!-- Card de scan -->
+    <!-- Card de scan: a função principal fica sempre no topo do Início -->
     <section class="card scan-card" id="scanCard">
       <h2>Escanear cupom fiscal</h2>
-      <p class="lead">Aponte a câmera para o QR Code da NFC-e. A nota é validada direto na SEFAZ.</p>
+      <p class="lead">Aponte a câmera para o QR Code do cupom. Os produtos e preços vêm direto do site da Secretaria da Fazenda (SEFAZ).</p>
 
       <div class="inapp-warn hidden" id="inAppWarn">
         Você abriu este link <b>dentro de outro app</b> (WhatsApp, Instagram...), que pode bloquear a câmera.
@@ -1205,7 +1251,7 @@
       <button class="btn small ghost" id="btnManualExpense" style="margin-top:8px">Adicionar gasto sem nota</button>
 
       <button class="link-btn" id="btnToggleManual">
-        Inserir URL manualmente
+        Digitar ou colar o link da nota
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
       </button>
       <div class="manual hidden" id="manualBox">
@@ -1226,6 +1272,9 @@
       <p id="status"></p>
       <div id="result"></div>
     </section>
+
+    <!-- Resumo da tela inicial: assistente, orçamento, semana, compras, última nota, gastos do grupo -->
+    <div id="homeSummary"></div>
 
     <!-- Histórico -->
     <section>
@@ -1343,7 +1392,7 @@
       </div>
       <ul class="stock-list" id="stockList"></ul>
       <p class="empty hidden" id="stockEmpty"></p>
-      <p class="stock-note">Toque num produto para ver em quais cupons ele aparece e para trocar a subcategoria. A categoria vem da loja: troque no detalhe do cupom. Produtos são juntados pelo nome; o mesmo produto com nomes diferentes em lojas diferentes aparece separado.</p>
+      <p class="stock-note">Toque num produto para ver em quais notas ele aparece e para trocar o tipo de produto. A categoria vem da loja: dá para trocar no detalhe da nota. Os produtos são agrupados pelo nome; se cada loja escreve o nome de um jeito, eles aparecem separados.</p>
     </section>
   </div>
 
@@ -1438,11 +1487,14 @@
     </section>
 
     <!-- Metas por categoria: um teto para cada categoria no período -->
+    <!-- Assistente: chance de estourar o orçamento do mês e o que cortar -->
+    <section class="card assist-card" id="budAssist"></section>
+
     <section class="card" id="budCatMetas"></section>
 
     <section class="card">
-      <h3 class="card-title">Tempo de consumo dos produtos</h3>
-      <p class="muted">Calculado pelas compras na aba Gastos: de quanto em quanto tempo cada produto é comprado. Só entra na previsão o que deve ser comprado <b>neste período</b>.</p>
+      <h3 class="card-title">Frequência de compra dos produtos</h3>
+      <p class="muted">Calculada pelas suas notas: de quanto em quanto tempo você compra cada produto. Só entra na previsão o que você deve comprar <b>neste período</b>.</p>
       <div class="chips" id="budFilter"></div>
       <div id="budList"></div>
     </section>
@@ -1553,6 +1605,15 @@
         <button class="btn small" id="btnDupKeep">Salvar nas minhas notas</button>
         <button class="btn small ghost" id="btnDupSkip">Não salvar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Primeiros passos: aparece uma vez, na primeira vez que a pessoa usa o app -->
+  <div class="modal hidden" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal-card welcome-card">
+      <button class="link-btn welcome-skip" data-welcome="skip">Pular</button>
+      <div id="welcomeBody"></div>
+      <div class="welcome-dots" id="welcomeDots" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -2002,6 +2063,7 @@
     authResolved = true;
     unsub('user', 'group', 'groupCupons', 'cupons', 'meta', 'feedback', 'orders', ...EXTRA_SUBS);
     resetExtras();
+    welcomeChecked = false;
     feedbackList = null;
     cartOrders = null;
     spaceKey = undefined;
@@ -2049,6 +2111,8 @@
         dataReady = true;
         refreshViews();
         handleShared(); // algo compartilhado com o app (link ou print da nota) espera os dados carregarem
+        // primeiros passos: decide só com os dados do servidor (o cache do aparelho pode estar vazio)
+        if (!welcomeChecked && !snap.metadata?.fromCache) { welcomeChecked = true; maybeShowWelcome(); }
       }, cloudError);
       subscribePersonalExtras();
       unsubs.meta = fb.onSnapshot(metaRef(), snap => {
@@ -3058,11 +3122,12 @@
   const brlCompact = (v) => v >= 1000 ? 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : 'R$ ' + Math.round(v);
 
   function spendDims() {
-    const dims = [['cat', 'Categoria'], ['sub', 'Subcategoria']];
+    const dims = [['cat', 'Categoria'], ['sub', 'Tipo de produto']];
     if (spendFromGroup()) dims.push(['who', 'Pessoa']);
     else if (inGroup()) dims.push(['shared', 'Pessoal × grupo']);
     dims.push(['store', 'Loja']);
-    dims.push(['tag', 'Etiqueta']);
+    // "Etiqueta" só aparece depois que a pessoa usou alguma
+    if (Object.values(tagData.products).some(t => t && t.length)) dims.push(['tag', 'Etiqueta']);
     return dims;
   }
 
@@ -3191,7 +3256,7 @@
         (slices.length > LIMIT ? '<button class="link-btn" data-showall="1">' + (spendShowAll ? 'Mostrar menos' : 'Mostrar todas (' + slices.length + ')') + '</button>' : '');
     $('spendHint').classList.toggle('hidden', (!slices.length && spendDim !== 'tag') || !!spendSel);
     $('spendHint').textContent = spendDim === 'sub'
-      ? 'Por subcategoria soma o valor de cada produto. Toque numa barra para ver os detalhes.'
+      ? 'Por tipo de produto, soma o valor de cada item das notas. Toque numa barra para ver os detalhes.'
       : spendDim === 'tag'
         ? 'Etiquetas são suas: ponha nos produtos tocando em "Etiqueta" no detalhe da nota ou na aba Histórico. Um produto com duas etiquetas conta nas duas.'
         : 'Toque numa barra para ver todos os detalhes.';
@@ -3389,6 +3454,9 @@
     renderBudTrend(products, cur, maxAnchor, spentCur, source);
     renderBudCats(rows);
     renderCatMetas(rows, source, isCur, end);
+    const assist = assistHtml(false);
+    $('budAssist').innerHTML = assist;
+    $('budAssist').classList.toggle('hidden', !assist);
     renderBudList(rows, isCur, end);
   }
 
@@ -3406,6 +3474,9 @@
 
   function renderCatMetas(rows, source, isCur, end) {
     const box = $('budCatMetas');
+    // metas por categoria só aparecem quando já há histórico suficiente
+    box.classList.toggle('hidden', !unlocked());
+    if (!unlocked()) return;
     const spent = new Map(), planned = new Map();
     if (isCur) source.filter(h => { const t = spendDate(h); return t >= budAnchor && t < end; })
       .forEach(h => { const id = cupomCat(h).id; spent.set(id, (spent.get(id) || 0) + (h.total || 0)); });
@@ -3603,7 +3674,7 @@
     const outList = filtered.filter(r => r.value <= 0).sort((a, b) => (a.p.next || Infinity) - (b.p.next || Infinity));
     const counts = { all: filtered.length, in: inList.length, out: outList.length };
 
-    $('budFilter').innerHTML = [['all', 'Todos'], ['in', 'Considerados'], ['out', 'Não considerados']].map(([k, label]) =>
+    $('budFilter').innerHTML = [['all', 'Todos'], ['in', 'Entram na previsão'], ['out', 'Ficam de fora']].map(([k, label]) =>
       '<button class="chip' + (budShow === k ? ' active' : '') + '" data-bshow="' + k + '">' + label + ' (' + counts[k] + ')</button>').join('') +
       (budCat ? '<button class="chip" data-bcat-clear="1">' + catById(budCat).name + ' ✕</button>' : '');
 
@@ -3614,15 +3685,15 @@
       let why;
       if (ok) {
         why = late
-          ? '<span class="bud-why late">' + ICON_LATE + 'Considerado · era para comprar por volta de ' + fmtDay(p.next) + '</span>'
-          : '<span class="bud-why in">' + ICON_IN + 'Considerado · ' + (r.dates.length > 1 ? r.dates.length + ' compras previstas' : 'compra prevista em ' + fmtDay(r.dates[0])) + '</span>';
+          ? '<span class="bud-why late">' + ICON_LATE + 'Entra na previsão · a compra estava prevista para ' + fmtDay(p.next) + '</span>'
+          : '<span class="bud-why in">' + ICON_IN + 'Entra na previsão · ' + (r.dates.length > 1 ? r.dates.length + ' compras previstas' : 'compra prevista em ' + fmtDay(r.dates[0])) + '</span>';
       } else if (!p.cycle) {
-        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · comprado só 1 vez, ainda não dá para saber o tempo de consumo</span>';
+        why = '<span class="bud-why out">' + ICON_OUT + 'Fica de fora · comprado só 1 vez, ainda não dá para saber de quanto em quanto tempo você compra</span>';
       } else if (p.inactive) {
-        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · parou de comprar (última há ' + Math.round(p.sinceLast) + ' dias)</span>';
+        why = '<span class="bud-why out">' + ICON_OUT + 'Fica de fora · você parou de comprar (a última compra foi há ' + Math.round(p.sinceLast) + ' dias)</span>';
       } else {
         const boughtHere = isCur && p.last >= budAnchor && p.last < end;
-        why = '<span class="bud-why out">' + ICON_OUT + 'Não considerado · ' + (boughtHere ? 'já comprado em ' + fmtDay(p.last) + '; ' : '') +
+        why = '<span class="bud-why out">' + ICON_OUT + 'Fica de fora · ' + (boughtHere ? 'já comprado em ' + fmtDay(p.last) + '; ' : '') +
           'próxima compra prevista em ' + fmtDay(Math.max(p.next, today)) + '</span>';
       }
       return '<div class="bud-item"><div class="bud-top"><span class="bud-name">' + escapeHtml(p.name) + '</span>' +
@@ -3638,9 +3709,9 @@
     if (!rows.length) {
       html = '<p class="empty">Ainda não há compras para prever. Escaneie notas e a previsão aparece aqui.</p>';
     } else {
-      if (budShow !== 'out') html += '<div class="bud-group-title"><span>Considerados (' + inList.length + ')</span><span>' +
+      if (budShow !== 'out') html += '<div class="bud-group-title"><span>Entram na previsão (' + inList.length + ')</span><span>' +
         brl(inList.reduce((s, r) => s + r.value, 0)) + '</span></div>' + (inList.map(item).join('') || '<p class="empty">Nenhum produto previsto neste período.</p>');
-      if (budShow !== 'in') html += '<div class="bud-group-title"><span>Não considerados (' + outList.length + ')</span></div>' +
+      if (budShow !== 'in') html += '<div class="bud-group-title"><span>Ficam de fora (' + outList.length + ')</span></div>' +
         (outList.map(item).join('') || '<p class="empty">Todos os produtos entram neste período.</p>');
     }
     $('budList').innerHTML = html;
@@ -3799,10 +3870,20 @@
     $('saveSummary').innerHTML = s;
     $('saveExtra').innerHTML = renderSuperfluous(source, saveMonth, mEnd, prevStart, monthName);
 
-    // ----- divisão de gastos do grupo (no mês escolhido) -----
+    // ----- divisão de gastos do grupo (no mês escolhido): só com o grupo ativo, de 2 pessoas ou mais -----
     const split = $('saveSplit');
-    split.classList.toggle('hidden', !inGroup());
-    if (inGroup()) split.innerHTML = renderSplit(saveMonth, mEnd, monthName(saveMonth));
+    const splitOn = inGroup() && (group.members || []).length > 1;
+    split.classList.toggle('hidden', !splitOn);
+    if (splitOn) split.innerHTML = renderSplit(saveMonth, mEnd, monthName(saveMonth));
+
+    // com poucas notas, preços e supérfluos ainda não dizem muito: mostra o que falta para liberar
+    const open = unlocked();
+    $('saveExtra').classList.toggle('hidden', !open);
+    $('saveCompare').classList.toggle('hidden', !open);
+    if (!open) {
+      $('saveAlerts').innerHTML = lockedHtml('Alertas de preço, comparação entre lojas e gastos com supérfluos');
+      return;
+    }
 
     // ----- alertas de preço -----
     const prices = priceHistory(priceSource());
@@ -3850,7 +3931,7 @@
     html += '<div class="sv-split-head"><span>Total do grupo <b>' + brl(total) + '</b></span><span>Parte de cada um <b>' + brl(share) + '</b></span></div>' +
       rows.sort((a, b) => b.paid - a.paid).map(m => '<div class="sv-line"><span class="sv-who">' + avatar(m.uid, m.name, 24) + escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name)) +
         ' <small>pagou ' + brl(m.paid) + '</small></span><b class="' + (m.bal >= -0.009 ? 'sv-pos' : 'sv-neg') + '">' +
-        (Math.abs(m.bal) < 0.01 ? 'quite' : m.bal > 0 ? 'recebe ' + brl(m.bal) : 'deve ' + brl(-m.bal)) + '</b></div>').join('');
+        (Math.abs(m.bal) < 0.01 ? 'em dia' : m.bal > 0 ? 'recebe ' + brl(m.bal) : 'deve ' + brl(-m.bal)) + '</b></div>').join('');
     // acertos: quem deve paga para quem tem a receber (o mínimo de transferências)
     const debt = rows.filter(m => m.bal < -0.009).map(m => ({ ...m, v: -m.bal }));
     const cred = rows.filter(m => m.bal > 0.009).map(m => ({ ...m, v: m.bal }));
@@ -3865,11 +3946,11 @@
     }
     const who = (m) => escapeHtml(m.uid === me.uid ? 'Você' : firstName(m.name));
     const nameOf = (uid) => { const m = members.find(x => x.uid === uid); return m ? who(m) : 'Ex-participante'; };
-    if (pays.length) html += '<p class="field-label" style="margin-top:12px">Para acertar as contas</p>' +
+    if (pays.length) html += '<p class="field-label" style="margin-top:12px">Pagamentos para equilibrar as contas</p>' +
       pays.map(p => '<div class="sv-pay">' + who(p.from) + ' <span aria-hidden="true">→</span><span class="sr-only">paga para</span> ' + who(p.to) + '<b>' + brl(p.v) + '</b>' +
         '<button class="sv-settle" data-settle="' + escapeHtml(p.from.uid + '|' + p.to.uid + '|' + (Math.round(p.v * 100) / 100)) + '">Marcar como pago</button></div>').join('');
-    else if (done.length) html += '<p class="sv-delta good" style="margin-top:12px">✓ Contas de ' + monthName + ' acertadas.</p>';
-    if (done.length) html += '<p class="field-label" style="margin-top:12px">Acertos feitos</p>' +
+    else if (done.length) html += '<p class="sv-delta good" style="margin-top:12px">✓ As contas de ' + monthName + ' estão em dia.</p>';
+    if (done.length) html += '<p class="field-label" style="margin-top:12px">Pagamentos registrados</p>' +
       done.sort((a, b) => (a.at || 0) - (b.at || 0)).map(a => '<div class="sv-line"><span>' + nameOf(a.from) + ' pagou ' + nameOf(a.to).replace(/^Você$/, 'você') +
         ' <small>' + fmtDay(a.at || Date.now()) + (a.byName ? ' · marcado por ' + escapeHtml(firstName(a.byName)) : '') + '</small></span>' +
         '<span><b>' + brl(a.amount || 0) + '</b> <button class="cart-x" data-unsettle="' + escapeHtml(a.id) + '">desfazer</button></span></div>').join('');
@@ -4300,7 +4381,7 @@
         (g.qty > 0 ? ' · Média ' + brl(g.spent / g.qty) + '/' + escapeHtml(g.unit) : '') + '</div>';
       if (openStockKey === g.key) {
         html += '<div class="s-detail">' +
-          '<label class="s-sub">Subcategoria <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
+          '<label class="s-sub">Tipo de produto <select class="cat-select" data-cat="' + g.cat.id + '" data-name="' + escapeHtml(g.name) + '">' +
           subOptions(g.cat, g.sub) + '</select></label>' + tagPicker(g.name) +
           g.purchases.sort((a, b) => (b.date || 0) - (a.date || 0)).map(p =>
           '<div><span>' + escapeHtml(titleCase(p.store || 'Loja')) + ' · ' + (p.date ? fmtDate(p.date).split(' •')[0] : '') +
@@ -4325,7 +4406,7 @@
     const sum = rows.reduce((s, r) => s + r[1], 0) || 1;
 
     $('stockBreakdown').innerHTML = !rows.length ? '' :
-      '<p class="bd-title">' + (cat ? 'Gastos em ' + escapeHtml(cat.name) + ' por subcategoria' : 'Gastos por categoria') + '</p>' +
+      '<p class="bd-title">' + (cat ? 'Gastos em ' + escapeHtml(cat.name) + ' por tipo de produto' : 'Gastos por categoria') + '</p>' +
       rows.map(([k, v]) => {
         const c = cat || catById(k);
         const label = cat ? k : c.name;
@@ -4385,6 +4466,13 @@
     const box = $('homeSummary');
     if (CLOUD && !me) { box.innerHTML = ''; return; }
     const mine = personalHistory();
+    // ainda sem notas: só um convite para escanear a primeira (os cartões vazios confundem)
+    if (!mine.length) {
+      box.innerHTML = '<div class="home-grid"><div class="h-card h-start"><span class="h-eyebrow">Seu resumo aparece aqui</span>' +
+        '<span class="h-serif">Escaneie a sua primeira nota</span><small>Depois dela, esta tela mostra quanto você gastou no mês e na semana, ' +
+        'o que está acabando em casa e, se você tiver um grupo, os gastos de cada pessoa.</small></div></div>';
+      return;
+    }
     const now = Date.now();
     const today = dayStart(now);
     const inRange = (h, a, b) => { const t = spendDate(h); return t >= a && t < b; };
@@ -4392,7 +4480,8 @@
     const spent = sumTotal(mine.filter(h => inRange(h, mStart, mEnd)));
     const products = buildProducts(mine);
     const max = +budMaxAll().mine_month || 0;
-    let html = '<div class="home-grid">' + weeklyCard(mine, products);
+    let html = '<div class="home-grid">' + (unlocked() ? '' : lockedHtml('O assistente do orçamento, as metas por categoria e a comparação de preços', true)) +
+      assistHtml(true) + weeklyCard(mine, products);
 
     // orçamento do mês (ou gasto x previsão, se não houver gasto máximo definido)
     if (max) {
@@ -4454,6 +4543,7 @@
   }
 
   function onHomeClick(e) {
+    if (e.target.closest('[data-assist]')) return onAssistClick(e);
     if (e.target.closest('[data-weekly-close]')) {
       try { localStorage.setItem('resumo_fechado', String(weeklyRange().start)); } catch (_) {}
       return renderHome();
@@ -4563,6 +4653,7 @@
     if (tab === 'search') renderSearch();
     if (tab === 'more') renderNotifCard();
     $('btnHeaderSearch').classList.toggle('active', tab === 'search');
+    renderTip(tab);
     $('chartTip').classList.add('hidden');
     if (tab === 'account') renderAccount();
     window.scrollTo({ top: 0 });
@@ -4572,7 +4663,7 @@
   // Leitor nativo do Android/Chrome (BarcodeDetector) é bem mais rápido que o decodificador em JS
   const HAS_NATIVE_DETECTOR = 'BarcodeDetector' in window;
   // Atualize a cada nova versão: aparece no rodapé e mostra se a pessoa está com o app atualizado
-  const APP_VERSION = '2026-11-15.1';
+  const APP_VERSION = '2026-11-16.2';
   // Navegadores internos de apps (WhatsApp, Instagram, Facebook, TikTok...) costumam bloquear a câmera
   const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
   const CAMERA_API = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -4763,7 +4854,7 @@
     const url = nfceUrl(text);
     // QR que não é de nota fiscal: avisa e continua escaneando
     if (!url) {
-      setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR da NFC-e.', true);
+      setHint('Esse QR Code não é de um cupom fiscal. Aponte para o QR Code impresso no cupom.', true);
       return;
     }
     // várias notas seguidas: guarda na fila e a câmera continua aberta
@@ -4849,7 +4940,7 @@
     const errors = [];
     for (let i = 0; i < PROXIES.length; i++) {
       const p = PROXIES[i];
-      setStatus('Buscando nota na SEFAZ... (' + (i + 1) + '/' + PROXIES.length + ': ' + p.name + ')', { loading: true });
+      setStatus('Buscando a nota no site da Fazenda... (tentativa ' + (i + 1) + ' de ' + PROXIES.length + ')', { loading: true });
       try {
         const res = await fetchWithTimeout(p.build(url));
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -4860,14 +4951,14 @@
         errors.push(p.name + ': ' + (err.name === 'AbortError' ? 'tempo esgotado' : err.message));
       }
     }
-    throw new Error('Nenhum proxy respondeu.<br><small>' + errors.map(escapeHtml).join('<br>') + '</small>');
+    throw new Error('o site da Fazenda não respondeu (pode estar fora do ar ou lento).<br><small>' + errors.map(escapeHtml).join('<br>') + '</small>');
   }
 
   async function processUrl(url) {
     resultEl.innerHTML = '';
     openResultCard();
     if (!/^https?:\/\//i.test(url)) {
-      setStatus('O QR Code lido não contém uma URL válida:<br><code>' + escapeHtml(url) + '</code>', { error: true });
+      setStatus('O QR Code lido não tem um link de nota fiscal:<br><code>' + escapeHtml(url) + '</code>', { error: true });
       return;
     }
     try {
@@ -4877,7 +4968,7 @@
       if (!data.items.length) {
         let host = '';
         try { host = new URL(url).hostname; } catch (_) {}
-        setStatus('Não encontrei produtos na resposta da SEFAZ (o site pode ter pedido captcha ou ter um layout diferente).' + diag(host), { error: true });
+        setStatus('O site da Fazenda não mostrou os produtos desta nota (ele pode ter pedido uma verificação ou estar com outro formato).' + diag(host), { error: true });
         showPasteBox(url);
         return;
       }
@@ -5071,7 +5162,7 @@
         '<span class="label-total">Total Vl.</span></div>' +
         '<div class="row"><div class="item-meta">' + meta.join('') + '</div>' +
         '<span class="item-total">' + (isNaN(i.total) ? '—' : fmtNum(i.total)) + '</span></div>' +
-        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Subcategoria">' + subOptions(cat, sub) + '</select>' +
+        '<select class="sub-pill" data-name="' + escapeHtml(i.name) + '" aria-label="Tipo de produto">' + subOptions(cat, sub) + '</select>' +
         (canHide ? '<button class="hide-btn' + (hidden ? ' on' : '') + '" data-hide="' + escapeHtml(i.name) + '">' +
           (hidden ? ICON_EYE_OFF + 'Oculto do grupo · mostrar' : ICON_EYE + 'Ocultar do grupo') + '</button>' : '') +
         '<button class="hide-btn tag-btn' + (tagsOf(i.name).length ? ' has' : '') + '" data-tagopen="' + escapeHtml(i.name) + '">🏷 ' +
@@ -5447,7 +5538,7 @@
       return;
     }
     const u = t.closest('[data-unsettle]');
-    if (u && confirm('Desfazer este acerto? O valor volta a aparecer como devido.')) {
+    if (u && confirm('Desfazer este pagamento? O valor volta a aparecer como devido.')) {
       try { await fb.deleteDoc(fb.doc(db, 'groups', me.groupId, 'acertos', u.dataset.unsettle)); } catch (err) { cloudError(err); }
     }
   }
@@ -5574,7 +5665,7 @@
   const NOTIF_KEY = 'avisos';
   const notifSupported = () => 'Notification' in window;
   function notifPrefs() {
-    const def = { on: false, out: true, meta: true, group: true, weekly: true };
+    const def = { on: false, assist: true, out: true, meta: true, group: true, weekly: true };
     try { return { ...def, ...JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') }; } catch (_) { return def; }
   }
   function saveNotifPrefs(p) { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(p)); } catch (_) {} }
@@ -5605,6 +5696,10 @@
     const p = notifPrefs();
     if (!p.on || !notifSupported() || Notification.permission !== 'granted') return;
     const now = Date.now(), today = dayStart(now), mine = personalHistory(), uid = me?.uid || 'local';
+    if (p.assist) {
+      const r = budgetRisk();
+      if (r.state === 'risk' && r.p >= 0.5 && sentOnce(uid + ':risco:' + today)) notify('Orçamento em risco', assistText(r).replace(/<[^>]+>/g, ''), 'risco');
+    }
     if (p.out) {
       const soon = buildProducts(mine).filter(x => x.cycle && !x.inactive && x.next >= today && x.next < today + 3 * DAY).sort((a, b) => a.next - b.next);
       if (soon.length && sentOnce(uid + ':acabando:' + today)) {
@@ -5653,7 +5748,7 @@
         : 'Receba um aviso quando algo estiver acabando, quando chegar perto da meta e quando o grupo mexer nas notas.') + '</p>';
       if (!on && perm !== 'denied') html += '<button class="btn small" data-notif="enable">Ligar avisos</button>';
       if (on) {
-        html += [['out', 'Produto acabando', '"Café Pilão deve acabar em 2 dias"'], ['meta', 'Metas de gasto', 'ao chegar em 80% e ao passar da meta'],
+        html += [['assist', 'Assistente do orçamento', 'quando a chance de estourar o orçamento passa de 50% (1 vez por dia)'], ['out', 'Produto acabando', '"Café Pilão deve acabar em 2 dias"'], ['meta', 'Metas de gasto', 'ao chegar em 80% e ao passar da meta'],
           ['group', 'Grupo', 'notas novas e comentários, com o app em segundo plano'], ['weekly', 'Resumo semanal', 'no domingo: quanto gastou e o que vem pela frente']]
           .map(([k, t, d]) => '<label class="check-row"><input type="checkbox" data-notif-kind="' + k + '"' + (p[k] ? ' checked' : '') + '><span><b>' + t + '</b> · ' + d + '</span></label>').join('') +
           '<div class="btn-row" style="margin-bottom:0"><button class="btn small ghost" data-notif="test">Testar aviso</button><button class="btn small ghost" data-notif="off">Desligar</button></div>';
@@ -5678,6 +5773,261 @@
     else if (b.dataset.notif === 'test') notify('Teste de aviso', 'Está funcionando! 🎉', 'teste');
     renderNotifCard();
   }
+
+  // ---------- Assistente do orçamento: chance de estourar e o que cortar ----------
+  // Modelo de previsão que roda no próprio celular, com o histórico da pessoa: simula o resto do mês
+  // 2.000 vezes (intervalos entre as compras de cada produto e preços pagos, sorteados do histórico,
+  // mais o gasto avulso médio por dia) e conta em quantas simulações o mês passa do orçamento.
+  // Depois tira cada produto da conta para ver qual corte mais baixa essa chance.
+  const ASSIST_SIMS = 2000;
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let assistCache = { key: null, value: null };
+  function budgetRisk() {
+    const max = +budMaxAll().mine_month || 0;
+    const mine = personalHistory();
+    const today = dayStart(Date.now());
+    const key = [today, max, mine.length, sumTotal(mine).toFixed(2), JSON.stringify(tagData.products).length].join('|');
+    if (assistCache.key !== key) assistCache = { key, value: computeRisk(max, mine, today) };
+    return assistCache.value;
+  }
+  function computeRisk(max, mine, today) {
+    const m0 = periodStart(today, 'month'), m1 = shiftPeriod(m0, 'month', 1);
+    const spent = sumTotal(mine.filter(h => { const t = spendDate(h); return t >= m0 && t < m1; }));
+    const remDays = Math.max(0, Math.round((m1 - today) / DAY));
+    const products = buildProducts(mine).filter(p => p.cycle && !p.inactive);
+    // orçamento sugerido: média dos últimos 3 meses fechados
+    const past = [1, 2, 3].map(n => { const a = shiftPeriod(m0, 'month', -n), b = shiftPeriod(a, 'month', 1); return sumTotal(mine.filter(h => { const t = spendDate(h); return t >= a && t < b; })); }).filter(v => v > 0);
+    const suggest = past.length ? Math.ceil(past.reduce((s, v) => s + v, 0) / past.length / 10) * 10 : 0;
+    const base = { max, spent, remDays, suggest };
+    if (!max) return { ...base, state: 'nobudget' };
+    if (spent > max) return { ...base, state: 'over' };
+    if (mine.length < 4 || !products.length) return { ...base, state: 'learning' };
+
+    // gasto que não segue um ritmo (compras avulsas, gastos sem nota): média por dia nos últimos 90 dias
+    const firstT = Math.min(...mine.map(spendDate).filter(Boolean));
+    const span = Math.max(14, Math.min(90, (today - dayStart(firstT)) / DAY));
+    const since = today - span * DAY;
+    const recur = new Set(products.map(p => p.key));
+    let irregular = 0;
+    mine.forEach(h => {
+      const t = spendDate(h);
+      if (t < since) return;
+      if (h.manual) { irregular += h.total || 0; return; }
+      (h.items || []).forEach(i => { if (!recur.has(normName(i.name) + '|' + (i.un || 'un').toLowerCase().trim())) irregular += itemValue(i); });
+    });
+    const irrRate = irregular / span;
+
+    const rnd = mulberry32(Math.round(today / DAY) * 7919 + mine.length);
+    const N = ASSIST_SIMS;
+    const totals = new Float64Array(N);
+    for (let s = 0; s < N; s++) totals[s] = spent + irrRate * remDays * (0.6 + 0.8 * rnd());
+    const sims = [];
+    products.forEach(p => {
+      const ev = p.events;
+      const gaps = ev.slice(1).map((e, k) => (e.t - ev[k].t) / DAY).filter(g => g > 0);
+      const gs = gaps.length ? gaps : [p.cycle];
+      const vals = ev.slice(-3).map(e => e.value);
+      const arr = new Float32Array(N);
+      let sum = 0;
+      for (let s = 0; s < N; s++) {
+        let t = p.last, c = 0;
+        for (let guard = 0; guard < 62; guard++) {
+          t += Math.max(1, gs[Math.floor(rnd() * gs.length)] * (0.85 + 0.3 * rnd())) * DAY;
+          if (t < today) t = today + rnd() * Math.min(remDays, 4) * DAY; // atrasado: deve comprar logo
+          if (t >= m1) break;
+          c += vals[Math.floor(rnd() * vals.length)];
+        }
+        arr[s] = c;
+        totals[s] += c;
+        sum += c;
+      }
+      if (sum > 0) sims.push({ p, arr, mean: sum / N, sup: !!superfluousGroup(p.name) });
+    });
+    // f = quanto do gasto com o produto sai da conta (1 = cortar tudo, 0,5 = comprar a metade)
+    const riskWithout = (list, f = 1) => {
+      let over = 0;
+      for (let s = 0; s < N; s++) { let t = totals[s]; list.forEach(x => { t -= x.arr[s] * f; }); if (t > max) over++; }
+      return over / N;
+    };
+    const p = riskWithout([]);
+    const sorted = Array.from(totals).sort((a, b) => a - b);
+    const median = sorted[N >> 1];
+    // supérfluos (refrigerante, doce, cerveja...): sugere cortar. Produtos do dia a dia: sugere comprar a metade.
+    sims.forEach(x => {
+      x.mode = x.sup ? 'cut' : 'half';
+      x.pWithout = riskWithout([x], x.sup ? 1 : 0.5);
+      x.gain = p - x.pWithout;
+    });
+    const helpful = sims.filter(x => x.gain >= 0.05).sort((a, b) => b.gain - a.gain);
+    const cut = helpful.find(x => x.sup) || helpful[0] || null;
+    let cut2 = null;
+    if (cut && cut.sup && cut.pWithout >= 0.5) {
+      const next = helpful.find(x => x !== cut && x.sup);
+      if (next) cut2 = { x: next, pBoth: riskWithout([cut, next]) };
+    }
+    return { ...base, state: 'risk', p, median, cut, cut2, perDay: remDays ? (max - spent) / remDays : 0 };
+  }
+
+  // previsão nunca é certeza: nos extremos mostra "mais de 95%" / "menos de 5%"
+  const pctR = (x) => x >= 0.95 ? 'mais de 95%' : x <= 0.05 ? 'menos de 5%' : Math.round(x * 100) + '%';
+  const pctBadge = (x) => x >= 0.95 ? '>95%' : x <= 0.05 ? '<5%' : Math.round(x * 100) + '%';
+  function habitText(p) {
+    const weekly = p.cycle <= 10;
+    const k = (weekly ? 7 : 30.4) / p.cycle;
+    const q = Math.round(p.avgQty * k * 10) / 10;
+    const unit = p.un === 'un' ? (q >= 2 ? 'unidades' : 'unidade') : p.un;
+    return 'Você compra em média <b>' + fmtQtd(q) + ' ' + escapeHtml(unit) + ' de ' + escapeHtml(titleCase(p.name)) + ' por ' + (weekly ? 'semana' : 'mês') +
+      '</b> (~' + brl(p.avgValue * k) + ').';
+  }
+  function assistText(r) {
+    const head = 'O orçamento do mês é <b>' + brl(r.max) + '</b>. ';
+    if (r.state === 'over') return head + 'Você já gastou ' + brl(r.spent) + ' e passou <b>' + brl(r.spent - r.max) + '</b> do orçamento.';
+    if (r.state === 'learning') return head + 'Você já gastou ' + brl(r.spent) + '. Ainda estou aprendendo o seu ritmo de compras: escaneie mais algumas notas para eu calcular a chance de estourar.';
+    let t = head + 'Você já gastou ' + brl(r.spent) + ' e, pelo seu ritmo, o mês deve fechar perto de <b>' + brl(r.median) + '</b>. ';
+    if (r.p < 0.2) return t + 'Chance de estourar: <b>' + pctR(r.p) + '</b>. 👍 Dá para gastar até ' + brl(r.perDay) + ' por dia até o fim do mês.';
+    if (!r.cut) return t + 'Você tem <b>' + pctR(r.p) + ' de chance de estourar</b> o orçamento. Nenhum produto sozinho muda muito isso: o gasto está espalhado em muitas compras.';
+    const name = escapeHtml(titleCase(r.cut.p.name));
+    t += habitText(r.cut.p) + (r.cut.mode === 'cut'
+      ? ' Caso você não corte ' + name + ' das suas compras, você tem <b>' + pctR(r.p) + ' de chance de estourar o orçamento</b>. Cortando, a chance cai para <b>' + pctR(r.cut.pWithout) + '</b>.'
+      : ' Mantendo esse ritmo, você tem <b>' + pctR(r.p) + ' de chance de estourar o orçamento</b>. Comprando metade de ' + name + ' até o fim do mês, a chance cai para <b>' + pctR(r.cut.pWithout) + '</b>.');
+    if (r.cut2) t += ' Cortando também ' + escapeHtml(titleCase(r.cut2.x.p.name)) + ', cai para <b>' + pctR(r.cut2.pBoth) + '</b>.';
+    return t;
+  }
+  function assistHtml(home) {
+    if ((CLOUD && !me) || !unlocked()) return '';
+    const r = budgetRisk();
+    if (home && r.state === 'nobudget' && !r.suggest) return '';
+    const tone = r.state === 'over' || (r.state === 'risk' && r.p >= 0.5) ? 'bad' : r.state === 'risk' && r.p >= 0.2 ? 'warn' : 'good';
+    let body, actions = '';
+    if (r.state === 'nobudget') {
+      body = 'Você ainda não definiu o orçamento do mês.' + (r.suggest ? ' Pelos últimos meses, você gasta em média <b>' + brl(r.suggest) + '</b>. Quer usar esse valor?' : ' Defina um valor para eu avisar quando houver risco de estourar.');
+      actions = r.suggest ? '<button class="btn small" data-assist="setbudget" data-v="' + r.suggest + '">Usar ' + brl(r.suggest) + '</button>' : '';
+    } else body = assistText(r);
+    if (home) actions += '<button class="btn small ghost" data-home="budget">Ver orçamento</button>';
+    return '<div class="' + (home ? 'h-card ' : '') + 'assist ' + tone + '"><div class="assist-head"><span class="assist-ic" aria-hidden="true">✦</span>' +
+      '<span><b>Assistente do orçamento</b><small>previsão feita com o seu histórico de compras</small></span>' +
+      (r.state === 'risk' ? '<span class="assist-pct" aria-label="Chance de estourar: ' + pctR(r.p) + '">' + escapeHtml(pctBadge(r.p)) + '</span>' : '') + '</div>' +
+      '<p class="assist-msg">' + body + '</p>' + (actions ? '<div class="btn-row" style="margin:10px 0 0">' + actions + '</div>' : '') + '</div>';
+  }
+  async function onAssistClick(e) {
+    const b = e.target.closest('[data-assist="setbudget"]');
+    if (!b) return false;
+    await saveBudMaxAll({ ...budMaxAll(), mine_month: +b.dataset.v });
+    toast('Orçamento do mês definido em ' + brl(+b.dataset.v) + '.');
+    refreshViews();
+    if (currentTab === 'budget') renderBudget();
+    return true;
+  }
+
+  // ---------- Funções liberadas aos poucos ----------
+  // O que depende de histórico (assistente, metas por categoria, preços, supérfluos) só aparece
+  // a partir de 5 notas: antes disso os números ainda não dizem muito e só confundem.
+  const MIN_NOTES = 5;
+  const unlocked = () => personalHistory().length >= MIN_NOTES;
+  function lockedHtml(what, home) {
+    const n = personalHistory().length, left = Math.max(0, MIN_NOTES - n);
+    return '<div class="' + (home ? 'h-card ' : '') + 'locked-card"><div class="locked-top"><span class="h-eyebrow">Mais funções em breve</span>' +
+      '<span class="locked-count">' + n + ' de ' + MIN_NOTES + ' notas</span></div>' +
+      '<div class="lp-bar"><i style="width:' + (n / MIN_NOTES * 100) + '%"></i></div>' +
+      '<p>' + escapeHtml(what) + ' aparecem quando você tiver ' + MIN_NOTES + ' notas escaneadas. ' +
+      (left === 1 ? 'Falta só 1.' : 'Faltam ' + left + '.') + '</p></div>';
+  }
+
+  // ---------- Primeiros passos (uma vez, na primeira vez que a pessoa usa o app) ----------
+  let welcomeStep = 0, welcomeChecked = false;
+  const welcomeKey = () => 'boas_vindas_' + (me?.uid || 'local');
+  function welcomeSeen() { try { return !!localStorage.getItem(welcomeKey()); } catch (_) { return true; } }
+  function markWelcomeSeen() { try { localStorage.setItem(welcomeKey(), '1'); } catch (_) {} }
+  function maybeShowWelcome() {
+    if (welcomeSeen() || (CLOUD && !me)) return;
+    // quem já usa o app (já tem notas) não precisa do passo a passo
+    if (personalHistory().length) { markWelcomeSeen(); return; }
+    welcomeStep = 0;
+    renderWelcome();
+    $('welcomeModal').classList.remove('hidden');
+  }
+  function renderWelcome() {
+    const max = +budMaxAll().mine_month || 0;
+    const steps = [
+      { ic: '📷', title: 'Escaneie sua primeira nota',
+        text: 'Aponte a câmera para o QR Code do cupom fiscal. O app lê todos os produtos, quantidades e preços sozinho, sem você digitar nada.',
+        extra: '<p class="welcome-note">Dica: dá para ler várias notas seguidas ou escolher fotos da galeria.</p>',
+        buttons: '<button class="btn small" data-welcome="next">Próximo</button>' },
+      { ic: '🎯', title: 'Defina o orçamento do mês',
+        text: 'Com um valor de referência, o app mostra quanto ainda dá para gastar e avisa quando houver risco de passar do limite.',
+        extra: '<label class="field" style="margin:14px 0 0"><span>Quanto você quer gastar por mês? (R$)</span><input id="welcomeBudget" inputmode="decimal" placeholder="Ex.: 800" value="' + (max ? fmtNum(max) : '') + '"></label>',
+        buttons: '<button class="btn small" data-welcome="budget">Salvar e continuar</button><button class="btn small ghost" data-welcome="next">Definir depois</button>' },
+      inGroup()
+        ? { ic: '👨‍👩‍👧', title: 'Você já está em um grupo',
+            text: 'As notas do grupo ' + escapeHtml(group.name) + ', a lista de compras e a divisão de gastos ficam juntas. Cada pessoa escolhe o que mostra para o grupo em Minha conta.',
+            buttons: '<button class="btn small" data-welcome="done">Começar a usar</button>' }
+        : { ic: '👨‍👩‍👧', title: 'Junte quem divide as compras',
+            text: 'Crie um grupo e convide a família ou quem mora com você: as notas, a lista de compras e a divisão de gastos ficam em um só lugar. Você escolhe o que cada um vê.',
+            buttons: '<button class="btn small" data-welcome="group">Criar ou entrar em um grupo</button><button class="btn small ghost" data-welcome="done">Agora não</button>' }
+    ];
+    const s = steps[welcomeStep];
+    $('welcomeBody').innerHTML = '<div class="welcome-ic" aria-hidden="true">' + s.ic + '</div>' +
+      '<p class="welcome-step">Passo ' + (welcomeStep + 1) + ' de 3</p>' +
+      '<h3 id="welcomeTitle">' + s.title + '</h3><p>' + s.text + '</p>' + (s.extra || '') +
+      '<div class="welcome-btns">' + s.buttons + '</div>';
+    $('welcomeDots').innerHTML = steps.map((_, i) => '<i class="' + (i === welcomeStep ? 'on' : '') + '"></i>').join('');
+  }
+  async function onWelcomeClick(e) {
+    const b = e.target.closest('[data-welcome]');
+    if (!b) return;
+    const a = b.dataset.welcome;
+    const close = () => { markWelcomeSeen(); $('welcomeModal').classList.add('hidden'); };
+    if (a === 'next') { welcomeStep++; return renderWelcome(); }
+    if (a === 'budget') {
+      const v = parseMoney($('welcomeBudget').value);
+      if (v > 0) {
+        try { await saveBudMaxAll({ ...budMaxAll(), mine_month: Math.round(v * 100) / 100 }); toast('Orçamento do mês: ' + brl(v) + '.'); } catch (err) { cloudError(err); }
+      }
+      welcomeStep++;
+      return renderWelcome();
+    }
+    if (a === 'group') { close(); return showTab('account'); }
+    if (a === 'skip' || a === 'done') { close(); showTab('scan'); window.scrollTo({ top: 0 }); }
+  }
+
+  // ---------- Dicas curtas: aparecem uma vez só, na primeira vez que a pessoa abre cada aba ----------
+  const TIPS = {
+    mine: 'Aqui ficam todas as notas que você escaneou. Toque numa nota para ver os produtos, trocar a categoria ou escrever uma anotação.',
+    group: 'Aqui aparecem as notas que cada pessoa do grupo escolheu compartilhar, com o nome de quem escaneou.',
+    spend: 'Veja quanto você gastou por semana, mês ou ano. Toque numa barra para ver em que o dinheiro foi gasto.',
+    budget: 'O app estima quanto você ainda vai gastar no período, pela frequência com que compra cada produto. Defina um limite para acompanhar.',
+    save: 'Resumo do mês e onde dá para economizar: produtos que ficaram mais caros e lojas onde o mesmo produto sai mais barato.',
+    stock: 'Todos os produtos que você já comprou, somados. Toque num produto para ver cada compra e o preço que pagou.',
+    list: 'Monte a lista antes de ir ao mercado e toque nos itens para riscar. Ao escanear a nota, o app confere o que foi comprado.',
+    cart: 'O app monta um carrinho com o que provavelmente acabou na sua casa. Revise as quantidades e, se quiser, mande o pedido para a loja.',
+    search: 'Busque um produto, uma loja, uma etiqueta ou algo escrito nos comentários das notas.',
+    more: 'Aqui ficam sua conta, os avisos no celular, a aparência do app e o botão para relatar problemas.'
+  };
+  const TIPS_KEY = 'dicas_vistas';
+  function tipsSeen() { try { return JSON.parse(localStorage.getItem(TIPS_KEY) || '{}'); } catch (_) { return null; } }
+  function renderTip(tab) {
+    const el = $(TAB_IDS[tab]);
+    el.querySelector(':scope > .tip-card')?.remove();
+    const seen = tipsSeen();
+    if (!TIPS[tab] || !seen || seen[tab] || (CLOUD && !me)) return;
+    el.insertAdjacentHTML('afterbegin', '<div class="tip-card" role="note"><span class="tip-ic" aria-hidden="true">💡</span>' +
+      '<p>' + escapeHtml(TIPS[tab]) + '</p><button class="tip-ok" data-tip-ok="' + tab + '">Entendi</button></div>');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tip-ok]');
+    if (!b) return;
+    const seen = tipsSeen() || {};
+    seen[b.dataset.tipOk] = 1;
+    try { localStorage.setItem(TIPS_KEY, JSON.stringify(seen)); } catch (_) {}
+    b.closest('.tip-card').remove();
+  });
 
   // ---------- Resumo semanal (Início, domingo e segunda) ----------
   // No domingo mostra a semana atual (segunda a hoje); na segunda, a semana que acabou.
@@ -5827,6 +6177,7 @@
         (done.length ? '<p class="field-label li-done-head">No carrinho (' + done.length + ')</p>' + done.map(row).join('') : '');
 
     const sug = listSuggestions(g);
+    $('listSuggest').classList.toggle('hidden', !sug.out.length && !sug.frequent.length);
     $('listSuggest').innerHTML = '<h3 class="card-title">Sugestões do app</h3>' +
       (sug.out.length ? '<p class="muted">Pelo ritmo de compra, ' + (sug.out.length === 1 ? 'este item provavelmente acabou:' : 'estes ' + sug.out.length + ' itens provavelmente acabaram:') + '</p>' +
         '<div class="cat-picker">' + sug.out.slice(0, 16).map(p => '<button class="chip cart-chip-add" data-ladd="' + escapeHtml(p.key) + '">+ ' + escapeHtml(titleCase(p.name)) + '</button>').join('') + '</div>' +
@@ -5963,7 +6314,7 @@
       renderBatch();
       try {
         const data = parseNota(await fetchViaProxies(it.url));
-        if (!data.items.length) throw new Error('a SEFAZ não mostrou os produtos');
+        if (!data.items.length) throw new Error('o site da Fazenda não mostrou os produtos');
         const rec = reconcileWithList(it.url, data);
         const r = await addToHistory(it.url, data);
         it.status = r === 'repetida' ? 'repetida' : 'ok';
@@ -5986,7 +6337,7 @@
     $('batchTitle').textContent = !batch.items.length ? 'Toque em "Escanear QR Code" e vá apontando para as notas'
       : ok + (ok === 1 ? ' nota salva' : ' notas salvas') + (pend ? ' · ' + pend + ' na fila' : '');
     $('btnBatchDone').classList.toggle('hidden', !batch.items.length);
-    const ST = { fila: ['Na fila', 'wait', ''], lendo: ['Buscando na SEFAZ…', 'busy', ''], ok: ['Salva', 'ok', '✓'], repetida: ['Já estava salva', 'rep', '='], erro: ['Não deu', 'err', '!'] };
+    const ST = { fila: ['Na fila', 'wait', ''], lendo: ['Buscando a nota…', 'busy', ''], ok: ['Salva', 'ok', '✓'], repetida: ['Já estava salva', 'rep', '='], erro: ['Não deu', 'err', '!'] };
     $('batchList').innerHTML = batch.items.map((x, i) => {
       const [txt, cls, mark] = ST[x.status];
       return '<li class="b-' + cls + '"><span class="b-dot" aria-hidden="true">' + (x.status === 'lendo' ? '<span class="spinner"></span>' : mark) + '</span>' +
@@ -6265,6 +6616,9 @@
   $('listNew').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addFromInput(); } });
   $('listNewQty').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addFromInput(); } });
   $('notifCard').addEventListener('click', onNotifClick);
+  $('budAssist').addEventListener('click', onAssistClick);
+  $('welcomeModal').addEventListener('click', onWelcomeClick);
+  $('welcomeModal').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'welcomeBudget') document.querySelector('[data-welcome="budget"]').click(); });
   $('notifCard').addEventListener('change', (e) => {
     const k = e.target.dataset.notifKind;
     if (!k) return;
@@ -6452,6 +6806,7 @@
     renderHistory();
     renderHome();
     handleShared();
+    maybeShowWelcome();
   }
 </script>
 </body>
